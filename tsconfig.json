@@ -51,7 +51,13 @@
       "huaweicloud": ["huaweicloud/src"],
       "@spinnaker/tencentcloud": ["tencentcloud/src"],
       "tencentcloud/*": ["tencentcloud/src/*"],
-      "tencentcloud": ["tencentcloud/src"]
+      "tencentcloud": ["tencentcloud/src"],
+      "@spinnaker/azure": ["azure/src"],
+      "azure/*": ["azure/src/*"],
+      "azure": ["azure/src"],
+      "@spinnaker/ecs": ["ecs/src"],
+      "ecs/*": ["ecs/src/*"],
+      "ecs": ["ecs/src"]
     },
     "pretty": true,
     "removeComments": false,
@@ -62,6 +68,6 @@
     "target": "es6",
     "typeRoots": ["node_modules/@types"]
   },
-  "exclude": ["build", "node", "node_modules", "transpiled"],
+  "exclude": ["build", "node", "node_modules", "transpiled", "**/*.stories.*"],
   "include": ["test/helpers/custom-matchers.d.ts", "app/scripts/modules/**/*.ts", "app/scripts/modules/**/*.tsx"]
 }

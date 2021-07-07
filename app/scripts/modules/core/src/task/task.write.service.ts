@@ -1,8 +1,9 @@
-import { API } from 'core/api/ApiService';
+import { REST } from 'core/api/ApiService';
+import { DebugWindow } from 'core/utils/consoleDebug';
+
 import { ITask } from '../domain';
 import { TaskReader } from './task.read.service';
 import { ITaskCommand } from './taskExecutor';
-import { DebugWindow } from 'core/utils/consoleDebug';
 
 export interface ITaskCreateResult {
   ref: string;
@@ -10,12 +11,12 @@ export interface ITaskCreateResult {
 
 export class TaskWriter {
   public static postTaskCommand(taskCommand: ITaskCommand): PromiseLike<ITaskCreateResult> {
-    return API.all('tasks').post(taskCommand);
+    return REST('/tasks').post(taskCommand);
   }
 
   public static cancelTask(taskId: string): PromiseLike<ITask> {
-    return API.all('tasks')
-      .one(taskId, 'cancel')
+    return REST('/tasks')
+      .path(taskId, 'cancel')
       .put()
       .then(() =>
         TaskReader.getTask(taskId).then((task) =>

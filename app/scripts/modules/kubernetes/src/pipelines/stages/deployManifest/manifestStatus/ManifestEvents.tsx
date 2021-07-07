@@ -1,12 +1,13 @@
-import React from 'react';
 import { get, trim } from 'lodash';
 import { DateTime } from 'luxon';
+import React from 'react';
+
 import {
   IManifest,
   IManifestEvent,
-  relativeTime,
-  JobManifestPodLogs,
   JobEventBasedPodNameProvider,
+  JobManifestPodLogs,
+  relativeTime,
 } from '@spinnaker/core';
 
 export interface IManifestEventsProps {
@@ -79,7 +80,7 @@ export class ManifestEvents extends React.Component<IManifestEventsProps> {
             <JobManifestPodLogs
               account={this.props.manifest.account}
               location={namespace}
-              podNameProvider={new JobEventBasedPodNameProvider(this.props.manifest, e)}
+              podNamesProviders={[new JobEventBasedPodNameProvider(this.props.manifest, e)]}
               linkName="Console Output (Raw)"
             />
           </div>

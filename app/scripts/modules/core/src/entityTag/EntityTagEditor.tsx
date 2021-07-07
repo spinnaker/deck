@@ -1,11 +1,11 @@
-import React from 'react';
 import { Form } from 'formik';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
 
 import { Application } from 'core/application';
 import { IEntityRef, IEntityTag } from 'core/domain';
 import { HelpField } from 'core/help';
-import { SubmitButton, ModalClose } from 'core/modal';
+import { ModalClose, SubmitButton } from 'core/modal';
 import {
   FormField,
   FormikFormField,
@@ -15,8 +15,7 @@ import {
   SpinFormik,
   TextAreaInput,
 } from 'core/presentation';
-import { NgReact } from 'core/reactShims';
-import { TaskMonitor } from 'core/task';
+import { TaskMonitor, TaskMonitorWrapper } from 'core/task';
 import { noop, UUIDGenerator } from 'core/utils';
 
 import { EntityRefBuilder } from './entityRef.builder';
@@ -137,8 +136,6 @@ export class EntityTagEditor extends React.Component<IEntityTagEditorProps, IEnt
     const ownerOptions = opts || [];
 
     const submitLabel = `${isNew ? ' Create' : ' Update'} ${tag.value.type}`;
-
-    const { TaskMonitorWrapper } = NgReact;
 
     return (
       <div>

@@ -1,21 +1,20 @@
-import { IAmazonLoadBalancerSourceData } from './IAmazonLoadBalancerSourceData';
 import {
+  IInstance,
+  IInstanceCounts,
   ILoadBalancer,
   ILoadBalancerDeleteCommand,
   ILoadBalancerUpsertCommand,
-  IInstance,
-  IInstanceCounts,
   ISubnet,
 } from '@spinnaker/core';
-
 import { IAuthenticateOidcActionConfig } from 'amazon/loadBalancer/OidcConfigReader';
 
+import { IAmazonLoadBalancerSourceData } from './IAmazonLoadBalancerSourceData';
 import { IAmazonServerGroup } from './IAmazonServerGroup';
 
 export type ClassicListenerProtocol = 'HTTP' | 'HTTPS' | 'TCP' | 'SSL';
 export type ALBListenerProtocol = 'HTTP' | 'HTTPS';
 export type IListenerActionType = 'forward' | 'authenticate-oidc' | 'redirect';
-export type NLBListenerProtocol = 'TCP';
+export type NLBListenerProtocol = 'TCP' | 'TLS' | 'UDP';
 
 export interface IAmazonLoadBalancer extends ILoadBalancer {
   availabilityZones?: string[];
@@ -209,6 +208,8 @@ export interface INLBTargetGroupDescription {
   attributes: {
     // Defaults to 300
     deregistrationDelay?: number;
+    deregistrationDelayConnectionTermination?: boolean;
+    preserveClientIp?: boolean;
   };
   // Defaults to 10
   healthCheckInterval?: number;
@@ -262,6 +263,7 @@ export interface IAmazonClassicLoadBalancerUpsertCommand extends IAmazonLoadBala
 
 export interface IAmazonApplicationLoadBalancerUpsertCommand extends IAmazonLoadBalancerUpsertCommand {
   deletionProtection: boolean;
+  ipAddressType?: string;
   idleTimeout: number;
   listeners: IListenerDescription[];
   targetGroups: IALBTargetGroupDescription[];

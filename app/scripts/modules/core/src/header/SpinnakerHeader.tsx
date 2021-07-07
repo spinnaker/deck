@@ -1,31 +1,19 @@
+import { useCurrentStateAndParams, useSrefActive } from '@uirouter/react';
 import React from 'react';
 import { useRecoilState } from 'recoil';
-import { useCurrentStateAndParams, useSrefActive } from '@uirouter/react';
-import { UIRouterContext } from '@uirouter/react-hybrid';
 
-import { NgReact } from 'core/reactShims';
+import { Icon } from '@spinnaker/presentation';
 import { verticalNavExpandedAtom } from 'core/application/nav/navAtoms';
+import { UserMenu } from 'core/authentication/userMenu/UserMenu';
 import { CollapsibleSectionStateCache } from 'core/cache';
-import { Overridable } from 'core/overrideRegistry';
-import { GlobalSearch } from 'core/search/global/GlobalSearch';
 import { HelpMenu } from 'core/help/HelpMenu';
-import { Icon } from 'core/presentation';
+import { overridableComponent } from 'core/overrideRegistry';
+import { GlobalSearch } from 'core/search/global/GlobalSearch';
+import { logger } from 'core/utils';
 
 import './SpinnakerHeader.css';
 
-@UIRouterContext
-@Overridable('spinnakerHeader')
-export class SpinnakerHeader extends React.Component<{}, {}> {
-  public render(): React.ReactElement<SpinnakerHeader> {
-    return <SpinnakerHeaderContent />;
-  }
-}
-
-/**
- * This needs to be a functional component to use an external module's hook.
- * Currently, @Overrides only works on a class component.
- * This is temproary until we can refactor the override component to work for functional components.
- */
+const LOG_CATEGORY = 'Navbar';
 
 export const SpinnakerHeaderContent = () => {
   const { state: currentState } = useCurrentStateAndParams();
@@ -36,6 +24,7 @@ export const SpinnakerHeaderContent = () => {
   const toggleNav = () => {
     setVerticalNavExpanded(!verticalNavExpanded);
     CollapsibleSectionStateCache.setExpanded('verticalNav', !verticalNavExpanded);
+    logger.log({ category: LOG_CATEGORY, action: !verticalNavExpanded ? 'ExpandVerticalNav' : 'CollapseVerticalNav' });
   };
 
   const isDevicePhoneOrSmaller = () => {
@@ -45,11 +34,33 @@ export const SpinnakerHeaderContent = () => {
   };
   const [navExpanded] = React.useState(!isDevicePhoneOrSmaller());
 
-  const { UserMenu } = NgReact;
   const searchSref = useSrefActive('home.infrastructure', null, 'active');
   const projectsSref = useSrefActive('home.projects', null, 'active');
   const appsSref = useSrefActive('home.applications', null, 'active');
   const templatesSref = useSrefActive('home.pipeline-templates', null, 'active');
+
+  const navItems = [
+    {
+      key: 'navHome',
+      text: 'Search',
+      srefProps: searchSref,
+    },
+    {
+      key: 'navProjects',
+      text: 'Projects',
+      srefProps: projectsSref,
+    },
+    {
+      key: 'navApplications',
+      text: 'Applications',
+      srefProps: appsSref,
+    },
+    {
+      key: 'navPipelineTemplates',
+      text: 'Pipeline Templates',
+      srefProps: templatesSref,
+    },
+  ];
 
   return (
     <nav className="container spinnaker-header" role="navigation" aria-label="Main Menu">
@@ -71,18 +82,22 @@ export const SpinnakerHeaderContent = () => {
       {navExpanded && (
         <div className="nav-container nav-items">
           <ul className="nav nav-items flex-1 page-nav">
-            <li key="navHome">
-              <a {...searchSref}>Search</a>
-            </li>
-            <li key="navProjects">
-              <a {...projectsSref}>Projects</a>
-            </li>
-            <li key="navApplications">
-              <a {...appsSref}>Applications</a>
-            </li>
-            <li key="navPipelineTemplates">
-              <a {...templatesSref}>Pipeline Templates</a>
-            </li>
+            {navItems.map((item) => {
+              const { onClick, ...restProps } = item.srefProps;
+              return (
+                <li key={item.key}>
+                  <a
+                    {...restProps}
+                    onClick={(e) => {
+                      onClick(e);
+                      logger.log({ category: LOG_CATEGORY, action: item.key });
+                    }}
+                  >
+                    {item.text}
+                  </a>
+                </li>
+              );
+            })}
             <GlobalSearch />
           </ul>
           <ul className="nav nav-items">
@@ -94,3 +109,5 @@ export const SpinnakerHeaderContent = () => {
     </nav>
   );
 };
+
+export const SpinnakerHeader = overridableComponent(SpinnakerHeaderContent, 'spinnakerHeader');

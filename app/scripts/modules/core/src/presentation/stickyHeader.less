@@ -1,4 +1,4 @@
-@import (reference) '~core/presentation/less/imports/commonImports.less';
+@import (reference) './less/imports/commonImports.less';
 
 .sticky-header {
   position: sticky;
@@ -12,6 +12,10 @@
     flex: 1 1 auto;
     background-color: var(--color-accent-g2);
     align-items: center;
+
+    &.in-migration {
+      background-color: var(--color-status-warning-light);
+    }
   }
   .clearfix();
 }

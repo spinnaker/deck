@@ -1,18 +1,19 @@
-import React from 'react';
 import { Debounce } from 'lodash-decorators';
+import React from 'react';
 import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application/application.model';
+import { BannerContainer } from 'core/banner';
+import { ILoadBalancerGroup } from 'core/domain';
 import { FilterTags, IFilterTag } from 'core/filterModel/FilterTags';
 import { ISortFilter } from 'core/filterModel/IFilterModel';
-import { ILoadBalancerGroup } from 'core/domain';
+import { HelpField } from 'core/help';
+import { ReactInjector } from 'core/reactShims';
 import { LoadBalancerState } from 'core/state';
-import { LoadBalancerPod } from './LoadBalancerPod';
-import { BannerContainer } from 'core/banner';
 import { Spinner } from 'core/widgets/spinners/Spinner';
 
-import { NgReact, ReactInjector } from 'core/reactShims';
 import { CreateLoadBalancerButton } from './CreateLoadBalancerButton';
+import { LoadBalancerPod } from './LoadBalancerPod';
 
 export interface ILoadBalancersProps {
   app: Application;
@@ -116,7 +117,6 @@ export class LoadBalancers extends React.Component<ILoadBalancersProps, ILoadBal
   };
 
   public render(): React.ReactElement<LoadBalancers> {
-    const { HelpField } = NgReact;
     const groupings = this.state.initialized ? (
       <div>
         {this.state.groups.map((group) => (
@@ -174,7 +174,12 @@ export class LoadBalancers extends React.Component<ILoadBalancersProps, ILoadBal
                       checked={this.state.showInstances}
                       onChange={this.handleInputChange}
                     />{' '}
-                    Instances <HelpField placement="right" id="loadBalancers.filter.instances" />
+                    Instances{' '}
+                    <HelpField
+                      key="loadBalancers.filter.instances"
+                      placement="right"
+                      id="loadBalancers.filter.instances"
+                    />
                   </label>
                 </div>
               </div>

@@ -1,7 +1,8 @@
 import React from 'react';
-import ReactGA from 'react-ga';
 
 import { IExecution } from 'core/domain';
+import { logger } from 'core/utils';
+
 import './ExecutionBuildLink.less';
 
 export interface IExecutionBuildLinkProps {
@@ -14,7 +15,7 @@ export class ExecutionBuildLink extends React.Component<IExecutionBuildLinkProps
   }
 
   private handleBuildInfoClick = (event: React.MouseEvent<HTMLElement>) => {
-    ReactGA.event({ category: 'Pipeline', action: 'Execution build number clicked - build info' });
+    logger.log({ category: 'Pipeline', action: 'Execution build number clicked - build info' });
     event.stopPropagation();
   };
 

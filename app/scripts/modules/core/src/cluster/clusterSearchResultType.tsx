@@ -1,28 +1,28 @@
-import React from 'react';
 import { uniqBy } from 'lodash';
+import React from 'react';
 import { Observable } from 'rxjs';
+import { filter, first, map } from 'rxjs/operators';
 
 import { IQueryParams } from 'core/navigation';
 import { ReactInjector } from 'core/reactShims';
 import { Registry } from 'core/registry';
-import { IServerGroupSearchResult } from 'core/serverGroup/serverGroupSearchResultType';
-
 import {
-  searchResultTypeRegistry,
   AccountCell,
+  DefaultSearchResultTab,
+  HeaderCell,
   HrefCell,
   ISearchColumn,
-  DefaultSearchResultTab,
+  ISearchResult,
+  ISearchResults,
+  ISearchResultSet,
+  SearchResultType,
+  searchResultTypeRegistry,
   SearchStatus,
-  HeaderCell,
   SearchTableBody,
   SearchTableHeader,
   SearchTableRow,
-  ISearchResult,
-  SearchResultType,
-  ISearchResultSet,
-  ISearchResults,
 } from 'core/search';
+import { IServerGroupSearchResult } from 'core/serverGroup/serverGroupSearchResultType';
 
 export interface IClusterSearchResult extends ISearchResult {
   account: string;
@@ -83,10 +83,10 @@ class ClustersSearchResultType extends SearchResultType<IClusterSearchResult> {
     _params: IQueryParams,
     otherResults: Observable<ISearchResultSet>,
   ): Observable<ISearchResults<IClusterSearchResult>> {
-    return otherResults
-      .filter((resultSet) => resultSet.type.id === 'serverGroups')
-      .first()
-      .map((resultSet: ISearchResultSet) => {
+    return otherResults.pipe(
+      filter((resultSet) => resultSet.type.id === 'serverGroups'),
+      first(),
+      map((resultSet: ISearchResultSet) => {
         const { status, results, error } = resultSet;
         if (status === SearchStatus.ERROR) {
           throw error;
@@ -96,7 +96,8 @@ class ClustersSearchResultType extends SearchResultType<IClusterSearchResult> {
         const searchResults = serverGroups.map((sg) => this.makeSearchResult(sg));
         const clusters: IClusterSearchResult[] = uniqBy(searchResults, (sg) => `${sg.account}-${sg.cluster}`);
         return { results: clusters };
-      });
+      }),
+    );
   }
 
   public displayFormatter(searchResult: IClusterSearchResult) {

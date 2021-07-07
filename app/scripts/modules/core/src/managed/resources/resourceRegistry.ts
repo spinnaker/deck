@@ -1,27 +1,91 @@
+import { BasePluginManager } from '../plugins/BasePluginManager';
 import { IconNames } from '../../presentation';
-import { IManagedResourceSummary } from '../../domain';
 
 const UNKNOWN_RESOURCE_ICON = 'placeholder';
-
-const resourceConfigsByKind: { [kind: string]: IResourceKindConfig } = {};
 
 export interface IResourceKindConfig {
   kind: string;
   iconName: IconNames;
-  // Short-term way of making custom links on the client for each resource.
-  // Soon we'll add a details drawer that all resource kinds will open when clicked,
-  // and each kind will implement their details drawer with any relevant links/pointers.
-  // This should be removed when that work is complete.
-  experimentalDisplayLink?: (resource: IManagedResourceSummary) => string;
+  experimentalDisplayLink?: (resource: IResourceLinkProps) => string;
 }
 
-export const isResourceKindSupported = (kind: string) => resourceConfigsByKind.hasOwnProperty(kind);
+export interface IResourceLinkProps {
+  kind: string;
+  account?: string;
+  stack?: string;
+  detail?: string;
+  displayName?: string;
+}
 
-export const registerResourceKind = (config: IResourceKindConfig) => {
-  resourceConfigsByKind[config.kind] = config;
-};
+class ResourcesManager extends BasePluginManager<IResourceKindConfig> {
+  public getIcon(kind: string) {
+    return this.getHandler(kind)?.iconName ?? UNKNOWN_RESOURCE_ICON;
+  }
 
-export const getResourceIcon = (kind: string) => resourceConfigsByKind[kind]?.iconName ?? UNKNOWN_RESOURCE_ICON;
+  public getExperimentalDisplayLink(resource: IResourceLinkProps): string | undefined {
+    return this.getHandler(resource.kind)?.experimentalDisplayLink?.(resource);
+  }
 
-export const getExperimentalDisplayLink = (resource: IManagedResourceSummary) =>
-  resourceConfigsByKind[resource.kind]?.experimentalDisplayLink?.(resource) ?? null;
+  // Returns the base "spinnaker" type. e.g. ec2/cluster@1.1 -> cluster
+  public getSpinnakerType(kind: string): string {
+    const normalizedKind = this.normalizeKind(kind);
+    const spinnakerType = normalizedKind.split('/')?.[1];
+    return spinnakerType || normalizedKind;
+  }
+
+  public getNativeResourceRoutingInfo({
+    kind,
+    account,
+    stack,
+    detail,
+    displayName,
+  }: IResourceLinkProps): { state: string; params: { [key in string]?: string } } | undefined {
+    const kindName = this.getSpinnakerType(kind);
+    const params = {
+      acct: account,
+      stack,
+      detail,
+      q: displayName,
+    };
+
+    switch (kindName) {
+      case 'cluster':
+        return { state: 'home.applications.application.insight.clusters', params };
+
+      case 'security-group':
+        return { state: 'home.applications.application.insight.firewalls', params };
+
+      case 'classic-load-balancer':
+      case 'application-load-balancer':
+        return { state: 'home.applications.application.insight.loadBalancers', params };
+    }
+
+    return undefined;
+  }
+}
+
+const DEFAULT_RESOURCES: IResourceKindConfig[] = [
+  {
+    kind: 'titus/cluster',
+    iconName: 'cluster',
+  },
+  {
+    kind: 'ec2/cluster',
+    iconName: 'cluster',
+  },
+  {
+    kind: 'ec2/security-group',
+    iconName: 'securityGroup',
+  },
+  {
+    kind: 'ec2/classic-load-balancer',
+    iconName: 'loadBalancer',
+  },
+  {
+    kind: 'ec2/application-load-balancer',
+    iconName: 'loadBalancer',
+  },
+];
+
+// TODO: this should not be global - convert it to React Context
+export const resourceManager = new ResourcesManager(DEFAULT_RESOURCES);

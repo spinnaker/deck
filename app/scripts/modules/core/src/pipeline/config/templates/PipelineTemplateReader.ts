@@ -1,10 +1,11 @@
-
-import { $q } from 'ngimport';
 import { flatten } from 'lodash';
-import { API } from 'core/api/ApiService';
+import { $q } from 'ngimport';
+
+import { REST } from 'core/api/ApiService';
+import { IPipelineTemplateConfigV2 } from 'core/domain';
 import { IPipeline } from 'core/domain/IPipeline';
 import { IPipelineTemplateV2Collections } from 'core/domain/IPipelineTemplateV2';
-import { IPipelineTemplateConfigV2 } from 'core/domain';
+
 import { PipelineTemplateV2Service } from './v2/pipelineTemplateV2.service';
 
 export interface IPipelineTemplate {
@@ -84,9 +85,8 @@ export class PipelineTemplateReader {
     executionId?: string,
     pipelineConfigId?: string,
   ): PromiseLike<IPipelineTemplate> {
-    return API.one('pipelineTemplates')
-      .one('resolve')
-      .withParams({ source, executionId, pipelineConfigId })
+    return REST('/pipelineTemplates/resolve')
+      .query({ source, executionId, pipelineConfigId })
       .get()
       .then((template: IPipelineTemplate) => {
         template.selfLink = source;
@@ -98,15 +98,14 @@ export class PipelineTemplateReader {
     config: IPipelineTemplateConfig | IPipelineTemplateConfigV2,
     executionId?: string,
   ): PromiseLike<IPipeline> {
-    const urls = PipelineTemplateV2Service.isV2PipelineConfig(config)
-      ? ['v2', 'pipelineTemplates', 'plan']
-      : ['pipelines', 'start'];
-
-    return API.one(...urls).post({ ...config, plan: true, executionId });
+    const endpoint = PipelineTemplateV2Service.isV2PipelineConfig(config)
+      ? '/v2/pipelineTemplates/plan'
+      : '/pipelines/start';
+    return REST(endpoint).post({ ...config, plan: true, executionId });
   }
 
   public static getPipelineTemplatesByScope = (scope: string): PromiseLike<IPipelineTemplate[]> => {
-    return API.one('pipelineTemplates').withParams({ scope }).get();
+    return REST('/pipelineTemplates').query({ scope }).get();
   };
 
   public static getPipelineTemplatesByScopes(scopes: string[]): PromiseLike<IPipelineTemplate[]> {
@@ -141,6 +140,6 @@ export class PipelineTemplateReader {
   }
 
   public static getV2PipelineTemplateList(): PromiseLike<IPipelineTemplateV2Collections> {
-    return API.one('v2', 'pipelineTemplates', 'versions').get();
+    return REST('/v2/pipelineTemplates/versions').get();
   }
 }

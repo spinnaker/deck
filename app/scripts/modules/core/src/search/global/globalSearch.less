@@ -1,4 +1,4 @@
-@import (reference) '~core/presentation/less/imports/commonImports.less';
+@import (reference) '../../presentation/less/imports/commonImports.less';
 
 global-search {
   position: relative;
@@ -66,6 +66,9 @@ global-search {
         }
         &.sublink {
           padding: 3px 4px;
+        }
+        &.query-match {
+          background-color: var(--color-primary-g1);
         }
       }
       .sublink-label {

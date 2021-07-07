@@ -1,26 +1,27 @@
-import { CreatePipelineButton } from '../create/CreatePipelineButton';
-import { IScheduler } from 'core/scheduler/SchedulerFactory';
-import React from 'react';
-import ReactGA from 'react-ga';
 import { get } from 'lodash';
 import { $q } from 'ngimport';
+import React from 'react';
 import { Subscription } from 'rxjs';
 
 import { Application } from 'core/application';
-import { IPipeline, IPipelineCommand, IExecution } from 'core/domain';
-import { ReactInjector } from 'core/reactShims';
-import { ManualExecutionModal } from '../manualExecution';
+import { IExecution, IPipeline, IPipelineCommand } from 'core/domain';
+import { FilterCollapse, FilterTags, IFilterTag, ISortFilter } from 'core/filterModel';
+import { Overridable } from 'core/overrideRegistry';
 import { Tooltip } from 'core/presentation/Tooltip';
+import { ReactInjector } from 'core/reactShims';
+import { SchedulerFactory } from 'core/scheduler';
+import { IScheduler } from 'core/scheduler/SchedulerFactory';
+import { ExecutionState } from 'core/state';
+import { logger } from 'core/utils';
+import { IRetryablePromise } from 'core/utils/retryablePromise';
+import { Spinner } from 'core/widgets/spinners/Spinner';
 
 import { CreatePipeline } from '../config/CreatePipeline';
+import { CreatePipelineButton } from '../create/CreatePipelineButton';
+import { ExecutionGroups } from './executionGroup/ExecutionGroups';
 import { ExecutionFilters } from '../filter/ExecutionFilters';
 import { ExecutionFilterService } from '../filter/executionFilter.service';
-import { ExecutionGroups } from './executionGroup/ExecutionGroups';
-import { FilterTags, FilterCollapse, IFilterTag, ISortFilter } from 'core/filterModel';
-import { Spinner } from 'core/widgets/spinners/Spinner';
-import { ExecutionState } from 'core/state';
-import { IRetryablePromise } from 'core/utils/retryablePromise';
-import { SchedulerFactory } from 'core/scheduler';
+import { ManualExecutionModal } from '../manualExecution';
 
 import './executions.less';
 
@@ -39,6 +40,12 @@ export interface IExecutionsState {
   reloadingForFilters: boolean;
 }
 
+// This Set ensures we only forward once from .executions to .executionDetails for an aged out execution
+const forwardedExecutions = new Set();
+// This ensures we only forward to permalink on landing, not on future refreshes
+let disableForwarding = false;
+
+@Overridable('PipelineExecutions')
 export class Executions extends React.Component<IExecutionsProps, IExecutionsState> {
   private executionsRefreshUnsubscribe: Function;
   private groupsUpdatedSubscription: Subscription;
@@ -129,12 +136,12 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   }
 
   private expand = (): void => {
-    ReactGA.event({ category: 'Pipelines', action: 'Expand All' });
+    logger.log({ category: 'Pipelines', action: 'Expand All' });
     ExecutionState.filterModel.expandSubject.next(true);
   };
 
   private collapse = (): void => {
-    ReactGA.event({ category: 'Pipelines', action: 'Collapse All' });
+    logger.log({ category: 'Pipelines', action: 'Collapse All' });
     ExecutionState.filterModel.expandSubject.next(false);
   };
 
@@ -157,7 +164,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   };
 
   private triggerPipeline(pipeline: IPipeline = null): void {
-    ReactGA.event({ category: 'Pipelines', action: 'Trigger Pipeline (top level)' });
+    logger.log({ category: 'Pipelines', action: 'Trigger Pipeline (top level)' });
     ManualExecutionModal.show({
       pipeline: pipeline,
       application: this.props.app,
@@ -171,6 +178,22 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
 
   private clearManualExecutionParam(): void {
     ReactInjector.$state.go('.', { startManualExecution: null }, { inherit: true, location: 'replace' });
+  }
+
+  private handleAgedOutExecutions(executionId: string, forwardToPermalink: boolean): void {
+    const { $state, executionService } = ReactInjector;
+    if (forwardToPermalink && executionId && !forwardedExecutions.has(executionId)) {
+      // We only want to forward to permalink on initial load
+      executionService.getExecution(executionId).then(() => {
+        const detailsState = $state.current.name.replace('executions.execution', 'executionDetails.execution');
+        const { stage, step, details } = $state.params;
+        forwardedExecutions.add(executionId);
+        $state.go(detailsState, { executionId, stage, step, details });
+      });
+    } else {
+      // Handles the case where we already forwarded once and user navigated back, so do not forward again.
+      $state.go('.^');
+    }
   }
 
   public componentDidMount(): void {
@@ -203,9 +226,11 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
         if ($state.params.executionId) {
           const executions: IExecution[] = app.executions.data;
           if (executions.every((e) => e.id !== $state.params.executionId)) {
-            $state.go('.^');
+            this.handleAgedOutExecutions($state.params.executionId, !disableForwarding);
           }
         }
+        // After the very first refresh interval (landing), we do not want to forward the user to the permalink
+        disableForwarding = true;
       },
       () => this.dataInitializationFailure(),
     );
@@ -243,7 +268,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
 
   private groupByChanged = (event: React.ChangeEvent<HTMLSelectElement>): void => {
     const value = event.target.value;
-    ReactGA.event({ category: 'Pipelines', action: 'Group By', label: value });
+    logger.log({ category: 'Pipelines', action: 'Group By', data: { label: value } });
     this.state.sortFilter.groupBy = value;
     this.updateExecutionGroups();
   };
@@ -251,7 +276,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
   private showCountChanged = (event: React.ChangeEvent<HTMLSelectElement>): void => {
     const value = event.target.value;
     this.state.sortFilter.count = parseInt(value, 10);
-    ReactGA.event({ category: 'Pipelines', action: 'Change Count', label: value });
+    logger.log({ category: 'Pipelines', action: 'Change Count', data: { label: value } });
     this.updateExecutionGroups(true);
   };
 
@@ -262,7 +287,7 @@ export class Executions extends React.Component<IExecutionsProps, IExecutionsSta
     //       (or similar) store.
     this.state.sortFilter.showDurations = checked;
     this.setState({ sortFilter: this.state.sortFilter });
-    ReactGA.event({ category: 'Pipelines', action: 'Toggle Durations', label: checked.toString() });
+    logger.log({ category: 'Pipelines', action: 'Toggle Durations', data: { label: checked.toString() } });
   };
 
   public render(): React.ReactElement<Executions> {

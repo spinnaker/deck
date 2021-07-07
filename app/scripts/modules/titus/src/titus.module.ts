@@ -1,42 +1,34 @@
 import { module } from 'angular';
 
-import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 import { AmazonLoadBalancersTag } from '@spinnaker/amazon';
+import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
-import { TITUS_SERVERGROUP_DETAILS_CAPACITYDETAILSSECTION } from './serverGroup/details/capacityDetailsSection.component';
-import { TITUS_SERVERGROUP_DETAILS_LAUNCHCONFIGSECTION } from './serverGroup/details/launchConfigSection.component';
-import './validation/ApplicationNameValidator';
 import './help/titus.help';
-import { TITUS_REACT_MODULE } from './reactShims/titus.react.module';
+import { TitusInstanceDetails } from './instance/details/TitusInstanceDetails';
+import titusLogo from './logo/titus.logo.png';
+import { TITUS_PIPELINE_STAGES_BAKE_TITUSBAKESTAGE } from './pipeline/stages/bake/titusBakeStage';
+import { TITUS_PIPELINE_STAGES_CLONESERVERGROUP_TITUSCLONESERVERGROUPSTAGE } from './pipeline/stages/cloneServerGroup/titusCloneServerGroupStage';
+import { TITUS_PIPELINE_STAGES_DESTROYASG_TITUSDESTROYASGSTAGE } from './pipeline/stages/destroyAsg/titusDestroyAsgStage';
+import { TITUS_PIPELINE_STAGES_DISABLEASG_TITUSDISABLEASGSTAGE } from './pipeline/stages/disableAsg/titusDisableAsgStage';
+import { TITUS_PIPELINE_STAGES_DISABLECLUSTER_TITUSDISABLECLUSTERSTAGE } from './pipeline/stages/disableCluster/titusDisableClusterStage';
+import { TITUS_PIPELINE_STAGES_ENABLEASG_TITUSENABLEASGSTAGE } from './pipeline/stages/enableAsg/titusEnableAsgStage';
+import { TITUS_PIPELINE_STAGES_FINDAMI_TITUSFINDAMISTAGE } from './pipeline/stages/findAmi/titusFindAmiStage';
+import { TITUS_PIPELINE_STAGES_RESIZEASG_TITUSRESIZEASGSTAGE } from './pipeline/stages/resizeAsg/titusResizeAsgStage';
 import './pipeline/stages/runJob/titusRunJobStage';
-
-import { TitusCloneServerGroupModal } from './serverGroup/configure/wizard/TitusCloneServerGroupModal';
-
-import './logo/titus.logo.less';
+import { TITUS_PIPELINE_STAGES_SCALEDOWNCLUSTER_TITUSSCALEDOWNCLUSTERSTAGE } from './pipeline/stages/scaleDownCluster/titusScaleDownClusterStage';
+import { TITUS_PIPELINE_STAGES_SHRINKCLUSTER_TITUSSHRINKCLUSTERSTAGE } from './pipeline/stages/shrinkCluster/titusShrinkClusterStage';
+import { TITUS_REACT_MODULE } from './reactShims/titus.react.module';
 import { TITUS_SECURITYGROUP_SECURITYGROUP_READ_SERVICE } from './securityGroup/securityGroup.read.service';
-import { TITUS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_TITUS_CONTROLLER } from './serverGroup/details/serverGroupDetails.titus.controller';
 import { TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER } from './serverGroup/configure/ServerGroupCommandBuilder';
 import { TITUS_SERVERGROUP_CONFIGURE_SERVERGROUP_CONFIGURE_TITUS_MODULE } from './serverGroup/configure/serverGroup.configure.titus.module';
+import { TitusCloneServerGroupModal } from './serverGroup/configure/wizard/TitusCloneServerGroupModal';
+import { TITUS_SERVERGROUP_DETAILS_CAPACITYDETAILSSECTION } from './serverGroup/details/capacityDetailsSection.component';
+import { TITUS_SERVERGROUP_DETAILS_LAUNCHCONFIGSECTION } from './serverGroup/details/launchConfigSection.component';
+import { TITUS_SERVERGROUP_DETAILS_SERVERGROUPDETAILS_TITUS_CONTROLLER } from './serverGroup/details/serverGroupDetails.titus.controller';
 import { TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER } from './serverGroup/serverGroup.transformer';
-import { TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER } from './instance/details/instance.details.controller';
-import { TITUS_PIPELINE_STAGES_FINDAMI_TITUSFINDAMISTAGE } from './pipeline/stages/findAmi/titusFindAmiStage';
-import { TITUS_PIPELINE_STAGES_ENABLEASG_TITUSENABLEASGSTAGE } from './pipeline/stages/enableAsg/titusEnableAsgStage';
-import { TITUS_PIPELINE_STAGES_DISABLEASG_TITUSDISABLEASGSTAGE } from './pipeline/stages/disableAsg/titusDisableAsgStage';
-import { TITUS_PIPELINE_STAGES_DESTROYASG_TITUSDESTROYASGSTAGE } from './pipeline/stages/destroyAsg/titusDestroyAsgStage';
-import { TITUS_PIPELINE_STAGES_RESIZEASG_TITUSRESIZEASGSTAGE } from './pipeline/stages/resizeAsg/titusResizeAsgStage';
-import { TITUS_PIPELINE_STAGES_CLONESERVERGROUP_TITUSCLONESERVERGROUPSTAGE } from './pipeline/stages/cloneServerGroup/titusCloneServerGroupStage';
-import { TITUS_PIPELINE_STAGES_BAKE_TITUSBAKESTAGE } from './pipeline/stages/bake/titusBakeStage';
-import { TITUS_PIPELINE_STAGES_DISABLECLUSTER_TITUSDISABLECLUSTERSTAGE } from './pipeline/stages/disableCluster/titusDisableClusterStage';
-import { TITUS_PIPELINE_STAGES_SHRINKCLUSTER_TITUSSHRINKCLUSTERSTAGE } from './pipeline/stages/shrinkCluster/titusShrinkClusterStage';
-import { TITUS_PIPELINE_STAGES_SCALEDOWNCLUSTER_TITUSSCALEDOWNCLUSTERSTAGE } from './pipeline/stages/scaleDownCluster/titusScaleDownClusterStage';
+import './validation/ApplicationNameValidator';
 
-import { TITUS_INSTANCE_INFORMATION_COMPONENT } from './instance/details/titusInstanceInformation.component';
-
-// load all templates into the $templateCache
-const templates = require.context('./', true, /\.html$/);
-templates.keys().forEach(function (key) {
-  templates(key);
-});
+import './logo/titus.logo.less';
 
 export const TITUS_MODULE = 'spinnaker.titus';
 module(TITUS_MODULE, [
@@ -46,7 +38,6 @@ module(TITUS_MODULE, [
   TITUS_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER,
   TITUS_SERVERGROUP_CONFIGURE_SERVERGROUP_CONFIGURE_TITUS_MODULE,
   TITUS_SERVERGROUP_SERVERGROUP_TRANSFORMER,
-  TITUS_INSTANCE_DETAILS_INSTANCE_DETAILS_CONTROLLER,
   TITUS_PIPELINE_STAGES_FINDAMI_TITUSFINDAMISTAGE,
   TITUS_PIPELINE_STAGES_ENABLEASG_TITUSENABLEASGSTAGE,
   TITUS_PIPELINE_STAGES_DISABLEASG_TITUSDISABLEASGSTAGE,
@@ -59,12 +50,11 @@ module(TITUS_MODULE, [
   TITUS_PIPELINE_STAGES_SCALEDOWNCLUSTER_TITUSSCALEDOWNCLUSTERSTAGE,
   TITUS_SERVERGROUP_DETAILS_CAPACITYDETAILSSECTION,
   TITUS_SERVERGROUP_DETAILS_LAUNCHCONFIGSECTION,
-  TITUS_INSTANCE_INFORMATION_COMPONENT,
 ]).config(() => {
   CloudProviderRegistry.registerProvider('titus', {
     name: 'Titus',
     logo: {
-      path: require('./logo/titus.logo.png'),
+      path: titusLogo,
     },
     serverGroup: {
       transformer: 'titusServerGroupTransformer',
@@ -90,8 +80,7 @@ module(TITUS_MODULE, [
       useProvider: 'aws',
     },
     instance: {
-      detailsTemplateUrl: require('./instance/details/instanceDetails.html'),
-      detailsController: 'titusInstanceDetailsCtrl',
+      details: TitusInstanceDetails,
     },
   });
 });

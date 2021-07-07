@@ -1,10 +1,13 @@
 import React from 'react';
 import Select, { Option } from 'react-select';
 
-import { IExecution, IExecutionStage } from 'core/domain';
 import { Application } from 'core/application/application.model';
+import { ApplicationReader } from 'core/application/service/ApplicationReader';
+import { AuthenticationService } from 'core/authentication';
+import { IExecution, IExecutionStage } from 'core/domain';
 import { Markdown } from 'core/presentation/Markdown';
-import { NgReact, ReactInjector } from 'core/reactShims';
+import { ReactInjector } from 'core/reactShims';
+import { Spinner } from 'core/widgets/spinners/Spinner';
 
 export interface IManualJudgmentApprovalProps {
   execution: IExecution;
@@ -16,6 +19,8 @@ export interface IManualJudgmentApprovalState {
   submitting: boolean;
   judgmentDecision: string;
   judgmentInput: { value?: string };
+  applicationRoles: { READ?: string[]; WRITE?: string[]; EXECUTE?: string[]; CREATE?: string[] };
+  userRoles: string[];
   error: boolean;
 }
 
@@ -29,8 +34,24 @@ export class ManualJudgmentApproval extends React.Component<
       submitting: false,
       judgmentDecision: null,
       judgmentInput: {},
+      applicationRoles: {},
+      userRoles: [],
       error: false,
     };
+  }
+
+  public componentDidMount() {
+    const applicationName = this.props.execution.application;
+    ApplicationReader.getApplicationPermissions(applicationName).then((result) => {
+      if (result) {
+        this.setState({
+          applicationRoles: result,
+        });
+      }
+    });
+    this.setState({
+      userRoles: AuthenticationService.getAuthenticatedUser().roles,
+    });
   }
 
   private provideJudgment(judgmentDecision: string): void {
@@ -38,6 +59,33 @@ export class ManualJudgmentApproval extends React.Component<
     const judgmentInput: string = this.state.judgmentInput ? this.state.judgmentInput.value : null;
     this.setState({ submitting: true, error: false, judgmentDecision });
     ReactInjector.manualJudgmentService.provideJudgment(application, execution, stage, judgmentDecision, judgmentInput);
+  }
+
+  private isManualJudgmentStageNotAuthorized(): boolean {
+    let isStageNotAuthorized = true;
+    let returnOnceFalse = true;
+    const { applicationRoles, userRoles } = this.state;
+    const stageRoles = this.props.stage?.context?.selectedStageRoles || [];
+    if (!stageRoles.length) {
+      isStageNotAuthorized = false;
+      return isStageNotAuthorized;
+    }
+    const { CREATE, EXECUTE, WRITE } = applicationRoles;
+    userRoles.forEach((userRole) => {
+      if (returnOnceFalse) {
+        if (stageRoles.includes(userRole)) {
+          isStageNotAuthorized =
+            (WRITE || []).includes(userRole) || (EXECUTE || []).includes(userRole) || (CREATE || []).includes(userRole);
+          if (isStageNotAuthorized) {
+            isStageNotAuthorized = false;
+            returnOnceFalse = false;
+          } else {
+            isStageNotAuthorized = true;
+          }
+        }
+      }
+    });
+    return isStageNotAuthorized;
   }
 
   private isSubmitting(decision: string): boolean {
@@ -71,7 +119,6 @@ export class ManualJudgmentApproval extends React.Component<
       !['SKIPPED', 'SUCCEEDED'].includes(status) && (!stage.context.judgmentStatus || status === 'RUNNING');
 
     const hasInstructions = !!stage.context.instructions;
-    const { ButtonBusyIndicator } = NgReact;
 
     return (
       <div>
@@ -103,24 +150,26 @@ export class ManualJudgmentApproval extends React.Component<
                 className="btn btn-danger"
                 onClick={this.handleStopClick}
                 disabled={
+                  this.isManualJudgmentStageNotAuthorized() ||
                   this.state.submitting ||
                   stage.context.judgmentStatus ||
                   (options.length && !this.state.judgmentInput.value)
                 }
               >
-                {this.isSubmitting('stop') && <ButtonBusyIndicator />}
+                {this.isSubmitting('stop') && <Spinner mode="circular" />}
                 {stage.context.stopButtonLabel || 'Stop'}
               </button>
               <button
                 className="btn btn-primary"
                 disabled={
+                  this.isManualJudgmentStageNotAuthorized() ||
                   this.state.submitting ||
                   stage.context.judgmentStatus ||
                   (options.length && !this.state.judgmentInput.value)
                 }
                 onClick={this.handleContinueClick}
               >
-                {this.isSubmitting('continue') && <ButtonBusyIndicator />}
+                {this.isSubmitting('continue') && <Spinner mode="circular" />}
                 {stage.context.continueButtonLabel || 'Continue'}
               </button>
             </div>

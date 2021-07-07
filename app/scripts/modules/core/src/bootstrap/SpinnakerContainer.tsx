@@ -1,11 +1,13 @@
-import * as React from 'react';
 import { UIView } from '@uirouter/react';
-import { SpinErrorBoundary } from 'core/presentation/SpinErrorBoundary';
+import { UIRouterContextComponent } from '@uirouter/react-hybrid';
+import * as React from 'react';
 import { RecoilRoot } from 'recoil';
 
+import { SpinErrorBoundary } from 'core/presentation/SpinErrorBoundary';
+
+import { SpinnakerHeader } from '../header/SpinnakerHeader';
 import { CustomBanner } from '../header/customBanner/CustomBanner';
 import { Notifier } from '../widgets/notifier/Notifier';
-import { SpinnakerHeader } from '../header/SpinnakerHeader';
 import { Spinner } from '../widgets/spinners/Spinner';
 
 export interface ISpinnakerContainerProps {
@@ -24,7 +26,9 @@ export const SpinnakerContainer = ({ authenticating, routing }: ISpinnakerContai
         )}
         <div className="navbar-inverse grid-header">
           <CustomBanner />
-          <SpinnakerHeader />
+          <UIRouterContextComponent>
+            <SpinnakerHeader />
+          </UIRouterContextComponent>
         </div>
         <div className="spinnaker-content grid-contents">{!authenticating && <UIView name="main" />}</div>
       </div>

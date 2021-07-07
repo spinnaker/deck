@@ -1,8 +1,9 @@
+import { filter, find, get, orderBy } from 'lodash';
 import React from 'react';
 import { Dropdown, MenuItem, Tooltip } from 'react-bootstrap';
-import { filter, find, get, orderBy } from 'lodash';
 
 import {
+  AddEntityTagLinks,
   ClusterTargetBuilder,
   ConfirmationModalService,
   IOwnerOption,
@@ -10,17 +11,16 @@ import {
   IServerGroupJob,
   ManagedMenuItem,
   ModalInjector,
-  NgReact,
   Overridable,
   ReactInjector,
   ServerGroupWarningMessageService,
   SETTINGS,
 } from '@spinnaker/core';
-
 import { IAmazonServerGroup, IAmazonServerGroupView } from 'amazon/domain';
-import { AmazonCloneServerGroupModal } from '../configure/wizard/AmazonCloneServerGroupModal';
 import { AwsReactInjector } from 'amazon/reactShims';
+
 import { IAmazonServerGroupCommand } from '../configure';
+import { AmazonCloneServerGroupModal } from '../configure/wizard/AmazonCloneServerGroupModal';
 import {
   AmazonResizeServerGroupModal,
   IAmazonResizeServerGroupModalProps,
@@ -285,7 +285,6 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
   public render(): JSX.Element {
     const { app, serverGroup } = this.props;
 
-    const { AddEntityTagLinks } = NgReact;
     const showEntityTags = SETTINGS.feature && SETTINGS.feature.entityTags;
     const entityTagTargets: IOwnerOption[] = ClusterTargetBuilder.buildClusterTargets(serverGroup);
 

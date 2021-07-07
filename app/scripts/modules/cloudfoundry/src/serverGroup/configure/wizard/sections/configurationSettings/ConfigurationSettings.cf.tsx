@@ -1,23 +1,16 @@
+import { FormikProps } from 'formik';
 import React from 'react';
 
-import { FormikProps } from 'formik';
-
 import {
+  ArtifactTypePatterns,
   IArtifact,
   IExpectedArtifact,
-  IWizardPageComponent,
   IPipeline,
   IStage,
+  IWizardPageComponent,
   RadioButtonInput,
   StageArtifactSelector,
-  ArtifactTypePatterns,
 } from '@spinnaker/core';
-
-import {
-  ICloudFoundryCreateServerGroupCommand,
-  ICloudFoundryManifest,
-} from '../../../serverGroupConfigurationModel.cf';
-
 import { ICloudFoundryEnvVar } from 'cloudfoundry/domain';
 import {
   Buildpacks,
@@ -28,6 +21,11 @@ import {
   Routes,
   Services,
 } from 'cloudfoundry/presentation';
+
+import {
+  ICloudFoundryCreateServerGroupCommand,
+  ICloudFoundryManifest,
+} from '../../../serverGroupConfigurationModel.cf';
 
 export interface ICloudFoundryServerGroupConfigurationSettingsProps {
   formik: FormikProps<ICloudFoundryCreateServerGroupCommand>;

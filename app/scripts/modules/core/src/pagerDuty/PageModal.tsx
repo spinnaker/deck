@@ -1,16 +1,16 @@
+import { get } from 'lodash';
 import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import { get } from 'lodash';
 
 import { Application, ApplicationModelBuilder } from 'core/application';
-import { IPagerDutyService } from './pagerDuty.read.service';
-import { PagerDutyWriter } from './pagerDuty.write.service';
-import { NgReact, ReactInjector } from 'core/reactShims';
 import { SETTINGS } from 'core/config';
 import { SubmitButton } from 'core/modal';
-import { TaskMonitor } from 'core/task';
+import { ReactInjector } from 'core/reactShims';
+import { TaskMonitor, TaskMonitorWrapper } from 'core/task';
 
 import { IPageButtonProps } from './PageButton';
+import { IPagerDutyService } from './pagerDuty.read.service';
+import { PagerDutyWriter } from './pagerDuty.write.service';
 
 export interface IPageModalProps {
   applications?: Application[];
@@ -111,8 +111,6 @@ export class PageModal extends React.Component<IPageModalProps, IPageModalState>
 
   public render() {
     const formValid = true;
-
-    const { TaskMonitorWrapper } = NgReact;
     const { services } = this.props;
     const { accountName, details, pageCount, subject, submitting, taskMonitor } = this.state;
 

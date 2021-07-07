@@ -1,11 +1,20 @@
 import { module } from 'angular';
 
-import { API } from '@spinnaker/core';
+import { REST } from '@spinnaker/core';
+
+import { IEcsCapacityProviderDetails } from './IEcsCapacityProviderDetails';
 import { IEcsClusterDescriptor } from './IEcsCluster';
 
 export class EcsClusterReader {
   public listClusters(): PromiseLike<IEcsClusterDescriptor[]> {
-    return API.all('ecs').all('ecsClusters').getList();
+    return REST('/ecs/ecsClusters').get();
+  }
+
+  public describeClusters(account: string, region: string): PromiseLike<IEcsCapacityProviderDetails[]> {
+    if (account != null && region != null) {
+      return REST('/ecs/ecsClusterDescriptions').path(account).path(region).get();
+    }
+    return {} as PromiseLike<IEcsCapacityProviderDetails[]>;
   }
 }
 

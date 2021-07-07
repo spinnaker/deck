@@ -1,26 +1,25 @@
-
-
 import { $q } from 'ngimport';
 
-import { API } from 'core/api/ApiService';
-import { IEntityTags, IEntityTag, ICreationMetadataTag } from '../domain/IEntityTags';
+import { REST } from 'core/api/ApiService';
 import { Application } from 'core/application/application.model';
+import { SETTINGS } from 'core/config/settings';
 import {
   IExecution,
+  IFunction,
+  ILoadBalancer,
   IPipeline,
+  ISecurityGroup,
   IServerGroup,
   IServerGroupManager,
-  ILoadBalancer,
-  ISecurityGroup,
-  IFunction,
 } from 'core/domain';
-import { SETTINGS } from 'core/config/settings';
+
+import { ICreationMetadataTag, IEntityTag, IEntityTags } from '../domain/IEntityTags';
 
 export class EntityTagsReader {
   public static getAllEntityTagsForApplication(application: string): PromiseLike<IEntityTags[]> {
-    return API.one('tags')
-      .withParams({ maxResults: SETTINGS.entityTags.maxResults || 5000, application })
-      .getList()
+    return REST('/tags')
+      .query({ maxResults: SETTINGS.entityTags.maxResults || 5000, application })
+      .get()
       .then((allTags: IEntityTags[]) => this.flattenTagsAndAddMetadata(allTags));
   }
 
@@ -148,12 +147,12 @@ export class EntityTagsReader {
     if (!entityId) {
       return $q.when([]);
     }
-    return API.one('tags')
-      .withParams({
+    return REST('/tags')
+      .query({
         entityType: entityType.toLowerCase(),
         entityId,
       })
-      .getList()
+      .get()
       .then((entityTagGroups: IEntityTags[]) => {
         return this.flattenTagsAndAddMetadata(entityTagGroups);
       })

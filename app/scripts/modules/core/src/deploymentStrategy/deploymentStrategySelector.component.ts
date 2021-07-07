@@ -1,6 +1,7 @@
-import { withErrorBoundary } from 'core/presentation/SpinErrorBoundary';
 import { module } from 'angular';
 import { react2angular } from 'react2angular';
+
+import { withErrorBoundary } from 'core/presentation/SpinErrorBoundary';
 
 import { DeploymentStrategySelector } from './DeploymentStrategySelector';
 
@@ -9,6 +10,7 @@ module(DEPLOYMENT_STRATEGY_SELECTOR_COMPONENT, []).component(
   'deploymentStrategySelector',
   react2angular(withErrorBoundary(DeploymentStrategySelector, 'deploymentStrategySelector'), [
     'command',
+    'onFieldChange',
     'onStrategyChange',
     'labelColumns',
     'fieldColumns',

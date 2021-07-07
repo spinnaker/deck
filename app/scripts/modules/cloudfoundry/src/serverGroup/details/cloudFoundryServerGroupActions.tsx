@@ -1,27 +1,26 @@
-import React from 'react';
-
-import { Dropdown, Tooltip } from 'react-bootstrap';
 import { filter, find, get, orderBy } from 'lodash';
+import React from 'react';
+import { Dropdown, Tooltip } from 'react-bootstrap';
 
 import {
+  AddEntityTagLinks,
   ClusterTargetBuilder,
   ConfirmationModalService,
   IOwnerOption,
   IServerGroupActionsProps,
   IServerGroupJob,
-  NgReact,
   ReactInjector,
   ServerGroupWarningMessageService,
   SETTINGS,
 } from '@spinnaker/core';
-
 import { ICloudFoundryServerGroup } from 'cloudfoundry/domain';
+
+import { CloudFoundryServerGroupCommandBuilder } from '../configure';
 import { CloudFoundryCreateServerGroupModal } from '../configure/wizard/CreateServerGroupModal';
-import { CloudFoundryResizeServerGroupModal } from './resize/CloudFoundryResizeServerGroupModal';
-import { CloudFoundryRollbackServerGroupModal } from './rollback/CloudFoundryRollbackServerGroupModal';
 import { CloudFoundryMapLoadBalancersModal } from './mapLoadBalancers/CloudFoundryMapLoadBalancersModal';
 import { CloudFoundryUnmapLoadBalancersModal } from './mapLoadBalancers/CloudFoundryUnmapLoadBalancersModal';
-import { CloudFoundryServerGroupCommandBuilder } from '../configure';
+import { CloudFoundryResizeServerGroupModal } from './resize/CloudFoundryResizeServerGroupModal';
+import { CloudFoundryRollbackServerGroupModal } from './rollback/CloudFoundryRollbackServerGroupModal';
 
 export interface ICloudFoundryServerGroupActionsProps extends IServerGroupActionsProps {
   serverGroup: ICloudFoundryServerGroup;
@@ -285,7 +284,6 @@ export class CloudFoundryServerGroupActions extends React.Component<ICloudFoundr
   public render(): JSX.Element {
     const { app, serverGroup } = this.props;
     const { loadBalancers } = serverGroup;
-    const { AddEntityTagLinks } = NgReact;
     const showEntityTags = SETTINGS.feature && SETTINGS.feature.entityTags;
     const entityTagTargets: IOwnerOption[] = ClusterTargetBuilder.buildClusterTargets(serverGroup);
 

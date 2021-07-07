@@ -1,24 +1,23 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import { module } from 'angular';
 import _ from 'lodash';
 import { Subject } from 'rxjs';
 
 import {
   AccountService,
+  filterObjectValues,
+  FirewallLabels,
   InfrastructureCaches,
+  ModalWizard,
   NameUtils,
   SECURITY_GROUP_READER,
   SecurityGroupWriter,
-  FirewallLabels,
   TaskMonitor,
-  ModalWizard,
-  filterObjectValues,
 } from '@spinnaker/core';
-
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import { VpcReader } from 'amazon/vpc/VpcReader';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 
 export const AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER =
   'spinnaker.amazon.securityGroup.baseConfig.controller';
@@ -322,7 +321,8 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
 
     ctrl.updateName = function () {
       const { securityGroup } = $scope;
-      const name = NameUtils.getClusterName(application.name, securityGroup.stack, securityGroup.detail);
+      const appName = application.isStandalone ? application.name.split('-')[0] : application.name;
+      const name = NameUtils.getClusterName(appName, securityGroup.stack, securityGroup.detail);
       securityGroup.name = name;
       $scope.namePreview = name;
     };
@@ -347,7 +347,7 @@ module(AMAZON_SECURITYGROUP_CONFIGURE_CONFIGSECURITYGROUP_MIXIN_CONTROLLER, [
 
     ctrl.updateRuleType = function (type, ruleset, index) {
       const rule = ruleset[index];
-      if (type === 'icmp') {
+      if (type === 'icmp' || type === 'icmpv6') {
         rule.startPort = 0;
         rule.endPort = 0;
       }

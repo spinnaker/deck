@@ -1,10 +1,11 @@
 import { IHttpPromiseCallbackArg } from 'angular';
+import { $q } from 'ngimport';
 
 import { ITask } from 'core/domain';
+
+import { AuthenticationService } from '../authentication/AuthenticationService';
 import { TaskReader } from './task.read.service';
 import { TaskWriter } from './task.write.service';
-import { AuthenticationService } from '../authentication/AuthenticationService';
-import { $q } from 'ngimport';
 
 export interface IJob {
   [attribute: string]: any;
@@ -48,15 +49,13 @@ export class TaskExecutor {
         return TaskReader.getTask(taskId);
       },
       (response: IHttpPromiseCallbackArg<any>) => {
+        const message: string = response.data?.message || 'Sorry, no more information.';
         const error: any = {
           status: response.status,
           message: response.statusText,
+          log: message,
+          failureMessage: message,
         };
-        if (response.data && response.data.message) {
-          error.log = response.data.message;
-        } else {
-          error.log = 'Sorry, no more information.';
-        }
         return $q.reject(error);
       },
     );

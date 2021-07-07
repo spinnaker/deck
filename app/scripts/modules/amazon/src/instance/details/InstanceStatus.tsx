@@ -75,11 +75,13 @@ export const InstanceStatus = ({
                 )}
                 {hasLoadBalancer &&
                   metric.type === 'LoadBalancer' &&
-                  (metric.loadBalancers || []).map((lb) => <InstanceLoadBalancerHealth loadBalancer={lb} />)}
+                  (metric.loadBalancers || []).map((lb) => (
+                    <InstanceLoadBalancerHealth key={`lb-${lb.name}`} loadBalancer={lb} />
+                  ))}
                 {hasTargetGroup &&
                   metric.type === 'TargetGroup' &&
                   (metric.targetGroups || []).map((tg) => (
-                    <InstanceLoadBalancerHealth loadBalancer={tg} ipAddress={privateIpAddress} />
+                    <InstanceLoadBalancerHealth key={`tg-${tg.name}`} loadBalancer={tg} ipAddress={privateIpAddress} />
                   ))}
               </dd>
             </React.Fragment>

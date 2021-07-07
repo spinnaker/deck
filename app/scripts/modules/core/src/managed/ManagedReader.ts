@@ -1,23 +1,23 @@
-import { get, set, flatMap } from 'lodash';
+import { flatMap, get, set } from 'lodash';
 
-import { API } from 'core/api';
+import { REST } from 'core/api';
 import {
   IManagedApplicationSummary,
-  ManagedResourceStatus,
-  IManagedResourceEventHistoryResponse,
-  IManagedResourceEventHistory,
   IManagedResourceDiff,
   IManagedResourceEvent,
+  IManagedResourceEventHistory,
+  IManagedResourceEventHistoryResponse,
+  ManagedResourceStatus,
 } from 'core/domain';
 
-const KIND_NAME_MATCHER = /.*\/(.*?)@/i;
+import { resourceManager } from './resources/resourceRegistry';
+import { sortEnvironments } from './utils/sortEnvironments';
+
 const RESOURCE_DIFF_LIST_MATCHER = /^(.*)\[(.*)\]$/i;
 
+// TODO: remove this function
 export const getKindName = (kind: string) => {
-  const match = kind.match(KIND_NAME_MATCHER);
-  const extractedKind = match && match[1];
-
-  return extractedKind || kind;
+  return resourceManager.getSpinnakerType(kind);
 };
 
 export const getResourceKindForLoadBalancerType = (type: string) => {
@@ -31,8 +31,9 @@ export const getResourceKindForLoadBalancerType = (type: string) => {
   }
 };
 
-const transformManagedResourceDiff = (diff: IManagedResourceEventHistoryResponse[0]['delta']): IManagedResourceDiff =>
-  Object.keys(diff).reduce((transformed, key) => {
+const transformManagedResourceDiff = (diff: IManagedResourceEventHistoryResponse[0]['delta']): IManagedResourceDiff => {
+  if (!diff) return {};
+  return Object.keys(diff).reduce((transformed, key) => {
     const diffNode = diff[key];
     const fieldKeys = flatMap<string, string>(key.split('/').filter(Boolean), (fieldKey) => {
       // Region keys currently come wrapped in {}, which is distracting and not useful. Let's trim those off.
@@ -66,6 +67,7 @@ const transformManagedResourceDiff = (diff: IManagedResourceEventHistoryResponse
     });
     return transformed;
   }, {} as IManagedResourceDiff);
+};
 
 export class ManagedReader {
   private static decorateResources(response: IManagedApplicationSummary) {
@@ -81,24 +83,30 @@ export class ManagedReader {
   }
 
   public static getApplicationSummary(app: string): PromiseLike<IManagedApplicationSummary<'resources'>> {
-    return API.one('managed')
-      .one('application', app)
-      .withParams({ entities: 'resources' })
-      .get()
-      .then(this.decorateResources);
+    return REST('/managed/application').path(app).query({ entities: 'resources' }).get().then(this.decorateResources);
+  }
+
+  public static getProcessedDeliveryConfig(app: string): PromiseLike<string> {
+    return REST('/managed/application').path(app).path('config').headers({ Accept: 'application/x-yaml' }).get();
+  }
+
+  public static getRawDeliveryConfig(app: string): PromiseLike<string> {
+    return REST('/managed/application').path(app).path('config', 'raw').headers({ Accept: 'application/x-yaml' }).get();
   }
 
   public static getEnvironmentsSummary(app: string): PromiseLike<IManagedApplicationSummary> {
-    return API.one('managed')
-      .one('application', app)
-      .withParams({ entities: ['resources', 'artifacts', 'environments'], maxArtifactVersions: 30 })
+    return REST('/managed/application')
+      .path(app)
+      .query({ entities: ['resources', 'artifacts', 'environments'], maxArtifactVersions: 30 })
       .get()
-      .then(this.decorateResources);
+      .then(this.decorateResources)
+      .then(sortEnvironments);
   }
 
   public static getResourceHistory(resourceId: string): PromiseLike<IManagedResourceEventHistory> {
-    return API.one('history', resourceId)
-      .withParams({ limit: 100 })
+    return REST('/history')
+      .path(resourceId)
+      .query({ limit: 100 })
       .get()
       .then((response: IManagedResourceEventHistoryResponse) => {
         response.forEach((event) => {

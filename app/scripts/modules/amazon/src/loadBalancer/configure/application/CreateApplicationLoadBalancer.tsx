@@ -1,28 +1,26 @@
-import React from 'react';
 import { cloneDeep, get } from 'lodash';
-
+import React from 'react';
 
 import {
   AccountService,
   FirewallLabels,
   ILoadBalancerModalProps,
   LoadBalancerWriter,
+  noop,
   ReactInjector,
   ReactModal,
   TaskMonitor,
   WizardModal,
   WizardPage,
-  noop,
 } from '@spinnaker/core';
-
 import { AWSProviderSettings } from 'amazon/aws.settings';
 import { IAmazonApplicationLoadBalancer, IAmazonApplicationLoadBalancerUpsertCommand } from 'amazon/domain';
 
-import { ALBListeners } from './ALBListeners';
 import { ALBAdvancedSettings } from './ALBAdvancedSettings';
+import { ALBListeners } from './ALBListeners';
 import { TargetGroups } from './TargetGroups';
-import { SecurityGroups } from '../common/SecurityGroups';
 import { LoadBalancerLocation } from '../common/LoadBalancerLocation';
+import { SecurityGroups } from '../common/SecurityGroups';
 import { AwsLoadBalancerTransformer } from '../../loadBalancer.transformer';
 
 import '../common/configure.less';
@@ -160,10 +158,16 @@ export class CreateApplicationLoadBalancer extends React.Component<
     });
   }
 
+  private setIpAddressType(command: IAmazonApplicationLoadBalancerUpsertCommand): void {
+    command.ipAddressType = command.dualstack ? 'dualstack' : 'ipv4';
+    delete command.dualstack;
+  }
+
   private formatCommand(command: IAmazonApplicationLoadBalancerUpsertCommand): void {
     this.setAvailabilityZones(command);
     this.manageTargetGroupNames(command);
     this.manageRules(command);
+    this.setIpAddressType(command);
   }
 
   protected onApplicationRefresh(values: IAmazonApplicationLoadBalancerUpsertCommand): void {
@@ -229,6 +233,7 @@ export class CreateApplicationLoadBalancer extends React.Component<
     if (forPipelineConfig) {
       // don't submit to backend for creation. Just return the loadBalancerCommand object
       this.formatListeners(loadBalancerCommandFormatted).then(() => {
+        this.setIpAddressType(loadBalancerCommandFormatted);
         closeModal && closeModal(loadBalancerCommandFormatted);
       });
     } else {

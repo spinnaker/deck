@@ -1,11 +1,12 @@
 import React, { memo, useState } from 'react';
-import ReactGA from 'react-ga';
 
-import { Application } from '../application';
+import { Illustration, IllustrationName } from '@spinnaker/presentation';
+import { logger } from 'core/utils';
+
 import { Button } from './Button';
+import { ManagedWriter } from './ManagedWriter';
+import { Application } from '../application';
 import {
-  Illustration,
-  IllustrationName,
   IModalComponentProps,
   ModalBody,
   ModalFooter,
@@ -13,13 +14,12 @@ import {
   showModal,
   ValidationMessage,
 } from '../presentation';
-import { ManagedWriter } from './ManagedWriter';
 
 const logClick = (label: string, application: string) =>
-  ReactGA.event({
+  logger.log({
     category: 'Environments - toggle application management modal',
     action: `${label} clicked`,
-    label: application,
+    data: { label: application },
   });
 
 export interface IToggleManagedResourceForApplicationModalProps extends IModalComponentProps {
@@ -95,7 +95,7 @@ export const ToggleManagedResourceForApplicationModal = memo(
       call
         .then(() => dataSource.refresh(true).catch(() => null))
         .then(() => {
-          closeModal();
+          closeModal?.();
         })
         .catch((error: Error) => {
           setActionError(error.data);

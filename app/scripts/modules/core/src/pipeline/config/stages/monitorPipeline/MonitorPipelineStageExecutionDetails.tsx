@@ -1,14 +1,12 @@
-import React from 'react';
 import { UISref } from '@uirouter/react';
-
-import { IExecutionDetailsSectionProps, ExecutionDetailsSection } from '../common';
-import { StageFailureMessage } from '../../../details';
 import _ from 'lodash';
+import React from 'react';
+
+import { ExecutionDetailsSection, IExecutionDetailsSectionProps } from '../common';
+import { StageFailureMessage } from '../../../details';
 
 export function MonitorPipelineStageExecutionDetails(props: IExecutionDetailsSectionProps) {
   const {
-    application,
-    execution,
     stage: { context = {}, outputs = {} },
     stage,
     name,
@@ -47,20 +45,17 @@ export function MonitorPipelineStageExecutionDetails(props: IExecutionDetailsSec
           {statuses.map((status) => {
             return (
               <div key={status.executionId}>
-                <span className={'label label-default label-' + status.status.toLowerCase()}>{status.status}</span>
+                <span className={'label label-default label-' + status.status.toLowerCase()}>{status.status}</span>{' '}
                 <UISref
                   key={status.executionId}
                   to="home.applications.application.pipelines.executionDetails.execution"
                   params={{
                     application: status.application,
                     executionId: status.executionId,
-                    executionParams: { application: application.name, executionId: execution.id },
                   }}
                   options={{ inherit: false, reload: 'home.applications.application.pipelines.executionDetails' }}
                 >
-                  <span>
-                    &nbsp;<a target="_self">{status.executionId}</a>
-                  </span>
+                  <a>{status.executionId}</a>
                 </UISref>{' '}
                 ({status.application})
                 {status.failureMessage && <StageFailureMessage stage={stage} message={status.failureMessage} />}

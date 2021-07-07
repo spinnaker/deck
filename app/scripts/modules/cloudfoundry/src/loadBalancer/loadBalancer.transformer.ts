@@ -8,7 +8,6 @@ import {
   ILoadBalancerUpsertCommand,
   IServerGroup,
 } from '@spinnaker/core';
-
 import {
   ICloudFoundryLoadBalancer,
   ICloudFoundryLoadBalancerUpsertCommand,
@@ -81,6 +80,7 @@ export class CloudFoundryLoadBalancerTransformer {
       region: '',
       domain: '',
       serverGroups: [],
+      routes: [],
     };
   }
 

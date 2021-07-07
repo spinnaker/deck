@@ -1,9 +1,10 @@
 import React from 'react';
 import { Dropdown } from 'react-bootstrap';
 
-import { Application } from '../application';
-import { Illustration, IllustrationName } from '../presentation';
+import { Illustration, IllustrationName } from '@spinnaker/presentation';
+
 import { showToggleManagedResourceModal } from './ToggleManagedResourceForApplication';
+import { Application } from '../application';
 
 import './EnvironmentsHeader.less';
 

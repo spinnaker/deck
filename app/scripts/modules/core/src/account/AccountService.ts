@@ -1,13 +1,15 @@
-import { chain, intersection, zipObject, uniq } from 'lodash';
 import { IQResolveReject } from 'angular';
+import { chain, intersection, uniq, zipObject } from 'lodash';
 import { $log, $q } from 'ngimport';
-import { Observable } from 'rxjs';
+import { defer as observableDefer, from as observableFrom, Observable } from 'rxjs';
+import { map, publishReplay, refCount } from 'rxjs/operators';
 
+import { REST } from 'core/api/ApiService';
 import { Application } from 'core/application/application.model';
-import { API } from 'core/api/ApiService';
-import { CloudProviderRegistry } from '../cloudProvider/CloudProviderRegistry';
 import { SETTINGS } from 'core/config/settings';
 import { ILoadBalancer, IServerGroup } from 'core/domain';
+
+import { CloudProviderRegistry } from '../cloudProvider/CloudProviderRegistry';
 
 export interface IRegion {
   account?: string;
@@ -36,6 +38,7 @@ export interface IAccountDetails extends IAccount {
   authorized: boolean;
   awsAccount?: string;
   awsVpc?: string;
+  bastionHost?: string;
   challengeDestructiveActions: boolean;
   cloudProvider: string;
   defaultKeyPair?: string;
@@ -64,17 +67,17 @@ export class AccountService {
   public static providers$: Observable<string[]>;
 
   public static initialize(): void {
-    this.accounts$ = Observable.defer(() => {
-      const promise = API.one('credentials').useCache().withParams({ expand: true }).get();
-      return Observable.fromPromise<IAccountDetails[]>(promise);
-    })
-      .publishReplay(1)
-      .refCount();
+    this.accounts$ = observableDefer(() => {
+      const promise = REST('/credentials').useCache().query({ expand: true }).get<IAccountDetails[]>();
+      return observableFrom(promise);
+    }).pipe(publishReplay(1), refCount());
 
-    this.providers$ = AccountService.accounts$.map((accounts: IAccountDetails[]) => {
-      const providersFromAccounts: string[] = uniq(accounts.map((account) => account.type));
-      return intersection(providersFromAccounts, CloudProviderRegistry.listRegisteredProviders());
-    });
+    this.providers$ = AccountService.accounts$.pipe(
+      map((accounts: IAccountDetails[]) => {
+        const providersFromAccounts: string[] = uniq(accounts.map((account) => account.type));
+        return intersection(providersFromAccounts, CloudProviderRegistry.listRegisteredProviders());
+      }),
+    );
   }
 
   public static challengeDestructiveActions(account: string): PromiseLike<boolean> {
@@ -96,7 +99,7 @@ export class AccountService {
   }
 
   public static getArtifactAccounts(): PromiseLike<IArtifactAccount[]> {
-    return API.one('artifacts').one('credentials').useCache().get();
+    return REST('/artifacts/credentials').useCache().get();
   }
 
   public static getAccountDetails(account: string): PromiseLike<IAccountDetails> {
@@ -183,8 +186,8 @@ export class AccountService {
   }
 
   public static listProviders$(application: Application = null): Observable<string[]> {
-    return this.providers$
-      .map((available: string[]) => {
+    return this.providers$.pipe(
+      map((available: string[]) => {
         if (!application) {
           return available;
         } else if (application.attributes.cloudProviders.length) {
@@ -194,15 +197,20 @@ export class AccountService {
         } else {
           return available;
         }
-      })
-      .map((results) => results.sort());
+      }),
+      map((results) => results.sort()),
+    );
   }
 
   public static listProviders(application: Application = null): PromiseLike<string[]> {
     return $q.when(this.listProviders$(application).toPromise());
   }
 
-  public static getAccountForInstance(cloudProvider: string, instanceId: string, app: Application): PromiseLike<string> {
+  public static getAccountForInstance(
+    cloudProvider: string,
+    instanceId: string,
+    app: Application,
+  ): PromiseLike<string> {
     return app.ready().then(() => {
       const serverGroups = app.getDataSource('serverGroups').data as IServerGroup[];
       const loadBalancers = app.getDataSource('loadBalancers').data as ILoadBalancer[];

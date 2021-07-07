@@ -1,18 +1,17 @@
+import { Form, Formik, FormikProps } from 'formik';
+import { merge, without } from 'lodash';
 import React from 'react';
-import { Formik, Form, FormikProps } from 'formik';
 import { Modal } from 'react-bootstrap';
-import { without, merge } from 'lodash';
 
-import { TaskMonitor } from 'core/task';
-import { NgReact } from 'core/reactShims';
-import { Spinner } from 'core/widgets';
 import { SpinFormik } from 'core/presentation';
+import { TaskMonitor, TaskMonitorWrapper } from 'core/task';
+import { Spinner } from 'core/widgets';
 
-import { IModalComponentProps } from '../../presentation';
-import { ModalClose } from '../buttons/ModalClose';
-import { SubmitButton } from '../buttons/SubmitButton';
 import { WizardPage } from './WizardPage';
 import { WizardStepLabel } from './WizardStepLabel';
+import { ModalClose } from '../buttons/ModalClose';
+import { SubmitButton } from '../buttons/SubmitButton';
+import { IModalComponentProps } from '../../presentation';
 
 export interface IWizardPageInjectedProps<T> {
   formik: FormikProps<T>;
@@ -133,7 +132,6 @@ export class WizardModal<T = {}>
       dismissModal,
     } = this.props;
     const { currentPage, initialized, pages } = this.state;
-    const { TaskMonitorWrapper } = NgReact;
 
     const spinner = (
       <div className="row">

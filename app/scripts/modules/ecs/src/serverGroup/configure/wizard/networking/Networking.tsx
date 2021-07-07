@@ -1,10 +1,13 @@
-import * as React from 'react';
 import { module } from 'angular';
-import { react2angular } from 'react2angular';
-import { IEcsServerGroupCommand } from '../../serverGroupConfiguration.service';
-import { HelpField, TetheredSelect, withErrorBoundary } from '@spinnaker/core';
+import { isEqual, uniqWith } from 'lodash';
+import * as React from 'react';
 import { Alert } from 'react-bootstrap';
 import { Option } from 'react-select';
+import { react2angular } from 'react2angular';
+
+import { HelpField, ISubnet, TetheredSelect, withErrorBoundary } from '@spinnaker/core';
+
+import { IEcsServerGroupCommand } from '../../serverGroupConfiguration.service';
 
 export interface IEcsNetworkingProps {
   command: IEcsServerGroupCommand;
@@ -16,10 +19,10 @@ interface IEcsNetworkingState {
   associatePublicIpAddress: boolean;
   networkMode: string;
   networkModesAvailable: string[];
-  securityGroups: string[];
+  securityGroupNames: string[];
   securityGroupsAvailable: string[];
-  subnetType: string;
-  subnetTypesAvailable: string[];
+  subnetTypes: string[];
+  subnetTypesAvailable: ISubnet[];
 }
 
 export class EcsNetworking extends React.Component<IEcsNetworkingProps, IEcsNetworkingState> {
@@ -27,16 +30,28 @@ export class EcsNetworking extends React.Component<IEcsNetworkingProps, IEcsNetw
     super(props);
     const cmd = this.props.command;
 
+    let defaultSubnetTypes: string[] = [];
+    if (cmd.subnetTypes && cmd.subnetTypes.length > 0) {
+      defaultSubnetTypes = cmd.subnetTypes;
+    }
+
+    if (cmd.subnetType && cmd.subnetType.length > 0) {
+      defaultSubnetTypes.push(cmd.subnetType);
+      cmd.subnetType = '';
+    }
+
+    cmd.subnetTypes = uniqWith(defaultSubnetTypes, isEqual);
+
     this.state = {
       associatePublicIpAddress: cmd.associatePublicIpAddress,
       networkMode: cmd.networkMode,
       networkModesAvailable: cmd.backingData && cmd.backingData.networkModes ? cmd.backingData.networkModes : [],
-      securityGroups: cmd.securityGroups,
+      securityGroupNames: cmd.securityGroupNames,
       securityGroupsAvailable:
         cmd.backingData && cmd.backingData.filtered && cmd.backingData.filtered.securityGroupNames
           ? cmd.backingData.filtered.securityGroupNames
           : [],
-      subnetType: cmd.subnetType,
+      subnetTypes: cmd.subnetTypes,
       subnetTypesAvailable:
         cmd.backingData && cmd.backingData.filtered && cmd.backingData.filtered.subnetTypes
           ? cmd.backingData.filtered.subnetTypes
@@ -72,14 +87,24 @@ export class EcsNetworking extends React.Component<IEcsNetworkingProps, IEcsNetw
     const updatedSecurityGroups = Array.isArray(newSecurityGroups)
       ? newSecurityGroups.map((securityGroups) => securityGroups.value)
       : [];
-    this.props.notifyAngular('securityGroups', updatedSecurityGroups);
-    this.setState({ securityGroups: updatedSecurityGroups });
+    this.props.notifyAngular('securityGroupNames', updatedSecurityGroups);
+    this.setState({ securityGroupNames: updatedSecurityGroups });
   };
 
-  private updateSubnetType = (newSubnetType: Option<string>) => {
-    const updatedSubnetType = newSubnetType.value;
-    this.props.notifyAngular('subnetType', updatedSubnetType);
-    this.setState({ subnetType: updatedSubnetType });
+  private updateSubnetTypes = (newSubnetTypes: Option<string>) => {
+    const cmd = this.props.command;
+    const updatedSubnetTypes = Array.isArray(newSubnetTypes)
+      ? newSubnetTypes.map((subnetType) => subnetType.value)
+      : [];
+    this.props.notifyAngular('subnetTypes', updatedSubnetTypes);
+    cmd.subnetTypeChanged(cmd);
+    this.setState({
+      subnetTypes: updatedSubnetTypes,
+      securityGroupsAvailable:
+        cmd.backingData && cmd.backingData.filtered && cmd.backingData.filtered.securityGroupNames
+          ? cmd.backingData.filtered.securityGroupNames
+          : [],
+    });
   };
 
   private updateAssociatePublicIpAddress = (usePublicIp: boolean) => {
@@ -91,7 +116,7 @@ export class EcsNetworking extends React.Component<IEcsNetworkingProps, IEcsNetw
     const updateAssociatePublicIpAddress = this.updateAssociatePublicIpAddress;
     const updateNetworkMode = this.updateNetworkMode;
     const updateSecurityGroups = this.updateSecurityGroups;
-    const updateSubnetType = this.updateSubnetType;
+    const updateSubnetTypes = this.updateSubnetTypes;
 
     const networkModesAvailable = this.state.networkModesAvailable.map(function (networkMode) {
       return { label: `${networkMode}`, value: networkMode };
@@ -102,15 +127,16 @@ export class EcsNetworking extends React.Component<IEcsNetworkingProps, IEcsNetw
     });
 
     const subnetTypesAvailable = this.state.subnetTypesAvailable.map(function (subnetType) {
-      return { label: `${subnetType}`, value: subnetType };
+      return { label: `${subnetType.purpose} (${subnetType.vpcId})`, value: subnetType.purpose };
     });
 
     const subnetTypeOptions = this.state.subnetTypesAvailable.length ? (
       <TetheredSelect
+        multi={true}
         options={subnetTypesAvailable}
-        value={this.state.subnetType}
+        value={this.state.subnetTypes}
         onChange={(e: Option) => {
-          updateSubnetType(e as Option<string>);
+          updateSubnetTypes(e as Option<string>);
         }}
       />
     ) : (
@@ -121,7 +147,7 @@ export class EcsNetworking extends React.Component<IEcsNetworkingProps, IEcsNetw
       <TetheredSelect
         multi={true}
         options={securityGroupsAvailable}
-        value={this.state.securityGroups}
+        value={this.state.securityGroupNames}
         onChange={(e: Option) => {
           updateSecurityGroups(e as Option<string>);
         }}

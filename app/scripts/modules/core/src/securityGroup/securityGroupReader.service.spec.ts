@@ -1,31 +1,34 @@
+import { mockHttpClient } from 'core/api/mock/jasmine';
 import { mock } from 'angular';
 
-import { API } from 'core/api/ApiService';
 import { Application } from 'core/application/application.model';
 import { ApplicationModelBuilder } from 'core/application/applicationModel.builder';
 import { InfrastructureCaches } from 'core/cache';
 import { ISecurityGroup } from 'core/domain';
-import { ISecurityGroupDetail, SECURITY_GROUP_READER, SecurityGroupReader } from './securityGroupReader.service';
+import {
+  ISecurityGroupDetail,
+  SECURITY_GROUP_READER,
+  SecurityGroupReader,
+  ISecurityGroupsByAccountSourceData,
+} from './securityGroupReader.service';
 import {
   SECURITY_GROUP_TRANSFORMER_SERVICE,
   SecurityGroupTransformerService,
 } from './securityGroupTransformer.service';
 
 describe('Service: securityGroupReader', function () {
-  let $q: ng.IQService, $http: ng.IHttpBackendService, $scope: ng.IRootScopeService, reader: SecurityGroupReader;
+  let $q: ng.IQService, $scope: ng.IRootScopeService, reader: SecurityGroupReader;
 
   beforeEach(mock.module(SECURITY_GROUP_TRANSFORMER_SERVICE, SECURITY_GROUP_READER));
   beforeEach(
     mock.inject(function (
       _$q_: ng.IQService,
-      $httpBackend: ng.IHttpBackendService,
       $rootScope: ng.IRootScopeService,
       _providerServiceDelegate_: any,
       securityGroupTransformer: SecurityGroupTransformerService,
       _securityGroupReader_: SecurityGroupReader,
     ) {
       reader = _securityGroupReader_;
-      $http = $httpBackend;
       $q = _$q_;
       $scope = $rootScope.$new();
 
@@ -46,7 +49,8 @@ describe('Service: securityGroupReader', function () {
     }),
   );
 
-  it('attaches load balancer to firewall usages', function () {
+  it('attaches load balancer to firewall usages', async function () {
+    const http = mockHttpClient();
     let data: any[] = null;
 
     const application: Application = ApplicationModelBuilder.createApplicationForTests(
@@ -83,7 +87,7 @@ describe('Service: securityGroupReader', function () {
     application.loadBalancers.refresh();
     $scope.$digest();
 
-    $http.expectGET(`${API.baseUrl}/securityGroups`).respond(200, {
+    http.expectGET(`/securityGroups`).respond(200, {
       test: {
         aws: {
           'us-east-1': [{ name: 'not-cached' }],
@@ -91,14 +95,15 @@ describe('Service: securityGroupReader', function () {
       },
     });
     reader.getApplicationSecurityGroups(application, null).then((results: any[]) => (data = results));
-    $http.flush();
+    await http.flush();
     $scope.$digest();
     const group: ISecurityGroup = data[0];
     expect(group.name).toBe('not-cached');
     expect(group.usages.loadBalancers[0]).toEqual({ name: application.getDataSource('loadBalancers').data[0].name });
   });
 
-  it('adds firewall names across accounts, falling back to the ID if none found', function () {
+  it('adds firewall names across accounts, falling back to the ID if none found', async function () {
+    const http = mockHttpClient();
     let details: ISecurityGroupDetail = null;
     const application: Application = ApplicationModelBuilder.createApplicationForTests('app');
     application['securityGroupsIndex'] = {
@@ -106,7 +111,7 @@ describe('Service: securityGroupReader', function () {
       prod: { 'us-east-1': { 'sg-2': { name: 'matched-prod' } } },
     };
 
-    $http.expectGET(`${API.baseUrl}/securityGroups/test/us-east-1/sg-123?provider=aws&vpcId=vpc-1`).respond(200, {
+    http.expectGET(`/securityGroups/test/us-east-1/sg-123?provider=aws&vpcId=vpc-1`).respond(200, {
       inboundRules: [
         { securityGroup: { accountName: 'test', id: 'sg-345' } },
         { securityGroup: { accountName: 'test', id: 'sg-2' } },
@@ -118,7 +123,7 @@ describe('Service: securityGroupReader', function () {
     reader
       .getSecurityGroupDetails(application, 'test', 'aws', 'us-east-1', 'vpc-1', 'sg-123')
       .then((result) => (details = result));
-    $http.flush();
+    await http.flush();
 
     expect(details.securityGroupRules.length).toBe(3);
     expect(details.securityGroupRules[0].securityGroup.name).toBe('sg-345');
@@ -129,7 +134,8 @@ describe('Service: securityGroupReader', function () {
     expect(details.securityGroupRules[2].securityGroup.inferredName).toBeFalsy();
   });
 
-  it('should clear cache, then reload firewalls and try again if a firewall is not found', function () {
+  it('should clear cache, then reload firewalls and try again if a firewall is not found', async function () {
+    const http = mockHttpClient();
     let data: ISecurityGroup[] = null;
     const application: Application = ApplicationModelBuilder.createApplicationForTests(
       'app',
@@ -164,7 +170,7 @@ describe('Service: securityGroupReader', function () {
     application.getDataSource('loadBalancers').refresh();
     $scope.$digest();
 
-    $http.expectGET(API.baseUrl + '/securityGroups').respond(200, {
+    http.expectGET('/securityGroups').respond(200, {
       test: {
         aws: {
           'us-east-1': [{ name: 'not-cached', id: 'not-cached-id', vpcId: null }],
@@ -173,9 +179,52 @@ describe('Service: securityGroupReader', function () {
     });
 
     reader.getApplicationSecurityGroups(application, []).then((results) => (data = results));
-    $http.flush();
+    await http.flush();
     const group: ISecurityGroup = data[0];
     expect(group.name).toBe('not-cached');
     expect(group.usages.loadBalancers[0]).toEqual({ name: application.getDataSource('loadBalancers').data[0].name });
+  });
+
+  it('Should not fetch groups again while fetching', async () => {
+    const http = mockHttpClient();
+    const application: Application = ApplicationModelBuilder.createApplicationForTests('app', {
+      key: 'securityGroups',
+      loader: () => $q.resolve([]),
+      onLoad: (_app, _data) => $q.resolve(_data),
+      defaultData: [],
+    });
+
+    application.getDataSource('securityGroups').refresh();
+
+    const groupName1 = 'testGroup1';
+    http.expectGET('/securityGroups').respond(200, {
+      [groupName1]: {
+        aws: {
+          'us-east-1': [{ name: 'hello', id: 'hello-id', vpcId: null }],
+        },
+      },
+    });
+
+    let data: ISecurityGroupsByAccountSourceData;
+    reader.getAllSecurityGroups().then((results) => (data = results));
+    reader.getAllSecurityGroups().then((results) => (data = results));
+    await http.flush();
+    expect(data[groupName1]).toBeDefined(`Group ${groupName1} is missing`);
+    expect(http.receivedRequests.length).toBe(1, 'Should only fetch once');
+
+    const groupName2 = 'testGroup2';
+    http.expectGET('/securityGroups').respond(200, {
+      [groupName2]: {
+        aws: {
+          'us-east-1': [{ name: 'hello', id: 'hello-id', vpcId: null }],
+        },
+      },
+    });
+
+    reader.getAllSecurityGroups().then((results) => (data = results));
+    await http.flush();
+    expect(http.receivedRequests.length).toBe(2, 'Should fetch again');
+    expect(data[groupName1]).toBeUndefined(`Group ${groupName1} is defined`);
+    expect(data[groupName2]).toBeDefined(`Group ${groupName2} is missing`);
   });
 });

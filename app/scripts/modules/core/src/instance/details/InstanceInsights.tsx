@@ -1,7 +1,8 @@
 import React from 'react';
-import ReactGA from 'react-ga';
 import { Dropdown } from 'react-bootstrap';
+
 import { IInstance } from 'core/domain';
+import { logger } from 'core/utils';
 
 export interface Insight {
   label: string;
@@ -17,10 +18,10 @@ export interface IInstanceInsightsProps {
 
 export const InstanceInsights = ({ analytics, insights, instance, title }: IInstanceInsightsProps) => {
   const logClickEvent = (label: string) => {
-    ReactGA.event({
+    logger.log({
       category: 'Insight Menu (Instance)',
       action: `${label} clicked`,
-      label: `${instance.account}/${instance.region}/${instance.name}/${instance.serverGroup}`,
+      data: { label: `${instance.account}/${instance.region}/${instance.name}/${instance.serverGroup}` },
     });
   };
 

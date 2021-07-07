@@ -1,6 +1,6 @@
+import { unset } from 'lodash';
 import React from 'react';
 import Select, { Option } from 'react-select';
-import { unset } from 'lodash';
 
 import { HelpField } from 'core/help/HelpField';
 import { Markdown } from 'core/presentation';
@@ -87,6 +87,7 @@ export class DeploymentStrategySelector extends React.Component<
     const { command, fieldColumns, labelColumns, onFieldChange } = this.props;
     const { AdditionalFieldsComponent, currentStrategy, strategies } = this.state;
     const hasAdditionalFields = Boolean(AdditionalFieldsComponent);
+
     if (strategies && strategies.length) {
       return (
         <div className="form-group">

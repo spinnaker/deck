@@ -1,12 +1,14 @@
 import { isEmpty } from 'lodash';
-import { Observable, Subject } from 'rxjs';
+import { uniqBy } from 'lodash';
+import { from as observableFrom, Observable, of as observableOf, Subject } from 'rxjs';
+import { catchError, finalize, map, mergeMap, tap } from 'rxjs/operators';
 
-import { UrlBuilder, IQueryParams } from 'core/navigation';
+import { IQueryParams, UrlBuilder } from 'core/navigation';
 
 import { ISearchResultSet } from './infrastructureSearch.service';
 import { ISearchResult, ISearchResults } from '../search.service';
-import { SearchResultType } from '../searchResult/searchResultType';
 import { SearchStatus } from '../searchResult/SearchResults';
+import { SearchResultType } from '../searchResult/searchResultType';
 import { searchResultTypeRegistry } from '../searchResult/searchResultType.registry';
 
 export class InfrastructureSearchServiceV2 {
@@ -16,7 +18,7 @@ export class InfrastructureSearchServiceV2 {
 
   public static search(apiParams: IQueryParams): Observable<ISearchResultSet> {
     if (isEmpty(apiParams)) {
-      return Observable.from(this.EMPTY_RESULTS);
+      return observableFrom(this.EMPTY_RESULTS);
     }
 
     const params = { ...apiParams };
@@ -33,24 +35,28 @@ export class InfrastructureSearchServiceV2 {
     };
 
     const makeResultSet = (searchResults: ISearchResults<any>, type: SearchResultType): ISearchResultSet => {
-      // Add URLs to each search result
-      const results = searchResults.results.map((result) => addComputedAttributes(result, type));
+      // Add URLs to each search result (discard duplicate results)
+      const results = uniqBy(
+        searchResults.results.map((result) => addComputedAttributes(result, type)),
+        (r) => r.href,
+      );
       const query: string = apiParams.key as string;
       return { type, results, status: SearchStatus.FINISHED, query };
     };
 
     const emitErrorResultSet = (error: any, type: SearchResultType): Observable<ISearchResultSet> => {
-      return Observable.of({ error, type, results: [], status: SearchStatus.ERROR });
+      return observableOf({ error, type, results: [], status: SearchStatus.ERROR });
     };
 
-    return Observable.from(types)
-      .mergeMap((type: SearchResultType) => {
-        return type
-          .search(params, otherResults$)
-          .map((searchResults: ISearchResults<any>) => makeResultSet(searchResults, type))
-          .catch((error: any) => emitErrorResultSet(error, type));
-      })
-      .do((result: ISearchResultSet<any>) => otherResults$.next(result))
-      .finally(() => otherResults$.complete());
+    return observableFrom(types).pipe(
+      mergeMap((type: SearchResultType) => {
+        return type.search(params, otherResults$).pipe(
+          map((searchResults: ISearchResults<any>) => makeResultSet(searchResults, type)),
+          catchError((error: any) => emitErrorResultSet(error, type)),
+        );
+      }),
+      tap((result: ISearchResultSet<any>) => otherResults$.next(result)),
+      finalize(() => otherResults$.complete()),
+    );
   }
 }

@@ -1,18 +1,19 @@
-import React from 'react';
 import { get } from 'lodash';
+import React from 'react';
 
-import { NgReact } from 'core/reactShims';
 import { Application } from 'core/application';
-import { IServerGroup } from 'core/domain';
-import { IJenkinsViewModel, IDockerViewModel } from './ServerGroup';
-import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
-import { HealthCounts } from 'core/healthCounts';
-import { NameUtils } from 'core/naming';
-import { CloudProviderLogo } from 'core/cloudProvider';
-import { LoadBalancersTagWrapper } from 'core/loadBalancer';
-import { ISortFilter } from 'core/filterModel';
-import { Overridable } from 'core/overrideRegistry';
 import { ArtifactIconService } from 'core/artifact';
+import { CloudProviderLogo } from 'core/cloudProvider';
+import { IServerGroup } from 'core/domain';
+import { EntityNotifications } from 'core/entityTag/notifications/EntityNotifications';
+import { ISortFilter } from 'core/filterModel';
+import { HealthCounts } from 'core/healthCounts';
+import { LoadBalancersTagWrapper } from 'core/loadBalancer';
+import { NameUtils } from 'core/naming';
+import { Overridable } from 'core/overrideRegistry';
+
+import { IDockerViewModel, IJenkinsViewModel } from './ServerGroup';
+import { RunningTasksTag } from './pod/RunningTasksTag';
 
 export interface IServerGroupHeaderProps {
   application: Application;
@@ -123,7 +124,7 @@ export class SequenceAndBuildAndImages extends React.Component<IServerGroupHeade
         {!!serverGroupSequence && <span className="server-group-sequence"> {serverGroupSequence}</span>}
         {!!serverGroupSequence && (!!jenkins || !!images) && <span>: </span>}
         {!!jenkins && (
-          <a className="build-link" href={jenkins.href} target="_blank">
+          <a className="build-link sp-margin-xs-right" href={jenkins.href} target="_blank">
             Build: #{jenkins.number}
           </a>
         )}
@@ -194,17 +195,12 @@ export class Health extends React.Component<IServerGroupHeaderProps> {
 
 export class RunningTasks extends React.Component<IServerGroupHeaderProps> {
   public render() {
-    const { application, serverGroup } = this.props;
-    const { RunningTasksTag } = NgReact;
+    const { serverGroup } = this.props;
     const hasRunningExecutions = !!serverGroup.runningExecutions.length || !!serverGroup.runningTasks.length;
 
     return (
       hasRunningExecutions && (
-        <RunningTasksTag
-          application={application}
-          tasks={serverGroup.runningTasks}
-          executions={serverGroup.runningExecutions}
-        />
+        <RunningTasksTag tasks={serverGroup.runningTasks} executions={serverGroup.runningExecutions} />
       )
     );
   }

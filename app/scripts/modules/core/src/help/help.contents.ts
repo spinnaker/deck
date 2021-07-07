@@ -1,5 +1,6 @@
-import { HelpContentsRegistry } from './helpContents.registry';
 import { SETTINGS } from 'core/config/settings';
+
+import { HelpContentsRegistry } from './helpContents.registry';
 
 export interface IHelpContents {
   [key: string]: string;
@@ -199,6 +200,7 @@ const helpContents: { [key: string]: string } = {
       <p>Select the types of executions to consider. When no selection is made, the default is "any execution".</p>
       <p>This will always evaluate to the most recent execution matching your provided criteria.</p>
   `,
+  'pipeline.config.tags': `<p>Pipeline tags let you filter pipelines/executions by addition dimensions in the executions page</p>`,
   'loadBalancer.advancedSettings.healthTimeout':
     '<p>Configures the timeout, in seconds, for reaching the healthCheck target.  Must be less than the interval.</p><p> Default: <b>5</b></p>',
   'loadBalancer.advancedSettings.idleTimeout':
@@ -213,6 +215,10 @@ const helpContents: { [key: string]: string } = {
     '<p>Configures the number of unhealthy observations before deservicing an instance from the ELB.</p><p>Default: <b>2</b></p>',
   'loadBalancer.advancedSettings.loadBalancingCrossZone':
     '<p>Cross-zone load balancing distributes traffic evenly across all targets in the Availability Zones enabled for the load balancer.</p><p> Default: <b>True</b></p>',
+  'loadBalancer.advancedSettings.albIpAddressType':
+    '<p>Assigns both a v4 and v6 IP address to the load balancer. If left unchecked, this value will default to <b>"ipv4"</b>.</p>',
+  'loadBalancer.advancedSettings.nlbIpAddressType':
+    '<p>Assigns both a v4 and v6 IP address to the load balancer. This option is only valid for NLBs which are external and only have Ip targets (not instance targets). If left unchecked, this value will default to <b>"ipv4"</b>.</p>',
   'pipeline.config.resizeAsg.action': `
       <p>Configures the resize action for the target server group.
       <ul>
@@ -287,6 +293,9 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.bake.manifest.overrideExpressionEvaluation':
     '<p>Explicitly evaluate SpEL expressions in overrides just prior to manifest baking. Can be paired with the "Skip SpEL evaluation" option in the Deploy Manifest stage when baking a third-party manifest artifact with expressions not meant for Spinnaker to evaluate as SpEL.</p>',
   'pipeline.config.bake.manifest.templateRenderer': '<p>This is the engine used for rendering your manifest.</p>',
+  'pipeline.config.bake.manifest.helm.chartFilePath': `
+    <p>This is the relative path to the Chart.yaml file within your Git repo.</p>
+    <p>e.g.: <b>helm/my-chart/Chart.yaml</b></p>`,
   'pipeline.config.bake.manifest.helm.rawOverrides':
     'Use <i>--set</i> instead of <i>--set-string</i> when injecting override values. Values injected using <i>--set</i> will be converted to primitive types by Helm.',
   'pipeline.config.bake.manifest.kustomize.filePath': `
@@ -357,6 +366,8 @@ const helpContents: { [key: string]: string } = {
       </p>`,
   'pipeline.config.trigger.runAsUser':
     "The current user must have access to the specified service account, and the service account must have access to the current application. Otherwise, you'll receive an 'Access is denied' error.",
+  'pipeline.config.trigger.authorizedUser':
+    "The current user must have the permission to approve the manual judgment stage. Otherwise, you'll not be able continue to the next pipeline stage.",
   'pipeline.config.script.repoUrl':
     '<p>Path to the repo hosting the scripts in Stash. (e.g. <samp>CDL/mimir-scripts</samp>). Leave empty to use the default.</p>',
   'pipeline.config.script.repoBranch':
@@ -379,6 +390,7 @@ const helpContents: { [key: string]: string } = {
     '<p>(Optional) If specified, only pushes to the branches that match this Java Regular Expression will be triggered. Leave empty to trigger builds for every branch.</p>',
   'pipeline.config.git.trigger.githubSecret':
     '<p>(Optional, but recommended) If specified, verifies GitHub as the sender of this trigger. See <a target="_blank" href="https://developer.github.com/webhooks/securing/">GitHub docs</a> for more information.</p>',
+  'serverGroup.ipv6': `<p>Associating an IPv6 address to nodes allows for ingress and egress communication over IPv6. Most modern software supports IPv6 and enablement is transparent. This is an incremental addition to IPv4 and will not remove the ability for connectivity over IPv4.</p>`,
   'serverGroupCapacity.useSourceCapacityTrue': `
       <p>Spinnaker will use the current capacity of the existing server group when deploying a new server group.</p>
       <p>This setting is intended to support a server group with auto-scaling enabled, where the bounds and desired capacity are controlled by an external process.</p>
@@ -521,6 +533,9 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.codebuild.sourceVersion': `(Optional) Source version of the build. If not specified, the artifact version will be used. If artifact doesn't have a version, the latest version will be used. See the <a href="https://docs.aws.amazon.com/codebuild/latest/APIReference/API_StartBuild.html#CodeBuild-StartBuild-request-sourceVersion">CodeBuild reference</a> for more information.`,
   'pipeline.config.codebuild.buildspec': `(Optional) Inline buildspec definition of the build. If not specified, buildspec configured in CodeBuild project will be used.`,
   'pipeline.config.codebuild.secondarySources': `(Optional) Secondary sources of the build. It can be overridden by adding Spinnaker Artifacts. If not specified, secondary sources configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.secondarySourcesVersionOverride': `(Optional) Existing secondary sources version overrides. Pre-defined secondary source's version can be overriden by specifying the source identifier and version. If not specified, secondary sources configured in CodeBuild project will be used.`,
+  'pipeline.config.codebuild.sourceIdentifier': `(Optional) Name of a pre-defined secondary source.`,
+  'pipeline.config.codebuild.secondarySourceVersion': `Version of secondary source identifier to use. Required if specifying a source identifier.`,
   'pipeline.config.codebuild.image': `(Optional) Image in which the build will run. It can be overridden by specifying the name of the image. If not specified, image configured in CodeBuild project will be used.`,
   'pipeline.config.codebuild.envVar': `(Optional) Environment variables that will be propagated into the build.`,
 };

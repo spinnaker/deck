@@ -1,11 +1,11 @@
 import { uniq } from 'lodash';
 import { $q } from 'ngimport';
 
-
 import { AccountService, IAccountDetails } from 'core/account';
 import { Application } from 'core/application';
-import { CloudProviderRegistry, ICloudProviderConfig } from '../CloudProviderRegistry';
 import { SETTINGS } from 'core/config';
+
+import { CloudProviderRegistry, ICloudProviderConfig } from '../CloudProviderRegistry';
 import { ProviderSelectionModal } from './ProviderSelectionModal';
 
 export type IProviderSelectionFilter = (app: Application, acc: IAccountDetails, prov: ICloudProviderConfig) => boolean;
@@ -27,13 +27,16 @@ export class ProviderSelectionService {
           return filterFn(application, acc, CloudProviderRegistry.getProvider(acc.cloudProvider));
         });
       }
-
       // reduce the accounts to the smallest, unique collection taking into consideration the useProvider values
       const providerOptions = uniq(
-        reducedAccounts.map((a) => {
-          const providerFeature = CloudProviderRegistry.getProvider(a.cloudProvider)[feature] || {};
-          return providerFeature.useProvider || a.cloudProvider;
-        }),
+        reducedAccounts
+          .filter((a) => {
+            return !CloudProviderRegistry.isDisabled(a.cloudProvider);
+          })
+          .map((a) => {
+            const providerFeature = CloudProviderRegistry.getProvider(a.cloudProvider)[feature] || {};
+            return providerFeature.useProvider || a.cloudProvider;
+          }),
       );
 
       let provider;
@@ -45,6 +48,22 @@ export class ProviderSelectionService {
         provider = $q.when(SETTINGS.defaultProvider || 'aws');
       }
       return provider;
+    });
+  }
+
+  public static isDisabled(app: Application): PromiseLike<boolean> {
+    return AccountService.applicationAccounts(app).then((accounts: IAccountDetails[]) => {
+      let isDisable = false;
+      if (accounts.length === 1) {
+        accounts
+          .filter((a) => {
+            return CloudProviderRegistry.hasValue(a.cloudProvider, 'kubernetesAdHocInfraWritesEnabled');
+          })
+          .map((a) => {
+            isDisable = !CloudProviderRegistry.getValue(a.cloudProvider, 'kubernetesAdHocInfraWritesEnabled');
+          });
+      }
+      return isDisable;
     });
   }
 }

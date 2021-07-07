@@ -1,13 +1,13 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import * as angular from 'angular';
-
 import { PROVIDER_SERVICE_DELEGATE } from 'core/cloudProvider/providerService.delegate';
 import { ConfirmationModalService } from 'core/confirmationModal';
-import { SERVER_GROUP_WRITER } from '../serverGroupWriter.service';
 import { ClusterState } from 'core/state';
+
 import { CORE_SERVERGROUP_DETAILS_MULTIPLESERVERGROUP_COMPONENT } from './multipleServerGroup.component';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { SERVER_GROUP_WRITER } from '../serverGroupWriter.service';
 
 export const CORE_SERVERGROUP_DETAILS_MULTIPLESERVERGROUPS_CONTROLLER =
   'spinnaker.core.serverGroup.details.multipleServerGroups.controller';
@@ -88,6 +88,7 @@ angular
       };
 
       this.disableServerGroups = () => {
+        this.serverGroups = this.serverGroups.filter((group) => !group.disabled);
         confirm('disableServerGroup', {
           presentContinuous: 'Disabling',
           simplePresent: 'Disable',
@@ -96,6 +97,7 @@ angular
       };
 
       this.enableServerGroups = () => {
+        this.serverGroups = this.serverGroups.filter((group) => group.disabled);
         confirm('enableServerGroup', {
           presentContinuous: 'Enabling',
           simplePresent: 'Enable',
@@ -103,9 +105,9 @@ angular
         });
       };
 
-      this.canDisable = () => this.serverGroups.every((group) => !group.disabled);
+      this.canDisable = () => this.serverGroups.some((group) => !group.disabled);
 
-      this.canEnable = () => this.serverGroups.every((group) => group.disabled);
+      this.canEnable = () => this.serverGroups.some((group) => group.disabled);
 
       /***
        * View instantiation/synchronization

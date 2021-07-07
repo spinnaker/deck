@@ -11,16 +11,16 @@ import {
   SECURITY_GROUP_READER,
   SubnetReader,
 } from '@spinnaker/core';
-
 import { GCEProviderSettings } from 'google/gce.settings';
 import { GCE_HEALTH_CHECK_READER } from 'google/healthCheck/healthCheck.read.service';
 import { getHealthCheckOptions } from 'google/healthCheck/healthCheckUtils';
+import { GceImageReader } from 'google/image';
 import { GCE_HTTP_LOAD_BALANCER_UTILS } from 'google/loadBalancer/httpLoadBalancerUtils.service';
 import { LOAD_BALANCER_SET_TRANSFORMER } from 'google/loadBalancer/loadBalancer.setTransformer';
-import { GceImageReader } from 'google/image';
-import { GceAcceleratorService } from './wizard/advancedSettings/gceAccelerator.service';
-import { GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE } from '../../instance/gceInstanceType.service';
+
 import { GOOGLE_INSTANCE_CUSTOM_CUSTOMINSTANCEBUILDER_GCE_SERVICE } from './../../instance/custom/customInstanceBuilder.gce.service';
+import { GOOGLE_INSTANCE_GCEINSTANCETYPE_SERVICE } from '../../instance/gceInstanceType.service';
+import { GceAcceleratorService } from './wizard/advancedSettings/gceAccelerator.service';
 import { GOOGLE_SERVERGROUP_CONFIGURE_WIZARD_SECURITYGROUPS_TAGMANAGER_SERVICE } from './wizard/securityGroups/tagManager.service';
 
 export const GOOGLE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE =
@@ -175,7 +175,7 @@ angular
 
       function configureDistributionPolicyTargetShape(command) {
         const accountDetails = command.backingData.credentialsKeyedByAccount[command.credentials];
-        if (accountDetails.computeVersion === 'ALPHA' && !command.distributionPolicy.targetShape) {
+        if (!command.distributionPolicy.targetShape) {
           command.distributionPolicy.targetShape = 'EVEN';
         }
       }

@@ -1,13 +1,13 @@
 'use strict';
 
+import UIROUTER_ANGULARJS from '@uirouter/angularjs';
 import { module } from 'angular';
 
-import { SERVER_GROUP_WRITER, TaskMonitor, ModalWizard, FirewallLabels } from '@spinnaker/core';
-import { AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE } from '../serverGroupConfiguration.service';
-import { AZURE_SERVERGROUP_SERVERGROUP_TRANSFORMER } from '../../serverGroup.transformer';
-import UIROUTER_ANGULARJS from '@uirouter/angularjs';
+import { FirewallLabels, ModalWizard, SERVER_GROUP_WRITER, TaskMonitor } from '@spinnaker/core';
 
-const Utility = require('../../../utility').default;
+import { AZURE_SERVERGROUP_SERVERGROUP_TRANSFORMER } from '../../serverGroup.transformer';
+import { AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCONFIGURATION_SERVICE } from '../serverGroupConfiguration.service';
+import Utility from '../../../utility';
 
 export const AZURE_SERVERGROUP_CONFIGURE_WIZARD_CLONESERVERGROUP_AZURE_CONTROLLER =
   'spinnaker.azure.cloneServerGroup.controller';

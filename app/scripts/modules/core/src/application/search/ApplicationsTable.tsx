@@ -1,9 +1,11 @@
-import React from 'react';
 import { UISref } from '@uirouter/react';
+import React from 'react';
 
-import { timestamp } from 'core/utils';
-import { IApplicationSummary } from '../service/ApplicationReader';
+import { SETTINGS } from 'core/config';
 import { SortToggle } from 'core/presentation';
+import { timestamp } from 'core/utils';
+
+import { IApplicationSummary } from '../service/ApplicationReader';
 
 export interface IApplicationTableProps {
   applications: IApplicationSummary[];
@@ -30,6 +32,7 @@ export const ApplicationTable = ({ currentSort, toggleSort, applications }: IApp
         <th>
           <SortToggle currentSort={currentSort} onChange={toggleSort} label="Account(s)" sortKey="accounts" />
         </th>
+        {SETTINGS.feature.slack && <th style={{ width: '22%' }}>Slack Channel</th>}
         <th style={{ width: '22%' }}>Description</th>
       </tr>
     </thead>
@@ -50,6 +53,7 @@ export const ApplicationTable = ({ currentSort, toggleSort, applications }: IApp
               <td>{timestamp(app.updateTs)}</td>
               <td>{app.email}</td>
               <td>{app.accounts}</td>
+              {SETTINGS.feature.slack && <td>{app.slackChannel?.name}</td>}
               <td>{app.description}</td>
             </tr>
           </UISref>

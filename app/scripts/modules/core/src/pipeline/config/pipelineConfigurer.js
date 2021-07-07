@@ -1,31 +1,29 @@
 'use strict';
 
+import * as angular from 'angular';
 import _ from 'lodash';
 
 import { ViewStateCache } from 'core/cache';
-
+import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
 import { ReactModal } from 'core/presentation';
 
-import * as angular from 'angular';
-
-import { OVERRIDE_REGISTRY } from 'core/overrideRegistry/override.registry';
-import { PIPELINE_CONFIG_ACTIONS } from './actions/pipelineConfigActions.module';
-import { PipelineConfigValidator } from './validation/PipelineConfigValidator';
-import { EXECUTION_BUILD_TITLE } from '../executionBuild/ExecutionBuildTitle';
-import { PipelineConfigService } from './services/PipelineConfigService';
-import { CopyStageModal } from './copyStage/CopyStageModal';
-import { ExecutionsTransformer } from '../service/ExecutionsTransformer';
-import { EditPipelineJsonModal } from './actions/pipelineJson/EditPipelineJsonModal';
 import { DeletePipelineModal } from './actions/delete/DeletePipelineModal';
 import { DisablePipelineModal } from './actions/disable/DisablePipelineModal';
 import { EnablePipelineModal } from './actions/enable/EnablePipelineModal';
-import { LockPipelineModal } from './actions/lock/LockPipelineModal';
-import { UnlockPipelineModal } from './actions/unlock/UnlockPipelineModal';
-import { RenamePipelineModal } from './actions/rename/RenamePipelineModal';
 import { ShowPipelineHistoryModal } from './actions/history/ShowPipelineHistoryModal';
+import { LockPipelineModal } from './actions/lock/LockPipelineModal';
+import { PIPELINE_CONFIG_ACTIONS } from './actions/pipelineConfigActions.module';
+import { EditPipelineJsonModal } from './actions/pipelineJson/EditPipelineJsonModal';
+import { RenamePipelineModal } from './actions/rename/RenamePipelineModal';
 import { ShowPipelineTemplateJsonModal } from './actions/templateJson/ShowPipelineTemplateJsonModal';
-import { PipelineTemplateV2Service } from './templates/v2/pipelineTemplateV2.service';
+import { UnlockPipelineModal } from './actions/unlock/UnlockPipelineModal';
+import { CopyStageModal } from './copyStage/CopyStageModal';
+import { EXECUTION_BUILD_TITLE } from '../executionBuild/ExecutionBuildTitle';
+import { ExecutionsTransformer } from '../service/ExecutionsTransformer';
+import { PipelineConfigService } from './services/PipelineConfigService';
 import { PipelineTemplateWriter } from './templates/PipelineTemplateWriter';
+import { PipelineTemplateV2Service } from './templates/v2/pipelineTemplateV2.service';
+import { PipelineConfigValidator } from './validation/PipelineConfigValidator';
 
 export const CORE_PIPELINE_CONFIG_PIPELINECONFIGURER = 'spinnaker.core.pipeline.config.pipelineConfigurer';
 export const name = CORE_PIPELINE_CONFIG_PIPELINECONFIGURER; // for backwards compatibility
@@ -166,8 +164,7 @@ angular
         ReactModal.show(RenamePipelineModal, { pipeline: $scope.pipeline, application: $scope.application })
           .then((pipelineName) => {
             $scope.pipeline.name = pipelineName;
-            setOriginal($scope.pipeline);
-            markDirty();
+            return this.applyUpdateTs($scope.pipeline);
           })
           .catch(() => {});
       };
@@ -335,11 +332,11 @@ angular
         const controller = PipelineTemplateV2Service.isV2PipelineConfig($scope.pipeline)
           ? {
               name: 'ConfigurePipelineTemplateModalV2Ctrl',
-              template: require('core/pipeline/config/templates/v2/configurePipelineTemplateModalV2.html'),
+              template: require('./templates/v2/configurePipelineTemplateModalV2.html'),
             }
           : {
               name: 'ConfigurePipelineTemplateModalCtrl',
-              template: require('core/pipeline/config/templates/configurePipelineTemplateModal.html'),
+              template: require('./templates/configurePipelineTemplateModal.html'),
             };
 
         this.setViewState({ loading: true });
@@ -365,16 +362,29 @@ angular
           .finally(() => this.setViewState({ loading: false }));
       };
 
+      this.applyUpdateTs = (toSave) => {
+        return $scope.application.pipelineConfigs.refresh(true).then((pipelines) => {
+          const latestFromServer = pipelines.find((p) => p.id === toSave.id);
+          if (latestFromServer && latestFromServer.updateTs) {
+            toSave.updateTs = latestFromServer.updateTs;
+            this.updatePipelineConfig({ updateTs: latestFromServer.updateTs });
+          }
+          setOriginal(toSave);
+          markDirty();
+        });
+      };
+
       this.savePipeline = () => {
         this.setViewState({ saving: true });
         const toSave = _.cloneDeep($scope.pipeline);
         PipelineConfigService.savePipeline(toSave)
-          .then(() => $scope.application.pipelineConfigs.refresh(true))
+          .then(() => this.applyUpdateTs(toSave))
           .then(
             () => {
-              setOriginal(toSave);
-              markDirty();
-              this.setViewState({ saving: false });
+              this.setViewState({
+                saveError: false,
+                saving: false,
+              });
             },
             (err) =>
               this.setViewState({
@@ -446,7 +456,7 @@ angular
               this.navigateTo({ section: 'triggers' });
             }
           }
-          $scope.viewState.revertCount++;
+          $scope.viewState.revertCount = ($scope.viewState.revertCount || 0) + 1;
           $scope.$broadcast('pipeline-reverted');
         });
       };
