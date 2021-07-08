@@ -72,13 +72,6 @@ export class CreateUserProvidedInput extends React.Component<ICreateServiceInsta
     });
   };
 
-  private deletePreviousVersionUpdated = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.props.onServiceChanged({
-      ...this.props.service,
-      deletePreviousVersion: event.target.checked,
-    });
-  };
-
   public render() {
     const { service } = this.props;
     return (
@@ -125,15 +118,6 @@ export class CreateUserProvidedInput extends React.Component<ICreateServiceInsta
             onChange={this.versionedUpdated}
           />
         </StageConfigField>
-        {service.versioned && (
-          <StageConfigField label="Delete previous version">
-            <input
-              type="checkbox"
-              checked={!!service.deletePreviousVersion}
-              onChange={this.deletePreviousVersionUpdated}
-            />
-          </StageConfigField>
-        )}
       </>
     );
   }

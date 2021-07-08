@@ -114,13 +114,6 @@ export class CreateServiceInstanceDirectInput extends React.Component<
     });
   };
 
-  private deletePreviousVersionUpdated = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.props.onServiceChanged({
-      ...this.props.service,
-      deletePreviousVersion: event.target.checked,
-    });
-  };
-
   public render() {
     const { service } = this.props;
     const services = this.state.serviceNamesAndPlans.map((item) => item.name);
@@ -180,15 +173,6 @@ export class CreateServiceInstanceDirectInput extends React.Component<
             onChange={this.versionedUpdated}
           />
         </StageConfigField>
-        {service.versioned && (
-          <StageConfigField label="Delete previous version">
-            <input
-              type="checkbox"
-              checked={!!service.deletePreviousVersion}
-              onChange={this.deletePreviousVersionUpdated}
-            />
-          </StageConfigField>
-        )}
       </div>
     );
   }

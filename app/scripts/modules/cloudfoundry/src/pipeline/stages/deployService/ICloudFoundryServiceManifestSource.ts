@@ -8,7 +8,6 @@ export interface ICloudfoundryServiceManifestDirectSource {
   tags?: string[];
   updatable: boolean;
   versioned: boolean;
-  deletePreviousVersion: boolean;
 }
 
 export interface ICloudFoundryServiceUserProvidedSource {
@@ -19,7 +18,6 @@ export interface ICloudFoundryServiceUserProvidedSource {
   tags?: string[];
   updatable: boolean;
   versioned: boolean;
-  deletePreviousVersion: boolean;
 }
 
 export interface ICloudFoundryServiceManifestSource {
