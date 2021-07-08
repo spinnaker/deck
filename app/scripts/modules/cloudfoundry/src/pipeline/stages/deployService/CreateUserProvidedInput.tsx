@@ -59,7 +59,6 @@ export class CreateUserProvidedInput extends React.Component<ICreateServiceInsta
       ...this.props.service,
       updatable: event.target.checked,
       versioned: false,
-      deletePreviousVersion: false,
     });
   };
 
@@ -68,7 +67,6 @@ export class CreateUserProvidedInput extends React.Component<ICreateServiceInsta
       ...this.props.service,
       versioned: event.target.checked,
       updatable: false,
-      deletePreviousVersion: true,
     });
   };
 

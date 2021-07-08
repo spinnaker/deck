@@ -101,7 +101,6 @@ export class CreateServiceInstanceDirectInput extends React.Component<
       ...this.props.service,
       updatable: event.target.checked,
       versioned: false,
-      deletePreviousVersion: false,
     });
   };
 
@@ -110,7 +109,6 @@ export class CreateServiceInstanceDirectInput extends React.Component<
       ...this.props.service,
       versioned: event.target.checked,
       updatable: false,
-      deletePreviousVersion: true,
     });
   };
 
