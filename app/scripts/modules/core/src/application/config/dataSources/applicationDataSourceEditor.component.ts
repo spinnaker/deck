@@ -1,10 +1,10 @@
 import { IController, module } from 'angular';
-import { TaskReader } from 'core';
 
 import { Application } from '../../application.model';
-import { ApplicationReader } from '../../service/ApplicationReader';
-import { ApplicationWriter } from '../../service/ApplicationWriter';
 import { ApplicationDataSource } from '../../service/applicationDataSource';
+import { ApplicationWriter } from '../../service/ApplicationWriter';
+import { ApplicationReader } from '../../service/ApplicationReader';
+import { TaskReader } from 'core';
 
 import './applicationDataSourceEditor.component.less';
 
@@ -18,6 +18,8 @@ export class DataSourceEditorController implements IController {
   public saving = false;
   public saveError = false;
   public original: string;
+  public saveErrorMessage: string;
+  public displayErrorMessage = false;
 
   public dataSources: ApplicationDataSource[];
 
@@ -80,11 +82,27 @@ export class DataSourceEditorController implements IController {
           this.isDirty = false;
           this.$onInit();
         },
-        () => {
+        (error) => {
+          if (error != null) {
+            try {
+              const responseBody = JSON.parse(error.variables[0].value.details.responseBody);
+              this.saveErrorMessage = responseBody.errors;
+            } catch (e) {
+              this.saveErrorMessage = error.toString();
+            }
+            if (this.saveErrorMessage == undefined) {
+              this.saveErrorMessage = error.variables[0].value.details.responseBody;
+            }
+          }
+
           this.saving = false;
           this.saveError = true;
         },
       );
+  }
+
+  public toggleErrorMessage() {
+    this.displayErrorMessage = !this.displayErrorMessage;
   }
 }
 

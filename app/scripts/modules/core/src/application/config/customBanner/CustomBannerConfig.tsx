@@ -1,13 +1,13 @@
-import { isEqual } from 'lodash';
 import React from 'react';
+import { isEqual } from 'lodash';
 import Select, { Option } from 'react-select';
 
-import { HelpField } from 'core/help/HelpField';
-import { Markdown } from 'core/presentation/Markdown';
-import { noop } from 'core/utils';
-
-import { bannerBackgroundColorOptions, bannerTextColorOptions } from './customBannerColors';
 import { ConfigSectionFooter } from '../footer/ConfigSectionFooter';
+import { bannerBackgroundColorOptions, bannerTextColorOptions } from './customBannerColors';
+
+import { noop } from 'core/utils';
+import { Markdown } from 'core/presentation/Markdown';
+import { HelpField } from 'core/help/HelpField';
 
 import './customBannerConfig.less';
 
@@ -22,11 +22,13 @@ export interface ICustomBannerConfigProps {
   bannerConfigs: ICustomBannerConfig[];
   isSaving: boolean;
   saveError: boolean;
+  saveErrorMessage: string;
   updateBannerConfigs: (bannerConfigs: ICustomBannerConfig[]) => void;
 }
 
 export interface ICustomBannerConfigState {
   bannerConfigsEditing: ICustomBannerConfig[];
+  displayErrorMessage: boolean;
 }
 
 export class CustomBannerConfig extends React.Component<ICustomBannerConfigProps, ICustomBannerConfigState> {
@@ -34,6 +36,7 @@ export class CustomBannerConfig extends React.Component<ICustomBannerConfigProps
     bannerConfigs: [],
     isSaving: false,
     saveError: false,
+    saveErrorMessage: '',
     updateBannerConfigs: noop,
   };
 
@@ -41,6 +44,7 @@ export class CustomBannerConfig extends React.Component<ICustomBannerConfigProps
     super(props);
     this.state = {
       bannerConfigsEditing: props.bannerConfigs,
+      displayErrorMessage: false,
     };
   }
 
@@ -133,6 +137,12 @@ export class CustomBannerConfig extends React.Component<ICustomBannerConfigProps
     });
   };
 
+  private toggleErrorMessage = (): void => {
+    this.setState({
+      displayErrorMessage: !this.state.displayErrorMessage,
+    });
+  };
+
   private onSaveClicked = (): void => {
     this.props.updateBannerConfigs(this.state.bannerConfigsEditing);
   };
@@ -151,25 +161,25 @@ export class CustomBannerConfig extends React.Component<ICustomBannerConfigProps
         <div className="col-md-10 col-md-offset-1">
           <table className="table table-condensed">
             <thead>
-              <tr>
-                <th className="text-center">Enabled</th>
-                <th>Text</th>
-                <th className="custom-banner-config-color-option-column">Text Color</th>
-                <th className="custom-banner-config-color-option-column">Background</th>
-                <th />
-              </tr>
+            <tr>
+              <th className="text-center">Enabled</th>
+              <th>Text</th>
+              <th className="custom-banner-config-color-option-column">Text Color</th>
+              <th className="custom-banner-config-color-option-column">Background</th>
+              <th />
+            </tr>
             </thead>
             <tbody>
-              {this.state.bannerConfigsEditing.map((banner, idx) => (
-                <tr key={idx} className="custom-banner-config-row">
-                  <td className="text-center">
-                    <input
-                      checked={banner.enabled}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.onEnabledChange(idx, e.target.checked)}
-                      type="checkbox"
-                    />
-                  </td>
-                  <td>
+            {this.state.bannerConfigsEditing.map((banner, idx) => (
+              <tr key={idx} className="custom-banner-config-row">
+                <td className="text-center">
+                  <input
+                    checked={banner.enabled}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => this.onEnabledChange(idx, e.target.checked)}
+                    type="checkbox"
+                  />
+                </td>
+                <td>
                     <textarea
                       className="form-control input-sm custom-banner-config-textarea"
                       onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => this.onTextChange(idx, e.target.value)}
@@ -179,49 +189,49 @@ export class CustomBannerConfig extends React.Component<ICustomBannerConfigProps
                       }}
                       value={banner.text}
                     />
-                    <div className="small text-right">
-                      Markdown is okay <HelpField id="markdown.examples" />
+                  <div className="small text-right">
+                    Markdown is okay <HelpField id="markdown.examples" />
+                  </div>
+                  <div>
+                    <b>Preview</b>
+                    <div
+                      className="input-sm custom-banner-config-preview"
+                      style={{
+                        backgroundColor: banner.backgroundColor,
+                        color: banner.textColor,
+                      }}
+                    >
+                      <Markdown message={banner.text} />
                     </div>
-                    <div>
-                      <b>Preview</b>
-                      <div
-                        className="input-sm custom-banner-config-preview"
-                        style={{
-                          backgroundColor: banner.backgroundColor,
-                          color: banner.textColor,
-                        }}
-                      >
-                        <Markdown message={banner.text} />
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <Select
-                      clearable={false}
-                      options={bannerTextColorOptions}
-                      onChange={(option: Option<string>) => this.onTextColorChange(idx, option)}
-                      optionRenderer={this.colorOptionRenderer}
-                      value={banner.textColor}
-                      valueRenderer={this.colorOptionRenderer}
-                    />
-                  </td>
-                  <td>
-                    <Select
-                      clearable={false}
-                      options={bannerBackgroundColorOptions}
-                      onChange={(option: Option<string>) => this.onBackgroundColorChange(idx, option)}
-                      optionRenderer={this.colorOptionRenderer}
-                      value={banner.backgroundColor}
-                      valueRenderer={this.colorOptionRenderer}
-                    />
-                  </td>
-                  <td>
-                    <button className="link custom-banner-config-remove" onClick={() => this.removeBanner(idx)}>
-                      <span className="glyphicon glyphicon-trash" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+                  </div>
+                </td>
+                <td>
+                  <Select
+                    clearable={false}
+                    options={bannerTextColorOptions}
+                    onChange={(option: Option<string>) => this.onTextColorChange(idx, option)}
+                    optionRenderer={this.colorOptionRenderer}
+                    value={banner.textColor}
+                    valueRenderer={this.colorOptionRenderer}
+                  />
+                </td>
+                <td>
+                  <Select
+                    clearable={false}
+                    options={bannerBackgroundColorOptions}
+                    onChange={(option: Option<string>) => this.onBackgroundColorChange(idx, option)}
+                    optionRenderer={this.colorOptionRenderer}
+                    value={banner.backgroundColor}
+                    valueRenderer={this.colorOptionRenderer}
+                  />
+                </td>
+                <td>
+                  <button className="link custom-banner-config-remove" onClick={() => this.removeBanner(idx)}>
+                    <span className="glyphicon glyphicon-trash" />
+                  </button>
+                </td>
+              </tr>
+            ))}
             </tbody>
           </table>
         </div>
@@ -234,9 +244,12 @@ export class CustomBannerConfig extends React.Component<ICustomBannerConfigProps
           isDirty={this.isDirty()}
           isValid={true}
           isSaving={this.props.isSaving}
-          saveError={false}
+          saveError={this.props.saveError}
+          saveErrorMessage={this.props.saveErrorMessage}
+          displayErrorMessage={this.state.displayErrorMessage}
           onRevertClicked={this.onRevertClicked}
           onSaveClicked={this.onSaveClicked}
+          toggleErrorMessage={this.toggleErrorMessage}
         />
       </div>
     );

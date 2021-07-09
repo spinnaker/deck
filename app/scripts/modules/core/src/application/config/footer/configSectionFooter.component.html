@@ -23,9 +23,23 @@
     </button>
     <div class="error-message" ng-if="$ctrl.viewState.saveError">
       There was an error saving your changes. Please try again.
+      <div class="text-left" ng-if="$ctrl.viewState.saveError">
+        <div ng-click="$ctrl.toggleErrorMessage()">
+          More information
+          <span
+            ng-class="
+              $ctrl.displayErrorMessage ? 'glyphicon glyphicon-chevron-down' : 'glyphicon glyphicon-chevron-right'
+            "
+          ></span>
+        </div>
+        <div ng-if="$ctrl.displayErrorMessage">
+          <p ng-if="$ctrl.displayErrorMessage" ng-bind="$ctrl.viewState.saveErrorMessage"></p>
+        </div>
+      </div>
     </div>
+
     <span ng-if="!$ctrl.viewState.isDirty" class="btn btn-link disabled"
-      ><span class="far fa-check-circle"></span> In sync with server</span
-    >
+    ><span class="far fa-check-circle"></span> In sync with server
+    </span>
   </div>
 </div>

@@ -12,6 +12,7 @@ module(CUSTOM_BANNER_CONFIG, []).component(
     'bannerConfigs',
     'isSaving',
     'saveError',
+    'saveErrorMessage',
     'updateBannerConfigs',
   ]),
 );
