@@ -68,6 +68,10 @@ export class StageSummaryController implements IController {
     return index === this.getCurrentStep();
   }
 
+  public hasActions(stage?: IStage): boolean {
+    return this.isRestartable(stage) || this.canManuallySkip() || this.canIgnoreFailure();
+  }
+
   public isRestartable(stage?: IStage): boolean {
     if (stage.isRunning || stage.isCompleted) {
       return false;
@@ -91,6 +95,10 @@ export class StageSummaryController implements IController {
     return this.stage.isRunning && topLevelStage && topLevelStage.context.canManuallySkip;
   }
 
+  public canIgnoreFailure(): boolean {
+    return this.stage.isHalted && this.stage.context.allowIgnoreFailure;
+  }
+
   public getTopLevelStage(): IExecutionStage {
     let parentStageId = this.stage.parentStageId;
     let topLevelStage: IExecutionStage = this.stage;
@@ -99,6 +107,32 @@ export class StageSummaryController implements IController {
       parentStageId = topLevelStage.parentStageId;
     }
     return topLevelStage;
+  }
+
+  public openIgnoreStageFailureModal(): void {
+    ConfirmationModalService.confirm({
+      header: 'Really ignore this failure?',
+      buttonText: 'Ignore',
+      askForReason: true,
+      submitJustWithReason: true,
+      body: `<div class="alert alert-warning">
+          <b>Warning:</b> Ignoring this failure may have unpredictable results.
+          <ul>
+            <li>Downstream stages that depend on the outputs of this stage may fail or behave unexpectedly.</li>
+          </ul>
+        </div>
+      `,
+      submitMethod: (reason: object) =>
+        this.executionService
+          .ignoreStageFailureInExecution(this.execution.id, this.stage.id, reason)
+          .then(() =>
+            this.executionService.waitUntilExecutionMatches(this.execution.id, (execution) => {
+              const updatedStage = execution.stages.find((stage) => stage.id === this.stage.id);
+              return updatedStage && updatedStage.status === 'FAILED_CONTINUE';
+            }),
+          )
+          .then((updated) => this.executionService.updateExecution(this.application, updated)),
+    });
   }
 
   public openManualSkipStageModal(): void {

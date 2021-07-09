@@ -2,7 +2,7 @@
   <h5 class="execution-details-title">
     Stage details: {{stageSummary.name || stageSummary.type }}
 
-    <div ng-if="$ctrl.isRestartable(stage) || $ctrl.canManuallySkip()" uib-dropdown class="btn-group pull-right">
+    <div ng-if="$ctrl.hasActions(stage)" uib-dropdown class="btn-group pull-right">
       <button
         type="button"
         class="btn btn-default btn-sm dropdown-toggle"
@@ -37,6 +37,16 @@
             >Skip {{ $ctrl.getTopLevelStage().name }}</a
           >
         </li>
+        <li ng-if="$ctrl.canIgnoreFailure()">
+          <a
+            href
+            analytics-on="click"
+            analytics-category="Pipeline"
+            analytics-event="Stage ignore failure clicked"
+            ng-click="$ctrl.openIgnoreStageFailureModal()"
+            >Ignore {{ stage.name }} Failure</a
+          >
+        </li>
       </ul>
     </div>
   </h5>
@@ -48,6 +58,11 @@
   <h6 ng-if="$ctrl.getTopLevelStage().context.manualSkip" uib-tooltip="{{$ctrl.getTopLevelStage().context.reason}}">
     Manually skipped by {{$ctrl.getTopLevelStage().lastModified.user}} &mdash;
     {{$ctrl.getTopLevelStage().lastModified.lastModifiedTime | timestamp}}
+  </h6>
+  <h6 ng-if="stage.context.ignoreFailureDetails" uib-tooltip="{{stage.context.ignoreFailureDetails.reason}}">
+    Failure ignored manually by {{stage.context.ignoreFailureDetails.by}} &mdash;
+    {{stage.context.ignoreFailureDetails.time | timestamp}} {{stage.context.ignoreFailureDetails.previousException?
+    'Previous exception:' + stage.context.ignoreFailureDetails.previousException : ''}}
   </h6>
 
   <table class="table">

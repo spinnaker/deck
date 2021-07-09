@@ -108,6 +108,9 @@ export class OrchestratedItemTransformer {
       isPaused: {
         get: (): boolean => item.status === 'PAUSED',
       },
+      isHalted: {
+        get: (): boolean => ['TERMINAL', 'CANCELED', 'STOPPED'].includes(item.status),
+      },
       status: {
         // Returns either SUCCEEDED, RUNNING, FAILED, CANCELED, or NOT_STARTED
         get: (): string => this.normalizeStatus(item),

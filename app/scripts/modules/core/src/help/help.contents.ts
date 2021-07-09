@@ -80,6 +80,10 @@ const helpContents: { [key: string]: string } = {
       <p>When this option is enabled, stage will only execute when the supplied expression evaluates true.</p>
       <p>The expression <em>does not</em> need to be wrapped in \${ and }.</p>
       <p>If this expression evaluates to false, the stages following this stage will still execute.</p>`,
+  'pipeline.config.allowIgnoreFailure': `
+      <p>When this option is enabled, users will be able to manually ignore the stage if it failed.</p>
+      <p>You should use this only for stages that other stages don't closely depend on.</p>
+      <p>For example, if later stages depend on the outputs of this stage, you should not allow that option.</p>`,
   'pipeline.config.checkPreconditions.failPipeline': `
       <p><strong>Checked</strong> - the overall pipeline will fail whenever this precondition is false.</p>
       <p><strong>Unchecked</strong> - the overall pipeline will continue executing but this particular branch will stop.</p>`,
