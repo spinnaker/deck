@@ -282,7 +282,7 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.cf.createservice.updatable':
     '<p>If checked, this will try to update the existing service. If not, if the service exists this stage will succeed and not try to update.</p>',
   'pipeline.config.cf.createservice.versioned':
-    '<p>If checked, this stage should always deploy a new service with an incremented version number (v001).</p>',
+    '<p>If checked, this stage should always deploy a new service with an incremented version number (mysql-v001).</p>',
   'pipeline.config.manualJudgment.instructions':
     '<p>(Optional) Instructions are shown to the user when making a manual judgment.</p><p>May contain HTML.</p>',
   'pipeline.config.manualJudgment.propagateAuthentication': `
