@@ -275,7 +275,7 @@ const helpContents: { [key: string]: string } = {
     '<p>(Optional) The name of a json file containing key/value pairs to add to the packer command.</p>',
   'pipeline.config.bake.extendedAttributes':
     '<p>(Optional) Any additional attributes that you want to pass onto rosco, which will be injected into your packer runtime variables.</p>',
-  'pipeline.config.cf.createservice.updateable':
+  'pipeline.config.cf.createservice.updatable':
     '<p>If checked, this will try to update the existing service. If not, if the service exists this stage will succeed and not try to update.</p>',
   'pipeline.config.cf.createservice.versioned':
     '<p>If checked, this stage should always deploy a new service with an incremented version number (v001).</p>',

@@ -94,7 +94,7 @@ export class CreateUserProvidedInput extends React.Component<ICreateServiceInsta
         <StageConfigField label="Tags">
           <ServiceTagsInput tags={service.tags || []} onChange={this.tagsUpdated} />
         </StageConfigField>
-        <StageConfigField label="Updatable" helpKey={'pipeline.config.cf.createservice.updateable'}>
+        <StageConfigField label="Updatable" helpKey={'pipeline.config.cf.createservice.updatable'}>
           <input
             type="checkbox"
             disabled={!!service.versioned}
