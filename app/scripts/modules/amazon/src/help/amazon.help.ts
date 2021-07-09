@@ -96,6 +96,7 @@ const helpContents: { [key: string]: string } = {
   'aws.serverGroup.instanceMonitoring':
     '(Optional) <b>Instance Monitoring</b> whether to enable detailed monitoring of instances. Group metrics must be disabled to update an ASG with Instance Monitoring set to false.',
   'aws.serverGroup.tags': '(Optional) <b>Tags</b> are propagated to the instances in this cluster.',
+  'aws.serverGroup.blockDevice.tags': '(Optional) <b>Tags</b> apply to all the volumes in specified above.',
   'aws.serverGroup.allImages': 'Search for an image that does not match the name of your application.',
   'aws.serverGroup.filterImages': 'Select from a pre-filtered list of images matching the name of your application.',
   'aws.serverGroup.traffic': `<p>Enables the "AddToLoadBalancer" scaling process, which is used by Spinnaker and discovery services to determine if the server group is enabled.</p>

@@ -6,3 +6,4 @@ export * from './ServerGroupLoadBalancers';
 export * from './ServerGroupSecurityGroups';
 export * from './advancedSettings/ServerGroupAdvancedSettings';
 export * from './advancedSettings/ServerGroupAdvancedSettingsCommon';
+export * from './volumes/ServerGroupVolumes';

@@ -83,6 +83,17 @@ export interface IAmazonServerGroupCommandViewState extends IServerGroupCommandV
   spelLoadBalancers: string[];
 }
 
+export interface IServerGroupCommandBlockDevice {
+  deleteOnTermination: boolean;
+  deviceName: string;
+  size: number;
+  volumeType: string;
+  virtualName: string;
+  iops: number;
+  snapshotId: string;
+  encrypted: boolean;
+}
+
 export interface IAmazonServerGroupCommand extends IServerGroupCommand {
   associateIPv6Address?: boolean;
   associatePublicIpAddress: boolean;
@@ -102,6 +113,8 @@ export interface IAmazonServerGroupCommand extends IServerGroupCommand {
   unlimitedCpuCredits?: boolean;
   capacityRebalance?: boolean;
   viewState: IAmazonServerGroupCommandViewState;
+  blockDevices: IServerGroupCommandBlockDevice[];
+  blockDeviceTags: string[];
 
   getBlockDeviceMappingsSource: (command: IServerGroupCommand) => IBlockDeviceMappingSource;
   selectBlockDeviceMappingsSource: (command: IServerGroupCommand, selection: string) => void;
@@ -121,6 +134,7 @@ export class AwsServerGroupConfigurationService {
     'GroupTotalInstances',
   ];
   private healthCheckTypes = ['EC2', 'ELB'];
+  private volumeTypes = ['gp2', 'gp3', 'st1', 'io1', 'io2', 'sc1'];
   private terminationPolicies = [
     'OldestInstance',
     'NewestInstance',
@@ -148,6 +162,7 @@ export class AwsServerGroupConfigurationService {
     command.backingData = {
       enabledMetrics: clone(this.enabledMetrics),
       healthCheckTypes: clone(this.healthCheckTypes),
+      volumeTypes: clone(this.volumeTypes),
       terminationPolicies: clone(this.terminationPolicies),
     } as IAmazonServerGroupCommandBackingData;
   }
@@ -221,6 +236,7 @@ export class AwsServerGroupConfigurationService {
         this.awsInstanceTypeService.getAllTypesByRegion(),
         $q.when(clone(this.enabledMetrics)),
         $q.when(clone(this.healthCheckTypes)),
+        $q.when(clone(this.volumeTypes)),
         $q.when(clone(this.terminationPolicies)),
       ])
       .then(
@@ -233,6 +249,7 @@ export class AwsServerGroupConfigurationService {
           instanceTypes,
           enabledMetrics,
           healthCheckTypes,
+          volumeTypes,
           terminationPolicies,
         ]) => {
           const backingData: Partial<IAmazonServerGroupCommandBackingData> = {
@@ -244,6 +261,7 @@ export class AwsServerGroupConfigurationService {
             instanceTypes,
             enabledMetrics,
             healthCheckTypes,
+            volumeTypes,
             terminationPolicies,
           };
 

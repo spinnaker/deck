@@ -22,6 +22,7 @@ import {
   ServerGroupInstanceType,
   ServerGroupLoadBalancers,
   ServerGroupSecurityGroups,
+  ServerGroupVolumes,
   ServerGroupZones,
 } from './pages';
 import { AwsReactInjector } from '../../../reactShims';
@@ -244,6 +245,13 @@ export class AmazonCloneServerGroupModal extends React.Component<
               render={({ innerRef }) => (
                 <ServerGroupAdvancedSettings ref={innerRef} formik={formik} app={application} />
               )}
+            />
+
+            <WizardPage
+              label="Volumes"
+              wizard={wizard}
+              order={nextIdx()}
+              render={({ innerRef }) => <ServerGroupVolumes ref={innerRef} formik={formik} app={application} />}
             />
           </>
         )}
