@@ -16,6 +16,10 @@ Run the following commands (in the deck directory) to get all dependencies insta
 
 The app will start up on localhost:9000.
 
+When editing `core` or any other cloud provider package, please run the following in that folder
+
+- `yarn dev`
+
 ## Environment variables
 
 Environment variables can be used to configure application behavior. The following lists those variables and their possible values:
@@ -55,7 +59,7 @@ It's a work in progress, but please try to follow the [conventions here](https:/
 ## Customizing the UI
 
 It's certainly doable - we're in the middle of some significant changes to our build process, which should make it easier.
-For now, you can look at the [all modules](https://github.com/spinnaker/deck/tree/master/app/scripts/modules/) to
+For now, you can look at the [all modules](https://github.com/spinnaker/deck/tree/master/packages/) to
 get an idea how we are customizing Deck internally. Expect a lot of this to change, though, as we figure out better, cleaner
 hooks and integration points. And we're happy to provide new integration points (or accept pull requests) following
 those existing conventions if you need an integration point that doesn't already exist.

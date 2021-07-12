@@ -24,7 +24,7 @@ if [ "x${GITHUB_ACTIONS}" != "xtrue" ] ; then
   exit 2
 fi
 
-MODULES_DIR="app/scripts/modules"
+MODULES_DIR="packages"
 
 # Check that the module exists and the last commit modifying <module>/package.json contains a version bump ONLY
 echo "Deck package publisher ---> Checking that (${MODULE}) exist..."
@@ -69,7 +69,7 @@ for DIR in ${BUILDORDER} ; do
   pushd "${MODULES_DIR}/${DIR}" > /dev/null || exit 5
   if [ "${DIR}" == "${MODULE}" ] ; then
     echo "Deck package publisher ---> Publishing ${MODULE}..."
-    yarn
+    yarn build
     npm publish
   else
     echo "Deck package publisher ---> Building (but not publishing) upstream dependency '${DIR}'..."
