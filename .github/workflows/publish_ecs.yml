@@ -5,7 +5,7 @@ on:
     branches:
       - 'master'
     paths:
-      - 'app/scripts/modules/ecs/package.json'
+      - 'packages/ecs/package.json'
 
 jobs:
   build:
@@ -20,7 +20,7 @@ jobs:
       - name: publish ecs
         run: |
           npm config set //registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN
-          app/scripts/modules/github_actions_publish.sh ecs
+          scripts/github_actions_publish.sh ecs
         env:
           CI: true
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
