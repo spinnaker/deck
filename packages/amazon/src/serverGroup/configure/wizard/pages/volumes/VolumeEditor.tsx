@@ -55,7 +55,7 @@ export class VolumeEditor extends React.Component<IVolumeEditorProps, IVolumeEdi
       encrypted: false,
       deviceName: '/dev/sdh',
       size: 16,
-      iops: 100,
+      iops: null,
       volumeType: 'gp2',
       virtualName: '',
       snapshotId: '',
@@ -90,6 +90,7 @@ export class VolumeEditor extends React.Component<IVolumeEditorProps, IVolumeEdi
           </thead>
           <tbody>
             {
+              (values.blockDevices != null) &&
               values.blockDevices.map((block, index) => (
                 <tr key={index}>
                   <td>{block.deleteOnTermination ? 'Yes' : 'No'}</td>

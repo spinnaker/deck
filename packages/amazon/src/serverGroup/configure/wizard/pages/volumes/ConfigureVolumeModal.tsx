@@ -49,7 +49,7 @@ export class ConfigureVolumeConfigModal extends React.Component<IConfigureVolume
       size: config.size || 16,
       volumeType: config.volumeType || 'gp2',
       virtualName: config.virtualName || '',
-      iops: config.iops || 100,
+      iops: config.iops,
       snapshotId: config.snapshotId || '',
       encrypted: config.encrypted,
     };
@@ -96,7 +96,7 @@ export class ConfigureVolumeConfigModal extends React.Component<IConfigureVolume
                 <FormikFormField
                   name="deviceName"
                   label="Device Name"
-                  required={false}
+                  required={true}
                   input={(props) => <TextInput {...props} />}
                   help={<HelpField id="aws.securityGroup.volume.devicename" />}
                 />
@@ -104,7 +104,7 @@ export class ConfigureVolumeConfigModal extends React.Component<IConfigureVolume
                 <FormikFormField
                   name="volumeType"
                   label="Volune Type"
-                  required
+                  required={true}
                   help={<HelpField id="aws.securityGroup.volume.type" />}
                   input={(props) => (
                     <SelectInput
@@ -133,7 +133,7 @@ export class ConfigureVolumeConfigModal extends React.Component<IConfigureVolume
                 <FormikFormField
                   name="size"
                   label="Size"
-                  required={false}
+                  required={true}
                   input={(props) => <NumberInput {...props} />}
                   help={<HelpField id="aws.securityGroup.volume.size" />}
                 />
