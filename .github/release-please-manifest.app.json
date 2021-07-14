@@ -11,6 +11,7 @@
   "packages/huaweicloud": "0.0.14",
   "packages/kubernetes": "0.0.70",
   "packages/oracle": "0.0.26",
+  "packages/presentation": "0.0.8",
   "packages/tencentcloud": "0.0.20",
   "packages/titus": "0.0.191"
 }
