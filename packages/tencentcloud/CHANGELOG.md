@@ -1,3 +1,14 @@
+## [0.1.0](https://www.github.com/spinnaker/deck/compare/tencentcloud-v0.0.20...tencentcloud-v0.1.0) (2021-07-14)
+
+
+### Features
+
+* **changelog:** generate changelogs for all packages (only includes commits before the migration to packages/*) ([bc05c6e](https://www.github.com/spinnaker/deck/commit/bc05c6e4669a418b1496edd1ebf9fb9d35749285))
+
+
+### Bug Fixes
+
+* **all:** Fix references due to packages moves ([a3f61c6](https://www.github.com/spinnaker/deck/commit/a3f61c63e55527b7ee0631756ecd73121d37d47b))
 
 ## [0.0.19](https://www.github.com/spinnaker/deck/compare/d478c23ec6dcd2c56f0fc04283fe548ea5b836dc...e8923ca33c66c03138881c17d66f2955dccbb3f5) (2021-07-01)
 
@@ -219,6 +230,4 @@ fix(tencentcloud): rename tencentCloud to tencentcloud. [#8346](https://github.c
 ### Changes
 
 chore(package): publish core 0.0.478 tencentcloud 0.0.2 [#8308](https://github.com/spinnaker/deck/pull/8308) ([94f977b8](https://github.com/spinnaker/deck/commit/94f977b83063edd6b0fa215cf3e3b1c9c899a1ce))  
-feat(tencentcloud): add help, image, keyPairs, reactShims, search, validation folders and files for tencentcloud [#8296](https://github.com/spinnaker/deck/pull/8296) ([ec08cc50](https://github.com/spinnaker/deck/commit/ec08cc504fce0a7e1e5c58b181ce7076929a9553))  
-
-
+feat(tencentcloud): add help, image, keyPairs, reactShims, search, validation folders and files for tencentcloud [#8296](https://github.com/spinnaker/deck/pull/8296) ([ec08cc50](https://github.com/spinnaker/deck/commit/ec08cc504fce0a7e1e5c58b181ce7076929a9553))

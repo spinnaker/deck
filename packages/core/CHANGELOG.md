@@ -1,3 +1,16 @@
+## [0.1.0](https://www.github.com/spinnaker/deck/compare/core-v0.0.609...core-v0.1.0) (2021-07-14)
+
+
+### Features
+
+* **cf/versioning:** Feat cloudFoundry service versioning ([#9407](https://www.github.com/spinnaker/deck/issues/9407)) ([c7e2174](https://www.github.com/spinnaker/deck/commit/c7e2174dba34585615564f53b73f0694413afc3f))
+* **changelog:** generate changelogs for all packages (only includes commits before the migration to packages/*) ([bc05c6e](https://www.github.com/spinnaker/deck/commit/bc05c6e4669a418b1496edd1ebf9fb9d35749285))
+
+
+### Bug Fixes
+
+* **all:** Fix references due to packages moves ([a3f61c6](https://www.github.com/spinnaker/deck/commit/a3f61c63e55527b7ee0631756ecd73121d37d47b))
+* **core:** move all graphql code generator components to core and fix the build script ([#9424](https://www.github.com/spinnaker/deck/issues/9424)) ([2cc0850](https://www.github.com/spinnaker/deck/commit/2cc0850fb6d8f7d76ee2499b36c791555586e5cc))
 
 ## [0.0.608](https://www.github.com/spinnaker/deck/compare/ec8327948590884983967e99c6d6df40e1f76f9c...760d2f3fe4594554803ae28b333dabd379f6623e) (2021-07-09)
 
@@ -8206,6 +8219,4 @@ fix(aws): restore scaling activities link ([4893a0c9](https://github.com/spinnak
 refactor(docker): prepare docker for lib packaging ([b5b2c903](https://github.com/spinnaker/deck/commit/b5b2c903d8b901756b9c887315b2c09d768e4514))  
 refactor(help): split help into provider modules ([76766da2](https://github.com/spinnaker/deck/commit/76766da28c6180c45f6a06e1e7ed9fb836b98818))  
 fix(clusters): fix search result heading for clusters ([6a7c9eef](https://github.com/spinnaker/deck/commit/6a7c9eef5955c6a4e9fbf84ae9c23476208f39bf))  
-fix(deploymentstrategy): include requires for deployment strategies ([ceb81ff3](https://github.com/spinnaker/deck/commit/ceb81ff334c6ffa235be8810eccb3885dbd25e35))  
-
-
+fix(deploymentstrategy): include requires for deployment strategies ([ceb81ff3](https://github.com/spinnaker/deck/commit/ceb81ff334c6ffa235be8810eccb3885dbd25e35))
