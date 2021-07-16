@@ -1,3 +1,22 @@
+## [0.1.0](https://www.github.com/spinnaker/deck/compare/oracle-v0.0.26...oracle-v0.1.0) (2021-07-16)
+
+
+### Features
+
+* **changelog:** generate changelogs for all packages (only includes commits before the migration to packages/*) ([bc05c6e](https://www.github.com/spinnaker/deck/commit/bc05c6e4669a418b1496edd1ebf9fb9d35749285))
+
+
+### Bug Fixes
+
+* **all:** Convert requires to imports ([abf4c75](https://www.github.com/spinnaker/deck/commit/abf4c7590ee4bf84adfb1624c5aafcaccf829be5))
+* **all:** Fix references due to packages moves ([a3f61c6](https://www.github.com/spinnaker/deck/commit/a3f61c63e55527b7ee0631756ecd73121d37d47b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @spinnaker/core bumped from * to ^0.1.0
 
 ## [0.0.25](https://www.github.com/spinnaker/deck/compare/57fb94206d47b2e27c8b5f480ed016f175980d63...02209adde500d281dd62d940027d81e7161f44c7) (2021-07-01)
 
@@ -331,6 +350,4 @@ fix(bakery/oracle): use read-only text field for bake region [#5843](https://git
 chore(package): prepare -> prepublishOnly for everything [#5806](https://github.com/spinnaker/deck/pull/5806) ([06f45b5c](https://github.com/spinnaker/deck/commit/06f45b5c0da71227e4f1d7bb9e7187e95231f4d2))  
 fix(bake/oracle): always show rebake option in bake configuration. [#5761](https://github.com/spinnaker/deck/pull/5761) ([f7e4900b](https://github.com/spinnaker/deck/commit/f7e4900b78901d6293103e64c7b11f33d4932bb2))  
 chore(prettier): Just Update Prettier™ [#5754](https://github.com/spinnaker/deck/pull/5754) ([709f30f6](https://github.com/spinnaker/deck/commit/709f30f6eff0c8862cb8736465e4fd152abd693c))  
-feat(bake/oracle): Added oracle OCI bakery. [#5697](https://github.com/spinnaker/deck/pull/5697) ([acb89a23](https://github.com/spinnaker/deck/commit/acb89a23d584c32b015069f03d2e83e988a5fc34))  
-
-
+feat(bake/oracle): Added oracle OCI bakery. [#5697](https://github.com/spinnaker/deck/pull/5697) ([acb89a23](https://github.com/spinnaker/deck/commit/acb89a23d584c32b015069f03d2e83e988a5fc34))

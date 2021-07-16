@@ -1,3 +1,23 @@
+## [0.1.0](https://www.github.com/spinnaker/deck/compare/titus-v0.0.191...titus-v0.1.0) (2021-07-16)
+
+
+### Features
+
+* **changelog:** generate changelogs for all packages (only includes commits before the migration to packages/*) ([bc05c6e](https://www.github.com/spinnaker/deck/commit/bc05c6e4669a418b1496edd1ebf9fb9d35749285))
+
+
+### Bug Fixes
+
+* **all:** Fix references due to packages moves ([a3f61c6](https://www.github.com/spinnaker/deck/commit/a3f61c63e55527b7ee0631756ecd73121d37d47b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @spinnaker/amazon bumped from * to ^0.1.0
+    * @spinnaker/core bumped from * to ^0.1.0
+    * @spinnaker/docker bumped from * to ^0.1.0
 
 ## [0.0.190](https://www.github.com/spinnaker/deck/compare/e3e1f4340df9be06a2f292e13c40aa54f10172c6...dc32d0249bde99a124787baa40740bd78e9de3a3) (2021-07-09)
 
@@ -2002,6 +2022,4 @@ chore(webpack): update webpack configurations for webpack 4 ([40981eae](https://
 
 ### Changes
 
-chore(titus): bump package to 0.2 ([857448f8](https://github.com/spinnaker/deck/commit/857448f890e4f7aa0de036b61ae50e6e0a363eaf))  
-
-
+chore(titus): bump package to 0.2 ([857448f8](https://github.com/spinnaker/deck/commit/857448f890e4f7aa0de036b61ae50e6e0a363eaf))

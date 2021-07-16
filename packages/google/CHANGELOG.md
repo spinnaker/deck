@@ -1,3 +1,21 @@
+## [0.1.0](https://www.github.com/spinnaker/deck/compare/google-v0.0.41...google-v0.1.0) (2021-07-16)
+
+
+### Features
+
+* **changelog:** generate changelogs for all packages (only includes commits before the migration to packages/*) ([bc05c6e](https://www.github.com/spinnaker/deck/commit/bc05c6e4669a418b1496edd1ebf9fb9d35749285))
+
+
+### Bug Fixes
+
+* **all:** Fix references due to packages moves ([a3f61c6](https://www.github.com/spinnaker/deck/commit/a3f61c63e55527b7ee0631756ecd73121d37d47b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @spinnaker/core bumped from * to ^0.1.0
 
 ## [0.0.40](https://www.github.com/spinnaker/deck/compare/f5349b4308afcc5b74bed0b9a7695a3ea31af401...d5b3de937e0f3a4fdb5d651a231b7585b3fc4a0b) (2021-07-01)
 
@@ -643,6 +661,4 @@ feat(provider/google): Add ILB listeners. [#3832](https://github.com/spinnaker/d
 feat(provider/google): Add support for Shared VPC Networking (XPN). [#3831](https://github.com/spinnaker/deck/pull/3831) ([7d0d532a](https://github.com/spinnaker/deck/commit/7d0d532a9750238ae66726e6bc73f6bbdc37f88b))  
 chore(provider/google): Update auth scopes tooltip. [#3826](https://github.com/spinnaker/deck/pull/3826) ([59854199](https://github.com/spinnaker/deck/commit/598541999a2105db0b50d07352ed9d952814d5d8))  
 refactor(provider/amazon): convert createApplicationLoadBalancer to TS [#3816](https://github.com/spinnaker/deck/pull/3816) ([a2d75789](https://github.com/spinnaker/deck/commit/a2d75789e380c36675cfe3a2a16839af58751d2f))  
-refactor(provider/amazon): Separate load balancer types [#3810](https://github.com/spinnaker/deck/pull/3810) ([b66dc0c3](https://github.com/spinnaker/deck/commit/b66dc0c3766b863ed1422721b872619e6cf5e1c1))  
-
-
+refactor(provider/amazon): Separate load balancer types [#3810](https://github.com/spinnaker/deck/pull/3810) ([b66dc0c3](https://github.com/spinnaker/deck/commit/b66dc0c3766b863ed1422721b872619e6cf5e1c1))

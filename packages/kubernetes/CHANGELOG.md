@@ -1,3 +1,21 @@
+## [0.1.0](https://www.github.com/spinnaker/deck/compare/kubernetes-v0.0.70...kubernetes-v0.1.0) (2021-07-16)
+
+
+### Features
+
+* **changelog:** generate changelogs for all packages (only includes commits before the migration to packages/*) ([bc05c6e](https://www.github.com/spinnaker/deck/commit/bc05c6e4669a418b1496edd1ebf9fb9d35749285))
+
+
+### Bug Fixes
+
+* **all:** Fix references due to packages moves ([a3f61c6](https://www.github.com/spinnaker/deck/commit/a3f61c63e55527b7ee0631756ecd73121d37d47b))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @spinnaker/core bumped from * to ^0.1.0
 
 ## [0.0.69](https://www.github.com/spinnaker/deck/compare/65f383b53a83b9bdaab16fe9cdf137c92b5bade8...425007f657d8a57751c3fad4bf67c9e1e167b2c9) (2021-07-01)
 
@@ -1097,6 +1115,4 @@ feat(provider/kubernetes): v2 lb details [#4375](https://github.com/spinnaker/de
 feat(provider/kubernetes): v2 manifest delete ctrl [#4370](https://github.com/spinnaker/deck/pull/4370) ([45880cca](https://github.com/spinnaker/deck/commit/45880cca3b19a08dbd61402a472079bec14386a7))  
 fix(provider/kubernetes): fix parsing of v2 names [#4367](https://github.com/spinnaker/deck/pull/4367) ([7cf1bbbf](https://github.com/spinnaker/deck/commit/7cf1bbbf664da8d705a4b32c1b07efd414f58945))  
 feat(provider/kubernetes): surface stack & detail [#4341](https://github.com/spinnaker/deck/pull/4341) ([ffd6f35e](https://github.com/spinnaker/deck/commit/ffd6f35ea4a91d0d78d9cd965647624851129031))  
-feat(provider/kubernetes): feature flag v1 rrb [#4343](https://github.com/spinnaker/deck/pull/4343) ([ca15ec80](https://github.com/spinnaker/deck/commit/ca15ec8026283eb474e9877f64010a119b77c47a))  
-
-
+feat(provider/kubernetes): feature flag v1 rrb [#4343](https://github.com/spinnaker/deck/pull/4343) ([ca15ec80](https://github.com/spinnaker/deck/commit/ca15ec8026283eb474e9877f64010a119b77c47a))
