@@ -46,8 +46,8 @@ jobs:
       - name: gha - get bumped packages
         id: bumps
         run: |
-          .github/gha_output_bumped_packages.sh
-          .github/gha_output_changelog.sh
+          scripts/gha_output_bumped_packages.sh
+          scripts/gha_output_changelog.sh
 
       - name: git - use conventional commit
         run: |
