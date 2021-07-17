@@ -1,3 +1,19 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## 0.0.125 (2021-07-17)
+
+
+### Bug Fixes
+
+* **publishing:** Apply conventional commit AFTER running 'gha - get bumped packages' ([8318ba8](https://github.com/spinnaker/deck/commit/8318ba8999dbbf7787eb4047de3006a4ebce2884))
+
+
+
+
+
 
 ## [0.0.123](https://www.github.com/spinnaker/deck/compare/674fa308e881cccafb5cf6850a9dd454f112aebd...5fc2772dcf043d67e259fdd438efc59b6c8b856d) (2021-07-08)
 
@@ -522,6 +538,4 @@ feat(provider/cf): add deploy and delete service pipeline stages ([876fcf55](htt
 refactor(core/modal): Use `formik` prop instead of spreading.   Simplify WizardPage props. ([a1d03e0e](https://github.com/spinnaker/deck/commit/a1d03e0eeb0ea25f87cf5deac644f4f5025c2b0d))  
 refactor(core/modal): Use TSX generics to render WizardModal ([2fad82c8](https://github.com/spinnaker/deck/commit/2fad82c8ddfdc912e7a7d72c98913351d12aa10c))  
 chore(prettier): Just Update Prettier™ [#5754](https://github.com/spinnaker/deck/pull/5754) ([709f30f6](https://github.com/spinnaker/deck/commit/709f30f6eff0c8862cb8736465e4fd152abd693c))  
-fix(cloudfoundry): module builds require the use of alias instead of a path directly in core [#5742](https://github.com/spinnaker/deck/pull/5742) ([4b8a7df3](https://github.com/spinnaker/deck/commit/4b8a7df3bb039d4eee6f2860c14cca91d2952e8e))  
-
-
+fix(cloudfoundry): module builds require the use of alias instead of a path directly in core [#5742](https://github.com/spinnaker/deck/pull/5742) ([4b8a7df3](https://github.com/spinnaker/deck/commit/4b8a7df3bb039d4eee6f2860c14cca91d2952e8e))
