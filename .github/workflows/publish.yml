@@ -1,0 +1,26 @@
+name: Publish packages to NPM
+
+on:
+  push:
+    branches:
+      - 'master'
+    paths:
+      - 'packages/*/package.json'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js 12.16.0
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.16.0
+      - name: publish packages to npm
+        run: |
+          npm config set //registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN
+          scripts/gha_publish.sh
+        env:
+          CI: true
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

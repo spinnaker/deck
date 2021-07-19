@@ -15,10 +15,10 @@ jobs:
     # Meta-job that depends on the other job statuses.  Branch protection then checks this job status.
     name: Deck CI
     if: startsWith(github.repository, 'spinnaker/')
-    needs: [test, build, functional-tests, packages]
+    needs: [test, build, functional-tests]
     runs-on: ubuntu-latest
     steps:
-      - run: echo test, build, packages successful
+      - run: echo test, build successful
 
   test:
     name: Unit tests
@@ -26,22 +26,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Ensure package bumps are pure
-        id: purebump
-        run: app/scripts/modules/assert_package_bumps_standalone.sh
-
       - uses: actions/setup-node@v1
-        if: steps.purebump.outputs.ispurebump != 'true'
         with:
           node-version: ${{ env.NODE_VERSION  }}
 
       - name: Get yarn cache
-        if: steps.purebump.outputs.ispurebump != 'true'
         id: yarn-cache
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - uses: actions/cache@v1
-        if: steps.purebump.outputs.ispurebump != 'true'
         with:
           path: ${{ steps.yarn-cache.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -49,11 +42,12 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install Dependencies
-        if: steps.purebump.outputs.ispurebump != 'true'
         run: yarn --frozen-lockfile
 
+      - name: Build Modules
+        run: yarn modules
+
       - name: Unit Tests
-        if: steps.purebump.outputs.ispurebump != 'true'
         run: yarn test --single-run
 
   functional-tests:
@@ -62,22 +56,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Ensure package bumps are pure
-        id: purebump
-        run: app/scripts/modules/assert_package_bumps_standalone.sh
-
       - uses: actions/setup-node@v1
-        if: steps.purebump.outputs.ispurebump != 'true'
         with:
           node-version: ${{ env.NODE_VERSION  }}
 
       - name: Get yarn cache
-        if: steps.purebump.outputs.ispurebump != 'true'
         id: yarn-cache
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - uses: actions/cache@v1
-        if: steps.purebump.outputs.ispurebump != 'true'
         with:
           path: ${{ steps.yarn-cache.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -85,11 +72,12 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install Dependencies
-        if: steps.purebump.outputs.ispurebump != 'true'
         run: yarn --frozen-lockfile
 
+      - name: Build Modules
+        run: yarn modules
+
       - name: Functional Tests
-        if: steps.purebump.outputs.ispurebump != 'true'
         run: yarn functional
 
   build:
@@ -98,22 +86,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Ensure package bumps are pure
-        id: purebump
-        run: app/scripts/modules/assert_package_bumps_standalone.sh
-
       - uses: actions/setup-node@v1
-        if: steps.purebump.outputs.ispurebump != 'true'
         with:
           node-version: ${{ env.NODE_VERSION  }}
 
       - name: Get yarn cache
-        if: steps.purebump.outputs.ispurebump != 'true'
         id: yarn-cache
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - uses: actions/cache@v1
-        if: steps.purebump.outputs.ispurebump != 'true'
         with:
           path: ${{ steps.yarn-cache.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -121,51 +102,10 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install Dependencies
-        if: steps.purebump.outputs.ispurebump != 'true'
         run: yarn --frozen-lockfile
+
+      - name: Build Modules
+        run: yarn modules
 
       - name: Yarn Build
-        if: steps.purebump.outputs.ispurebump != 'true'
         run: yarn build
-
-  packages:
-    name: Build Packages
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        packages:
-          ['core amazon docker titus', 'appengine azure cloudfoundry', 'ecs oracle', 'google huaweicloud kubernetes']
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Ensure package bumps are pure
-        id: purebump
-        run: app/scripts/modules/assert_package_bumps_standalone.sh
-
-      - uses: actions/setup-node@v1
-        if: steps.purebump.outputs.ispurebump != 'true'
-        with:
-          node-version: ${{ env.NODE_VERSION  }}
-
-      - name: Get yarn cache
-        if: steps.purebump.outputs.ispurebump != 'true'
-        id: yarn-cache
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - uses: actions/cache@v1
-        if: steps.purebump.outputs.ispurebump != 'true'
-        with:
-          path: ${{ steps.yarn-cache.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install Dependencies
-        if: steps.purebump.outputs.ispurebump != 'true'
-        run: yarn --frozen-lockfile
-
-      - name: Build NPM Packages
-        if: steps.purebump.outputs.ispurebump != 'true'
-        run: app/scripts/modules/build_modules.sh ${{ matrix.packages }}
