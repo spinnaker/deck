@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.0.198...@spinnaker/titus@0.1.0) (2021-07-20)
+
+
+### Features
+
+* commit to test package bump PR creation ([#9492](https://github.com/spinnaker/deck/issues/9492)) ([d1f45b5](https://github.com/spinnaker/deck/commit/d1f45b5e5c228d359cae9450ac6f6cc80ef6f1eb))
+
+
+
+
+
 ## [0.0.198](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.0.197...@spinnaker/titus@0.0.198) (2021-07-20)
 
 **Note:** Version bump only for package @spinnaker/titus
