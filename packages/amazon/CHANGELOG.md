@@ -3,6 +3,72 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.5.0...@spinnaker/amazon@0.6.0) (2021-07-20)
+
+
+### Features
+
+* sample amazon commit to test package publishin ([#9481](https://github.com/spinnaker/deck/issues/9481)) ([8d45c5e](https://github.com/spinnaker/deck/commit/8d45c5ef24a83905a6e6bca46889ea4323b4ae50))
+
+
+
+
+
+# [0.5.0](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.0.326...@spinnaker/amazon@0.5.0) (2021-07-19)
+
+
+### Features
+
+* **amazon:** sample commit to test publish PR generation ([#9462](https://github.com/spinnaker/deck/issues/9462)) ([f38438c](https://github.com/spinnaker/deck/commit/f38438c30e169b1b52d4eb46796ab93ec577780f))
+
+
+
+
+
+# [0.4.0](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.0.326...@spinnaker/amazon@0.4.0) (2021-07-19)
+
+
+### Features
+
+* **amazon:** sample commit to test publish PR generation ([#9462](https://github.com/spinnaker/deck/issues/9462)) ([f38438c](https://github.com/spinnaker/deck/commit/f38438c30e169b1b52d4eb46796ab93ec577780f))
+
+
+
+
+
+# [0.3.0](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.0.326...@spinnaker/amazon@0.3.0) (2021-07-19)
+
+
+### Features
+
+* **amazon:** sample commit to test publish PR generation ([#9462](https://github.com/spinnaker/deck/issues/9462)) ([f38438c](https://github.com/spinnaker/deck/commit/f38438c30e169b1b52d4eb46796ab93ec577780f))
+
+
+
+
+
+# [0.2.0](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.0.326...@spinnaker/amazon@0.2.0) (2021-07-19)
+
+
+### Features
+
+* **amazon:** sample commit to test publish PR generation ([#9462](https://github.com/spinnaker/deck/issues/9462)) ([f38438c](https://github.com/spinnaker/deck/commit/f38438c30e169b1b52d4eb46796ab93ec577780f))
+
+
+
+
+
+# [0.1.0](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.0.326...@spinnaker/amazon@0.1.0) (2021-07-19)
+
+
+### Features
+
+* **amazon:** sample commit to test publish PR generation ([#9462](https://github.com/spinnaker/deck/issues/9462)) ([f38438c](https://github.com/spinnaker/deck/commit/f38438c30e169b1b52d4eb46796ab93ec577780f))
+
+
+
+
+
 ## 0.0.326 (2021-07-17)
 
 

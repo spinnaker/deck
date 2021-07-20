@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.43](https://github.com/spinnaker/deck/compare/@spinnaker/appengine@0.0.38...@spinnaker/appengine@0.0.43) (2021-07-19)
+
+**Note:** Version bump only for package @spinnaker/appengine
+
+
+
+
+
+## [0.0.42](https://github.com/spinnaker/deck/compare/@spinnaker/appengine@0.0.38...@spinnaker/appengine@0.0.42) (2021-07-19)
+
+**Note:** Version bump only for package @spinnaker/appengine
+
+
+
+
+
+## [0.0.41](https://github.com/spinnaker/deck/compare/@spinnaker/appengine@0.0.38...@spinnaker/appengine@0.0.41) (2021-07-19)
+
+**Note:** Version bump only for package @spinnaker/appengine
+
+
+
+
+
+## [0.0.40](https://github.com/spinnaker/deck/compare/@spinnaker/appengine@0.0.38...@spinnaker/appengine@0.0.40) (2021-07-19)
+
+**Note:** Version bump only for package @spinnaker/appengine
+
+
+
+
+
+## [0.0.39](https://github.com/spinnaker/deck/compare/@spinnaker/appengine@0.0.38...@spinnaker/appengine@0.0.39) (2021-07-19)
+
+**Note:** Version bump only for package @spinnaker/appengine
+
+
+
+
+
 ## 0.0.38 (2021-07-17)
 
 
