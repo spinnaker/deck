@@ -12,15 +12,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       - name: Use Node.js 12.16.0
         uses: actions/setup-node@v1
         with:
           node-version: 12.16.0
+
+      - name: git - tag bumped packages
+        id: tag
+        run: |
+          git config user.name spinnakerbot
+          git config user.email spinnakerbot@spinnaker.io
+          scripts/gha_tag_bumped_packages.sh
+
       - name: publish packages to npm
+        if: ${{ steps.tag.outputs.tagged == 'true' }}
         run: |
           npm config set //registry.npmjs.org/:_authToken=$NPM_AUTH_TOKEN
-          scripts/gha_publish.sh
+          yarn --frozen-lockfile
+          npx lerna run build
+          npx lerna publish from-git --yes
         env:
           CI: true
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
