@@ -27,6 +27,7 @@ export interface IAWSProviderSettings extends IProviderSettings {
   };
   defaultSecurityGroups?: string[];
   disableSpotPricing?: boolean;
+  dockerBakeryDeprecated?: boolean;
   dockerBakeWarning?: string;
   instanceTypes?: {
     exclude?: {
