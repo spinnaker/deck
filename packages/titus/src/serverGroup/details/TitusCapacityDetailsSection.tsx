@@ -10,6 +10,7 @@ import {
   showModal
 } from '@spinnaker/core';
 import { ITitusServerGroup } from '../../domain';
+import { TitusProviderSettings } from '../../titus.settings';
 import { TitusScalingActivitiesModal } from './scalingActivity/TitusScalingActivitiesModal';
 
 import { ITitusResizeServerGroupModalProps, TitusResizeServerGroupModal } from './resize/TitusResizeServerGroupModal';
@@ -32,7 +33,8 @@ export class TitusCapacityDetailsSection extends React.Component<ICapacityDetail
         notManaged &&
           ReactModal.show<ITitusResizeServerGroupModalProps>(TitusResizeServerGroupModal, { serverGroup, application });
       });
-
+    
+    const showScalingActivities = (TitusProviderSettings.scalingActivities || []).includes(application.name);
     return (
       <>
         <dl className="dl-horizontal dl-narrow">
@@ -51,11 +53,11 @@ export class TitusCapacityDetailsSection extends React.Component<ICapacityDetail
             Resize Server Group
           </a>
         </div>
-        <div>
+        {showScalingActivities && <div>
           <a className="clickable" onClick={() => showModal(TitusScalingActivitiesModal, { serverGroup }, { maxWidth: '1000px' })}>
             View Scaling Activities
           </a>
-        </div>
+        </div>}
       </>
     );
   }

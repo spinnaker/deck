@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { DateTime } from 'luxon';
 import { 
   ICapacity, 
   IModalComponentProps,
@@ -7,7 +8,6 @@ import {
   ModalHeader,
   ServerGroupReader, 
   Spinner, 
-  timestamp, 
   useData 
 } from '@spinnaker/core';
 import { ITitusServerGroup } from '../../../domain';
@@ -20,11 +20,11 @@ type JobState = 'Accepted' | 'KillInitiated' | 'Finished';
 
 interface ITitusScalingEvent {
   capacity: ICapacity;
+  date: string;
   jobId: string;
   jobState: JobState;
   reasonCode: string;
   reasonMessage: string; 
-  timeStamp: string;
 }
 
 export const TitusScalingActivitiesModal = ({ dismissModal, serverGroup }: ITitusScalingActivitiesProps) => {
@@ -32,6 +32,11 @@ export const TitusScalingActivitiesModal = ({ dismissModal, serverGroup }: ITitu
 
   const { result: scalingActivities, status, error } = useData(fetchScalingActivities, [], [serverGroup.id]);
   const loading = status === 'PENDING';
+
+  const formatDate = (date: string) => {
+    const newDate = new Date(date);
+    return DateTime.fromJSDate(newDate).toFormat('yyyy-MM-dd HH:mm:ss ZZZZ');
+  };
 
   return (
     <>
@@ -61,7 +66,7 @@ export const TitusScalingActivitiesModal = ({ dismissModal, serverGroup }: ITitu
                     <span className={`label label-${a.jobState !== 'KillInitiated' ? 'success' : 'danger'} pull-left`}>
                       {a.jobState}
                     </span>
-                    <span className="label label-default pull-right">{timestamp(a.timeStamp)}</span>
+                    <span className="label label-default pull-right">{formatDate(a.date)}</span>
                   </p>
                   <p>{`${a.reasonMessage} Desired capacity is ${a.capacity?.desired || 'unknown'}.`}</p>
                 </div>
