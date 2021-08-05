@@ -52,6 +52,7 @@ export interface MdApplication {
   environments: Array<MdEnvironment>;
   notifications?: Maybe<Array<MdNotification>>;
   rawConfig?: Maybe<Scalars['String']>;
+  gitIntegration?: Maybe<MdGitIntegration>;
 }
 
 export interface MdArtifact {
@@ -173,6 +174,14 @@ export type MdEventLevel =
   | 'INFO'
   | 'WARNING'
   | 'ERROR';
+
+export interface MdGitIntegration {
+  __typename?: 'MdGitIntegration';
+  id: Scalars['String'];
+  repository?: Maybe<Scalars['String']>;
+  branch?: Maybe<Scalars['String']>;
+  isEnabled?: Maybe<Scalars['Boolean']>;
+}
 
 export interface MdGitMetadata {
   __typename?: 'MdGitMetadata';
@@ -343,6 +352,11 @@ export interface MdUnpinArtifactVersionPayload {
   reference: Scalars['String'];
 }
 
+export interface MdUpdateGitIntegrationPayload {
+  application: Scalars['String'];
+  isEnabled: Scalars['Boolean'];
+}
+
 export interface MdVersionVeto {
   __typename?: 'MdVersionVeto';
   vetoedBy?: Maybe<Scalars['String']>;
@@ -360,6 +374,7 @@ export interface Mutation {
   markArtifactVersionAsGood?: Maybe<Scalars['Boolean']>;
   retryArtifactVersionAction?: Maybe<MdAction>;
   dismissNotification?: Maybe<Scalars['Boolean']>;
+  updateGitIntegration?: Maybe<MdGitIntegration>;
 }
 
 
@@ -402,6 +417,11 @@ export interface MutationRetryArtifactVersionActionArgs {
 
 export interface MutationDismissNotificationArgs {
   payload: MdDismissNotificationPayload;
+}
+
+
+export interface MutationUpdateGitIntegrationArgs {
+  payload?: Maybe<MdUpdateGitIntegrationPayload>;
 }
 
 export interface Query {
