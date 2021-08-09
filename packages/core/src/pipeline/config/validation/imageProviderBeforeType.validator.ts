@@ -6,6 +6,9 @@ export interface IImageProviderBeforeTypeValidationConfig extends IValidatorConf
   message: string;
 }
 
+/**
+ * Checks for triggers that provide images or a custom image id. If none are present, warn the user who is configuring the pipeline.
+ */
 export class ImageProviderBeforeTypeValidator implements IStageOrTriggerValidator {
   public validate( 
     pipeline: IPipeline,
