@@ -39,14 +39,6 @@ export class DockerImageUtils {
       return undefined;
     }
 
-    let imageId: string;
-
-    if (parts.digest) {
-      imageId = `${parts.repository}@${parts.digest}`;
-    } else {
-      imageId = `${parts.repository}:${parts.tag}`;
-    }
-
-    return imageId;
+    return `${parts.repository}:${parts.digest || parts.tag}`
   }
 }

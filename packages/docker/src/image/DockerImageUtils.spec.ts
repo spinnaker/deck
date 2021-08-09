@@ -132,7 +132,7 @@ describe('imageId generating', () => {
         digest: 'sha256:28f82eba',
         tag: undefined,
       }),
-    ).toEqual('gcr.io/project/my-image@sha256:28f82eba');
+    ).toEqual('gcr.io/project/my-image:sha256:28f82eba');
   });
 
   it('generate imageId with tag', () => {
