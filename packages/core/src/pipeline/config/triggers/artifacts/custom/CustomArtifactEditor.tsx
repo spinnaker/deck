@@ -2,10 +2,10 @@ import { cloneDeep, extend } from 'lodash';
 import React from 'react';
 
 import { ArtifactEditor } from '../ArtifactEditor';
-import { ArtifactTypePatterns } from '../../../../../artifact';
+import { ArtifactTypePatterns } from '../../../../../artifact/ArtifactTypes';
 import { IArtifactEditorProps, IArtifactKindConfig } from '../../../../../domain';
 import { StageConfigField } from '../../../stages/common';
-import { SpelText } from '../../../../../widgets';
+import { SpelText } from '../../../../../widgets/spelText/SpelText';
 
 export const TYPE = 'custom/object';
 export const CUSTOM_ARTIFACT_ACCOUNT = 'custom-artifact';

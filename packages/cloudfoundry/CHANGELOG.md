@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.137](https://github.com/spinnaker/deck/compare/@spinnaker/cloudfoundry@0.0.136...@spinnaker/cloudfoundry@0.0.137) (2021-08-05)
+
+**Note:** Version bump only for package @spinnaker/cloudfoundry
+
+
+
+
+
+## [0.0.136](https://github.com/spinnaker/deck/compare/@spinnaker/cloudfoundry@0.0.135...@spinnaker/cloudfoundry@0.0.136) (2021-08-02)
+
+**Note:** Version bump only for package @spinnaker/cloudfoundry
+
+
+
+
+
+## [0.0.135](https://github.com/spinnaker/deck/compare/@spinnaker/cloudfoundry@0.0.134...@spinnaker/cloudfoundry@0.0.135) (2021-07-30)
+
+
+### Bug Fixes
+
+* **build:** Upgrade uirouter/react version ([cc5004b](https://github.com/spinnaker/deck/commit/cc5004bfded32642553077346c19e34820d24ae7))
+
+
+
+
+
 ## [0.0.134](https://github.com/spinnaker/deck/compare/@spinnaker/cloudfoundry@0.0.133...@spinnaker/cloudfoundry@0.0.134) (2021-07-26)
 
 **Note:** Version bump only for package @spinnaker/cloudfoundry

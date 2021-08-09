@@ -3,6 +3,62 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.2.0...@spinnaker/core@0.2.1) (2021-08-05)
+
+
+### Bug Fixes
+
+* **core:** fix layout, click-to-scroll on diff view ([#9555](https://github.com/spinnaker/deck/issues/9555)) ([bc6ccca](https://github.com/spinnaker/deck/commit/bc6ccca86c6506cfcd243823147c9c9ea95df185))
+* **core:** Format changes timestamps when they are numbers or strings ([#9552](https://github.com/spinnaker/deck/issues/9552)) ([e780285](https://github.com/spinnaker/deck/commit/e780285d8fbdbbef3eba181368c0fe9ac4a4b866))
+
+
+
+
+
+# [0.2.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.1.0...@spinnaker/core@0.2.0) (2021-08-02)
+
+
+### Bug Fixes
+
+* **core/filterModel:** Do not add browser histroy events when changing infrastructure filter queries ([56cc429](https://github.com/spinnaker/deck/commit/56cc429a93d6a980cdce4e52dfb8adbe1d045832))
+* **core:** fixed a bunch of circular deps ([29f2b39](https://github.com/spinnaker/deck/commit/29f2b39fd44b43265124e824cb311ff3f8abbf0a))
+* **core:** Remove circular dependencies - 2 ([ee5f783](https://github.com/spinnaker/deck/commit/ee5f783e213bb175f6f9bd9c85bd42e3d6850d47))
+* **core:** Remove circular dependency of modules ([5c942b1](https://github.com/spinnaker/deck/commit/5c942b15b5f6a257d737a87fc8552dc5e40c8762))
+* **core:** trying to avoid importing ReactInjector in presentation ([4d464ce](https://github.com/spinnaker/deck/commit/4d464cea3a98be1c31484c7ec4123d3ca74c7c21))
+* **md:** text for BLOCKED status in allowed times constraint ([#9550](https://github.com/spinnaker/deck/issues/9550)) ([811e806](https://github.com/spinnaker/deck/commit/811e8065d12d36d114ea9e3af0049d368563a1ff))
+* **md:** the raw delivery config is not showing up properly. Hiding it for now ([#9548](https://github.com/spinnaker/deck/issues/9548)) ([8f7c6ef](https://github.com/spinnaker/deck/commit/8f7c6eff565a7915fbb8fe2607eae742ffc516b1))
+
+
+### Features
+
+* **core/cluster:** Remove unused react2angular <filter-search> component ([7514b0b](https://github.com/spinnaker/deck/commit/7514b0b06e687e3f92548517297365ed4d8137ce))
+
+
+
+
+
+# [0.1.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.0.620...@spinnaker/core@0.1.0) (2021-07-30)
+
+
+### Bug Fixes
+
+* **all:** Fix lodash global usage ([d048432](https://github.com/spinnaker/deck/commit/d048432978f0aa0bceb2b58f80ea7301de153072))
+* **build:** Upgrade uirouter/react version ([cc5004b](https://github.com/spinnaker/deck/commit/cc5004bfded32642553077346c19e34820d24ae7))
+* **core/pipeline:** Disable pipeline sorting when filtering by name (because some pipelines are hidden) ([1e06186](https://github.com/spinnaker/deck/commit/1e06186dec9fa9b38806f02db17e38c9d89125da))
+* **md:** fetch raw delivery config via graphql ([#9537](https://github.com/spinnaker/deck/issues/9537)) ([1ca3549](https://github.com/spinnaker/deck/commit/1ca354966c1ad7ab07d614db1df56aea67ffef6a))
+* **vite:** Add vite fixes ([8e0840a](https://github.com/spinnaker/deck/commit/8e0840a647944d9f90ad51c6568c320b096730d6))
+
+
+### Features
+
+* **core/pipeline:** Add some SpinErrorBoundaries to pipeline execution details ([14fa364](https://github.com/spinnaker/deck/commit/14fa364905a8bc532e6e28529acacf8a7d0d9e83))
+* **core/presentation:** Add a retry button to SpinErrorBoundary ([9883704](https://github.com/spinnaker/deck/commit/9883704db8f5b770c0793347b85d93bd87626e18))
+* introduce a separate timeout config property for api timeouts ([#9498](https://github.com/spinnaker/deck/issues/9498)) ([678a78a](https://github.com/spinnaker/deck/commit/678a78afa4cb762df01d8c6ed19311fdeeeb86a7))
+
+
+
+
+
 ## [0.0.620](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.0.619...@spinnaker/core@0.0.620) (2021-07-26)
 
 **Note:** Version bump only for package @spinnaker/core
