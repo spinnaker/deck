@@ -480,6 +480,7 @@ const helpContents: { [key: string]: string } = {
   'markdown.examples': `
     Some examples of markdown syntax: <br/> \`*italic*\` <br/> \`**bold**\` <br/> \`[link text](http://url-goes-here)\`
   `,
+  'pipeline.config.webhook.url': 'This webhook call must be idempotent, as certain failed requests will be automatically retried.',
   'pipeline.config.webhook.payload': 'JSON payload to be added to the webhook call.',
   'pipeline.config.webhook.cancelPayload':
     'JSON payload to be added to the webhook call when it is called in response to a cancellation.',

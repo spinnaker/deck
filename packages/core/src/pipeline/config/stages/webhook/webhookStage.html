@@ -3,7 +3,7 @@
     <strong>Note:</strong> {{$ctrl.noUserConfigurableFields ? 'All' : 'Some'}} of the settings of this stage are
     preconfigured, and cannot be changed.
   </div>
-  <stage-config-field label="Webhook URL" ng-if="$ctrl.displayField('url')">
+  <stage-config-field label="Webhook URL" help-key="pipeline.config.webhook.url" ng-if="$ctrl.displayField('url')">
     <input type="text" class="form-control input-sm" ng-model="$ctrl.stage.url" />
   </stage-config-field>
   <stage-config-field label="Method" ng-if="$ctrl.displayField('method')">
