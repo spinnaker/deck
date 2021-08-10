@@ -6,6 +6,7 @@ import { Illustration } from '@spinnaker/presentation';
 import { ApplicationQueryError } from '../ApplicationQueryError';
 import { ProcessedDeliveryConfig } from './DeliveryConfig';
 import { GitIntegration } from './GitIntegration';
+import { SETTINGS } from '../../config/settings';
 import {
   FetchApplicationManagementDataDocument,
   useFetchApplicationManagementDataQuery,
@@ -56,7 +57,7 @@ export const Configuration = () => {
   return (
     <div className="full-width">
       <ManagementToggle isPaused={data.application?.isPaused} />
-      {gitIntegration && <GitIntegration {...gitIntegration} />}
+      {SETTINGS.feature.mdGitIntegration && gitIntegration && <GitIntegration {...gitIntegration} />}
       <ProcessedDeliveryConfig />
       {/* <DeliveryConfig config={data.application?.rawConfig} /> */}
     </div>
