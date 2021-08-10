@@ -1,10 +1,17 @@
 import * as React from 'react';
-import { flatMap, uniq} from 'lodash';
+import { flatMap, uniq } from 'lodash';
 import { Subject } from 'rxjs';
 import { IScalingPolicyAlarmView } from '../../../../../domain';
-import { CloudMetricsReader, IMetricAlarmDimension, IServerGroup, ReactSelectInput, TextInput, useData } from '@spinnaker/core';
+import {
+  CloudMetricsReader,
+  IMetricAlarmDimension,
+  IServerGroup,
+  ReactSelectInput,
+  TextInput,
+  useData,
+} from '@spinnaker/core';
 
-import './dimensionsEditor.component.less';
+import './dimensionsEditor.less';
 
 export interface IDimensionsEditorProps {
   alarm: IScalingPolicyAlarmView;
@@ -13,17 +20,15 @@ export interface IDimensionsEditorProps {
   updateAvailableMetrics: () => void;
 }
 
-export const DimensionsEditor = ({
-  alarm,
-  serverGroup,
-  updateAvailableMetrics
-}: IDimensionsEditorProps) => {
- const [ dimensions, setDimensions ] = React.useState(alarm.dimensions || []);
+export const DimensionsEditor = ({ alarm, serverGroup, updateAvailableMetrics }: IDimensionsEditorProps) => {
+  const [dimensions, setDimensions] = React.useState(alarm.dimensions || []);
 
   const fetchDimensions = () => {
-    return CloudMetricsReader.listMetrics('aws', serverGroup.account, serverGroup.region, { namespace: alarm.namespace }).then(results => {
-      const allDimensions = flatMap(results, (r) =>  r.dimensions);
-      const sortedDimensions = uniq(allDimensions.map(d => d.name)).sort();
+    return CloudMetricsReader.listMetrics('aws', serverGroup.account, serverGroup.region, {
+      namespace: alarm.namespace,
+    }).then((results) => {
+      const allDimensions = flatMap(results, (r) => r.dimensions);
+      const sortedDimensions = uniq(allDimensions.map((d) => d.name)).sort();
       return sortedDimensions;
     });
   };
@@ -35,8 +40,8 @@ export const DimensionsEditor = ({
     setDimensions(newDimensions);
   };
   const removeDimension = (index: number) => {
-    const newDimensions = alarm.dimensions.filter((_d, i) => i !== index );
-    alarm.dimensions = newDimensions; 
+    const newDimensions = alarm.dimensions.filter((_d, i) => i !== index);
+    alarm.dimensions = newDimensions;
     setDimensions(newDimensions);
     updateAvailableMetrics();
   };
@@ -48,8 +53,7 @@ export const DimensionsEditor = ({
     setDimensions(newDimensions);
     updateAvailableMetrics();
   };
-  // eslint-disable-next-line
-  console.log(alarm.dimensions);
+
   return (
     <div>
       <div className="row">
@@ -60,22 +64,20 @@ export const DimensionsEditor = ({
       {dimensions.map((dimension, i) => (
         <div key={`dimension-${i}`} className="row dimensions-row horizontal middle">
           <div className="col-md-6">
-            <ReactSelectInput 
+            <ReactSelectInput
               onChange={(e) => updateDimension('name', e.target.value, i)}
               value={dimension.name}
               stringOptions={dimensionOptions}
             />
           </div>
-          <TextInput 
-            onChange={(e) => updateDimension('value', e.target.value, i)}
-            value={dimension.value}
-          />
-         {!alarm.disableEditingDimensions && 
-          <div className="col-md-1" onClick={() => removeDimension(i)}>
-            <a>
-              <i className="glyphicon glyphicon-trash clickable" />
-            </a>
-          </div>}
+          <TextInput onChange={(e) => updateDimension('value', e.target.value, i)} value={dimension.value} />
+          {!alarm.disableEditingDimensions && (
+            <div className="col-md-1" onClick={() => removeDimension(i)}>
+              <a>
+                <i className="glyphicon glyphicon-trash clickable" />
+              </a>
+            </div>
+          )}
         </div>
       ))}
       {!alarm.disableEditingDimensions && (
@@ -90,4 +92,4 @@ export const DimensionsEditor = ({
       )}
     </div>
   );
-}
+};

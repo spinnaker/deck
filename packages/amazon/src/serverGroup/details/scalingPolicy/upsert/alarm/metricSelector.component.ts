@@ -109,7 +109,7 @@ export class MetricSelectorController implements IController {
         this.state.metricsLoaded = true;
         this.advancedMode();
       });
-  }
+  };
 
   private buildMetricOption(metric: ICloudMetricDescriptor): IMetricOption {
     const option: IMetricOption = {

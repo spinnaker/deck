@@ -10,6 +10,10 @@ export const name = AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_DIMENS
 
 module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_DIMENSIONSEDITOR_COMPONENT, []).component(
   'dimensionsEditor',
-  react2angular(withErrorBoundary(DimensionsEditor, 'dimensionsEditor'), ['alarm', 'namespaceUpdated', 'serverGroup', 'updateAvailableMetrics']),
+  react2angular(withErrorBoundary(DimensionsEditor, 'dimensionsEditor'), [
+    'alarm',
+    'namespaceUpdated',
+    'serverGroup',
+    'updateAvailableMetrics',
+  ]),
 );
-
