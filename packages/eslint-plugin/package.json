@@ -5,6 +5,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "create-rule": "create-rule.js",
+    "dev": "npm run test:debug",
     "test": "jest",
     "test:debug": "node --inspect ./node_modules/.bin/jest --runInBand --watch"
   },
