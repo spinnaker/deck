@@ -133,9 +133,10 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTR
       this.boundsChanged();
     };
 
-    this.adjustmentTypeChanged = (type) => {
+    this.adjustmentTypeChanged = (action, type) => {
+      this.viewState.operator = action;
       this.viewState.adjustmentType = type;
-      const newType = type !== 'instances' ? 'PercentChangeInCapacity' : operator === 'Set to' ? 'ExactCapacity' : 'ChangeInCapacity';
+      const newType = type !== 'instances' ? 'PercentChangeInCapacity' : action === 'Set to' ? 'ExactCapacity' : 'ChangeInCapacity';
       this.command.adjustmentType = newType;
     };
 

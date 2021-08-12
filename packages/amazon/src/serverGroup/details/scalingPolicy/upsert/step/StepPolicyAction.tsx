@@ -10,7 +10,7 @@ type AdjustmentTypeView = 'instances' | 'percent of group';
 
 export interface IStepPolicyActionProps {
   adjustmentType: AdjustmentTypeView;
-  adjustmentTypeChanged: (type: AdjustmentTypeView) => void;
+  adjustmentTypeChanged: (action: Operator, type: AdjustmentTypeView) => void;
   alarm: IScalingPolicyAlarm;
   isMin: boolean;
   operator: Operator;
@@ -35,12 +35,13 @@ export const StepPolicyAction = ({
   const onActionChange = (val: Operator) => {
     operator = val;
     setAction(val);
+    adjustmentTypeChanged(val, adjustmentType);
   };
 
   const [ adjustmentTypeView, setAdjustmentTypeView ] = React.useState<AdjustmentTypeView>(adjustmentType);
   const onAdjustmentTypeChange = (type: AdjustmentTypeView) => {
     setAdjustmentTypeView(type);
-    adjustmentTypeChanged(type);
+    adjustmentTypeChanged(action, type);
   };
 
   const [ steps, setSteps ] = React.useState<IStepAdjustment[]>(stepAdjustments);
