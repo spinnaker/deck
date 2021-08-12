@@ -8,9 +8,11 @@ import { TaskMonitor } from '@spinnaker/core';
 import { ScalingPolicyWriter } from '../ScalingPolicyWriter';
 import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_ALARMCONFIGURER_COMPONENT } from './alarm/alarmConfigurer.component';
 import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT } from './simple/simplePolicyAction.component';
-import { STEP_POLICY_ACTION } from './step/stepPolicyAction.component';
+import { STEP_POLICY_ACTION } from './step/awsStepPolicyAction.component';
+import { STEP_POLICY_ACTION_COMPONENT } from './step/stepPolicyAction.component'
 
 import './upsertScalingPolicy.modal.less';
+import { linen } from 'color-name';
 
 export const AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER =
   'spinnaker.amazon.serverGroup.details.scalingPolicy.upsertScalingPolicy.controller';
@@ -18,6 +20,7 @@ export const name = AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALIN
 module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER, [
   AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT,
   STEP_POLICY_ACTION,
+  STEP_POLICY_ACTION_COMPONENT,
   AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_ALARMCONFIGURER_COMPONENT,
 ]).controller('awsUpsertScalingPolicyCtrl', [
   '$uibModalInstance',
@@ -125,11 +128,14 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTR
       this.command.simple.scalingAdjustment = adjustment;
     };
 
-    this.adjustmentTypeChanged = (action, type) => {
-      this.viewState.operator = action;
+    this.stepsChanged = (newSteps) => {
+      this.command.step.stepAdjustments = newSteps;
+      this.boundsChanged();
+    };
+
+    this.adjustmentTypeChanged = (type) => {
       this.viewState.adjustmentType = type;
-      const newType =
-        type !== 'instances' ? 'PercentChangeInCapacity' : action === 'Set to' ? 'ExactCapacity' : 'ChangeInCapacity';
+      const newType = type !== 'instances' ? 'PercentChangeInCapacity' : operator === 'Set to' ? 'ExactCapacity' : 'ChangeInCapacity';
       this.command.adjustmentType = newType;
     };
 
