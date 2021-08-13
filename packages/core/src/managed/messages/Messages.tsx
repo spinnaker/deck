@@ -32,6 +32,15 @@ const AppNotifications = () => {
               (<RelativeTimestamp timestamp={notification.triggeredAt} withSuffix />)
             </>
           )}
+          {notification.link && (
+            <>
+              {' '}
+              -{' '}
+              <a href={notification.link} target="_blank">
+                View
+              </a>
+            </>
+          )}
         </MessageBox>
       ))}
     </MessagesSection>
