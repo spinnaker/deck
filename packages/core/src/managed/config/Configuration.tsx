@@ -12,6 +12,7 @@ import {
   useFetchApplicationManagementDataQuery,
   useToggleManagementMutation,
 } from '../graphql/graphql-sdk';
+import { Messages } from '../messages/Messages';
 import { showModal, useApplicationContextSafe } from '../../presentation';
 import { ActionModal, IArtifactActionModalProps } from '../utils/ActionModal';
 import { MODAL_MAX_WIDTH, spinnerProps } from '../utils/defaults';
@@ -56,6 +57,7 @@ export const Configuration = () => {
 
   return (
     <div className="full-width">
+      <Messages showManagementWarning={false} />
       <ManagementToggle isPaused={data.application?.isPaused} />
       {SETTINGS.feature.mdGitIntegration && gitIntegration && <GitIntegration {...gitIntegration} />}
       <ProcessedDeliveryConfig />
