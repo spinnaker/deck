@@ -18,35 +18,34 @@ export interface IStepPolicyActionProps {
   stepsChanged: (steps: IStepAdjustment[]) => void;
 }
 
-export const StepPolicyAction = ({ 
+export const StepPolicyAction = ({
   adjustmentType,
   adjustmentTypeChanged,
-  alarm, 
-  isMin, 
+  alarm,
+  isMin,
   operator,
   stepAdjustments,
-  stepsChanged
-}: IStepPolicyActionProps ) => { 
+  stepsChanged,
+}: IStepPolicyActionProps) => {
   const hasEqualTo = alarm?.comparisonOperator.includes('Equal');
   const availableActions = ['Add', 'Remove', 'Set to'];
   const adjustmentTypeOptions = operator === 'Set to' ? ['instances'] : ['instances', 'percent of group'];
 
-  const [ action, setAction ] = React.useState<Operator>(operator);
+  const [action, setAction] = React.useState<Operator>(operator);
   const onActionChange = (val: Operator) => {
-    operator = val;
     setAction(val);
     adjustmentTypeChanged(val, adjustmentType);
   };
 
-  const [ adjustmentTypeView, setAdjustmentTypeView ] = React.useState<AdjustmentTypeView>(adjustmentType);
+  const [adjustmentTypeView, setAdjustmentTypeView] = React.useState<AdjustmentTypeView>(adjustmentType);
   const onAdjustmentTypeChange = (type: AdjustmentTypeView) => {
     setAdjustmentTypeView(type);
     adjustmentTypeChanged(action, type);
   };
 
-  const [ steps, setSteps ] = React.useState<IStepAdjustment[]>(stepAdjustments);
+  const [steps, setSteps] = React.useState<IStepAdjustment[]>(stepAdjustments);
   const addStep = () => {
-    const newStep = { scalingAdjustment: 1} as IStepAdjustment;
+    const newStep = { scalingAdjustment: 1 } as IStepAdjustment;
     const newSteps = [...steps, newStep];
     stepAdjustments = newSteps;
     setSteps(newSteps);
@@ -57,7 +56,7 @@ export const StepPolicyAction = ({
     setSteps(newSteps);
     stepsChanged(newSteps);
   };
-  const updateStep = (updatedStep: IStepAdjustment, index: number) => {    
+  const updateStep = (updatedStep: IStepAdjustment, index: number) => {
     const newSteps = [...steps];
     newSteps[index] = updatedStep;
     setSteps(newSteps);
@@ -68,55 +67,79 @@ export const StepPolicyAction = ({
     <div className="StepPolicyAction row">
       {steps?.map((step: IStepAdjustment, index: number) => (
         <div key={`step-adjustment-${index}`} className="step-policy-row col-md-10 col-md-offset-1 horizontal middle">
-          {Boolean(index) ? <span className="action-input sp-margin-s-left">{action}</span> : 
-          <ReactSelectInput 
-            value={action}
-            stringOptions={availableActions}
-            onChange={(e) => onActionChange(e.target.value)}
-            clearable={false}
+          {Boolean(index) ? (
+            <span className="action-input sp-margin-s-left">{action}</span>
+          ) : (
+            <ReactSelectInput
+              value={action}
+              stringOptions={availableActions}
+              onChange={(e) => onActionChange(e.target.value)}
+              clearable={false}
+              inputClassName="action-input"
+            />
+          )}
+          <NumberInput
+            value={step.scalingAdjustment}
+            min={1}
+            onChange={(e) => updateStep({ ...step, scalingAdjustment: Number.parseInt(e.target.value) }, index)}
             inputClassName="action-input"
-          />}
-          <NumberInput 
-            value={step.scalingAdjustment} 
-            min={1} 
-            onChange={(e) => updateStep({...step, scalingAdjustment: Number.parseInt(e.target.value)}, index)}  
-            inputClassName="action-input"
-          /> 
-          {Boolean(index) ? <span className="sp-margin-xs-left">{adjustmentTypeView}</span> : 
-          <ReactSelectInput 
-            value={adjustmentType}
-            stringOptions={adjustmentTypeOptions}
-            onChange={(e) => onAdjustmentTypeChange(e.target.value)}
-            clearable={false}
-            inputClassName="adjustment-type-input"
-          />}
-          <span className="sp-margin-xs-xaxis"> when <b>{alarm?.metricName}</b> is </span>
-          {(index === steps.length - 1) && <span>{` ${isMin ? 'less' : 'greater'} than${(!Boolean(index) || hasEqualTo) ? ' or equal to' : ''} ${isMin ? (step.metricIntervalUpperBound || '') : (step.metricIntervalLowerBound || '')} `}</span>}
-          {(index < steps.length - 1) && 
+          />
+          {Boolean(index) ? (
+            <span className="sp-margin-xs-left">{adjustmentTypeView}</span>
+          ) : (
+            <ReactSelectInput
+              value={adjustmentType}
+              stringOptions={adjustmentTypeOptions}
+              onChange={(e) => onAdjustmentTypeChange(e.target.value)}
+              clearable={false}
+              inputClassName="adjustment-type-input"
+            />
+          )}
+          <span className="sp-margin-xs-xaxis">
+            {' '}
+            when <b>{alarm?.metricName}</b> is{' '}
+          </span>
+          {index === steps.length - 1 && (
+            <span>{` ${isMin ? 'less' : 'greater'} than${!Boolean(index) || hasEqualTo ? ' or equal to' : ''} ${
+              isMin ? step.metricIntervalUpperBound || '' : step.metricIntervalLowerBound || ''
+            } `}</span>
+          )}
+          {index < steps.length - 1 && (
             <>
               <span className="sp-margin-xs-xaxis">between</span>
-              {isMin ? 
-                <NumberInput 
-                  value={step.metricIntervalLowerBound} 
-                  max={step.metricIntervalUpperBound} 
-                  onChange={(e) => updateStep({...step, metricIntervalLowerBound: Number.parseInt(e.target.value)}, index)}
-                  inputClassName="action-input"
-                /> :
-                <span>{step.metricIntervalLowerBound}</span>}
-              <span className="sp-margin-xs-xaxis">and</span>
-              {isMin ? <span>{step.metricIntervalUpperBound}</span> : 
-                <NumberInput 
-                  value={step.metricIntervalUpperBound} 
-                  min={step.metricIntervalLowerBound} 
-                  onChange={(e) => updateStep({...step, metricIntervalUpperBound: Number.parseInt( e.target.value)}, index)}
+              {isMin ? (
+                <NumberInput
+                  value={step.metricIntervalLowerBound}
+                  max={step.metricIntervalUpperBound}
+                  onChange={(e) =>
+                    updateStep({ ...step, metricIntervalLowerBound: Number.parseInt(e.target.value) }, index)
+                  }
                   inputClassName="action-input"
                 />
-              }
-            </>  
-          }
-          {Boolean(index) && 
-            <a className="glyphicon glyphicon-trash clickable sp-margin-xs-xaxis remove-step-action-icon" onClick={() => removeStep(index)}/>
-          }
+              ) : (
+                <span>{step.metricIntervalLowerBound}</span>
+              )}
+              <span className="sp-margin-xs-xaxis">and</span>
+              {isMin ? (
+                <span>{step.metricIntervalUpperBound}</span>
+              ) : (
+                <NumberInput
+                  value={step.metricIntervalUpperBound}
+                  min={step.metricIntervalLowerBound}
+                  onChange={(e) =>
+                    updateStep({ ...step, metricIntervalUpperBound: Number.parseInt(e.target.value) }, index)
+                  }
+                  inputClassName="action-input"
+                />
+              )}
+            </>
+          )}
+          {Boolean(index) && (
+            <a
+              className="glyphicon glyphicon-trash clickable sp-margin-xs-xaxis remove-step-action-icon"
+              onClick={() => removeStep(index)}
+            />
+          )}
         </div>
       ))}
       <div className="row sp-margin-s">
@@ -140,4 +163,4 @@ export const StepPolicyAction = ({
       </div>
     </div>
   );
-}
+};

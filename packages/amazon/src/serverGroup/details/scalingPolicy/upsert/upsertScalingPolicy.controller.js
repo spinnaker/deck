@@ -9,7 +9,7 @@ import { ScalingPolicyWriter } from '../ScalingPolicyWriter';
 import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_ALARMCONFIGURER_COMPONENT } from './alarm/alarmConfigurer.component';
 import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT } from './simple/simplePolicyAction.component';
 import { STEP_POLICY_ACTION } from './step/awsStepPolicyAction.component';
-import { STEP_POLICY_ACTION_COMPONENT } from './step/stepPolicyAction.component'
+import { STEP_POLICY_ACTION_COMPONENT } from './step/stepPolicyAction.component';
 
 import './upsertScalingPolicy.modal.less';
 import { linen } from 'color-name';
@@ -136,7 +136,8 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTR
     this.adjustmentTypeChanged = (action, type) => {
       this.viewState.operator = action;
       this.viewState.adjustmentType = type;
-      const newType = type !== 'instances' ? 'PercentChangeInCapacity' : action === 'Set to' ? 'ExactCapacity' : 'ChangeInCapacity';
+      const newType =
+        type !== 'instances' ? 'PercentChangeInCapacity' : action === 'Set to' ? 'ExactCapacity' : 'ChangeInCapacity';
       this.command.adjustmentType = newType;
     };
 
