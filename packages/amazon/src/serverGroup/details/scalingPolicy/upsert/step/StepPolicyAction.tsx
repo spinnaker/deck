@@ -29,7 +29,7 @@ export const StepPolicyAction = ({
 }: IStepPolicyActionProps) => {
   const hasEqualTo = alarm?.comparisonOperator.includes('Equal');
   const availableActions = ['Add', 'Remove', 'Set to'];
-  
+
   const [action, setAction] = React.useState<Operator>(operator);
   const adjustmentTypeOptions = action === 'Set to' ? ['instances'] : ['instances', 'percent of group'];
   const onActionChange = (val: Operator) => {
