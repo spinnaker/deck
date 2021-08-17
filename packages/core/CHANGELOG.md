@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.3.1...@spinnaker/core@0.4.0) (2021-08-17)
+
+
+### Features
+
+* **md:** updated preview environment titles to use the branch name, link to the PR, and show basedOn ([#9587](https://github.com/spinnaker/deck/issues/9587)) ([13e3f8f](https://github.com/spinnaker/deck/commit/13e3f8fadcb51d06dcc0f4bccfeeabd7127feb17))
+
+
+
+
+
 ## [0.3.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.3.0...@spinnaker/core@0.3.1) (2021-08-13)
 
 
