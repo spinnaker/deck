@@ -28,6 +28,7 @@
     "ora": "^5.4.0",
     "postcss-colorfix": "0.0.5",
     "postcss-url": "9.0.0",
+    "prettier": "*",
     "rollup": "^2.35.1",
     "rollup-plugin-esbuild": "^4.5.0",
     "rollup-plugin-external-globals": "0.6.1",
