@@ -21,7 +21,7 @@ const predefinedMetricTypeMapping: Dictionary<string> = {
 };
 
 export const TargetTrackingChart = ({
-  alarmUpdated,
+  alarmUpdated = new Subject<void>(),
   config,
   serverGroup,
   unit,
