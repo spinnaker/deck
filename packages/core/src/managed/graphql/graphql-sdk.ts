@@ -411,7 +411,7 @@ export type ActionDetailsFragment = { __typename?: 'MdAction' } & Pick<
 
 export type DetailedVersionFieldsFragment = { __typename?: 'MdArtifactVersionInEnvironment' } & Pick<
   MdArtifactVersionInEnvironment,
-  'id' | 'buildNumber' | 'version' | 'createdAt' | 'status' | 'deployedAt'
+  'id' | 'buildNumber' | 'version' | 'createdAt' | 'status' | 'isCurrent' | 'deployedAt'
 > & {
     gitMetadata?: Maybe<
       { __typename?: 'MdGitMetadata' } & Pick<MdGitMetadata, 'commit' | 'author' | 'branch'> & {
@@ -475,30 +475,30 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
   application?: Maybe<
     { __typename?: 'MdApplication' } & Pick<MdApplication, 'id' | 'name' | 'account'> & {
         environments: Array<
-          { __typename?: 'MdEnvironment' } & {
-            state: { __typename?: 'MdEnvironmentState' } & Pick<MdEnvironmentState, 'id'> & {
-                artifacts?: Maybe<
-                  Array<
-                    { __typename?: 'MdArtifact' } & Pick<
-                      MdArtifact,
-                      'id' | 'name' | 'environment' | 'type' | 'reference'
-                    > & {
-                        versions?: Maybe<
-                          Array<{ __typename?: 'MdArtifactVersionInEnvironment' } & DetailedVersionFieldsFragment>
-                        >;
-                      } & ArtifactPinnedVersionFieldsFragment
-                  >
-                >;
-                resources?: Maybe<
-                  Array<
-                    { __typename?: 'MdResource' } & Pick<MdResource, 'id' | 'kind' | 'displayName'> & {
-                        moniker?: Maybe<{ __typename?: 'MdMoniker' } & Pick<MdMoniker, 'app' | 'stack' | 'detail'>>;
-                        location?: Maybe<{ __typename?: 'MdLocation' } & Pick<MdLocation, 'account' | 'regions'>>;
-                      }
-                  >
-                >;
-              };
-          } & BaseEnvironmentFieldsFragment
+          { __typename?: 'MdEnvironment' } & Pick<MdEnvironment, 'isDeleting'> & {
+              state: { __typename?: 'MdEnvironmentState' } & Pick<MdEnvironmentState, 'id'> & {
+                  artifacts?: Maybe<
+                    Array<
+                      { __typename?: 'MdArtifact' } & Pick<
+                        MdArtifact,
+                        'id' | 'name' | 'environment' | 'type' | 'reference'
+                      > & {
+                          versions?: Maybe<
+                            Array<{ __typename?: 'MdArtifactVersionInEnvironment' } & DetailedVersionFieldsFragment>
+                          >;
+                        } & ArtifactPinnedVersionFieldsFragment
+                    >
+                  >;
+                  resources?: Maybe<
+                    Array<
+                      { __typename?: 'MdResource' } & Pick<MdResource, 'id' | 'kind' | 'displayName'> & {
+                          moniker?: Maybe<{ __typename?: 'MdMoniker' } & Pick<MdMoniker, 'app' | 'stack' | 'detail'>>;
+                          location?: Maybe<{ __typename?: 'MdLocation' } & Pick<MdLocation, 'account' | 'regions'>>;
+                        }
+                    >
+                  >;
+                };
+            } & BaseEnvironmentFieldsFragment
         >;
       }
   >;
@@ -525,7 +525,7 @@ export type FetchVersionsHistoryQuery = { __typename?: 'Query' } & {
                           Array<
                             { __typename?: 'MdArtifactVersionInEnvironment' } & Pick<
                               MdArtifactVersionInEnvironment,
-                              'id' | 'buildNumber' | 'version' | 'createdAt' | 'status'
+                              'id' | 'buildNumber' | 'version' | 'createdAt' | 'status' | 'isCurrent'
                             > & {
                                 gitMetadata?: Maybe<
                                   { __typename?: 'MdGitMetadata' } & Pick<
@@ -539,9 +539,6 @@ export type FetchVersionsHistoryQuery = { __typename?: 'Query' } & {
                                         { __typename?: 'MdPullRequest' } & Pick<MdPullRequest, 'number' | 'link'>
                                       >;
                                     }
-                                >;
-                                lifecycleSteps?: Maybe<
-                                  Array<{ __typename?: 'MdLifecycleStep' } & Pick<MdLifecycleStep, 'type' | 'status'>>
                                 >;
                               }
                           >
@@ -763,6 +760,7 @@ export const DetailedVersionFieldsFragmentDoc = gql`
     version
     createdAt
     status
+    isCurrent
     gitMetadata {
       commit
       author
@@ -849,6 +847,7 @@ export const FetchApplicationDocument = gql`
       account
       environments {
         ...baseEnvironmentFields
+        isDeleting
         state {
           id
           artifacts {
@@ -939,6 +938,7 @@ export const FetchVersionsHistoryDocument = gql`
               version
               createdAt
               status
+              isCurrent
               gitMetadata {
                 commit
                 author
@@ -952,10 +952,6 @@ export const FetchVersionsHistoryDocument = gql`
                   number
                   link
                 }
-              }
-              lifecycleSteps {
-                type
-                status
               }
             }
             ...artifactPinnedVersionFields
