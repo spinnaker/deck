@@ -32,11 +32,11 @@
       ng-options="stat for stat in $ctrl.statistics"
     ></select>
     <span class="input-label" style="vertical-align: top; margin-top: 7px"> of </span>
-    <aws-metric-selector
-      alarm-updated="$ctrl.alarmUpdated"
+    <metric-selector
+      update-alarm="$ctrl.alarmChanged"
       alarm="$ctrl.command.alarm"
       server-group="$ctrl.serverGroup"
-    ></aws-metric-selector>
+    ></metric-selector>
   </div>
 </div>
 

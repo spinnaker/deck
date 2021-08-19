@@ -6,7 +6,11 @@ import { Subject } from 'rxjs';
 import { Application, IServerGroup, TaskMonitor } from '@spinnaker/core';
 
 import { IUpsertScalingPolicyCommand, ScalingPolicyWriter } from '../ScalingPolicyWriter';
-import { ITargetTrackingConfiguration, ITargetTrackingPolicy } from '../../../../domain';
+import {
+  ICustomizedMetricSpecification,
+  ITargetTrackingConfiguration,
+  ITargetTrackingPolicy,
+} from '../../../../domain';
 
 export type MetricType = 'custom' | 'predefined';
 
@@ -71,6 +75,10 @@ export class UpsertTargetTrackingController implements IComponentController {
   public scaleInChanged(): void {
     this.state.scaleInChanged = true;
   }
+
+  public alarmChanged = (newAlarm: ICustomizedMetricSpecification) => {
+    this.command.targetTrackingConfiguration.customizedMetricSpecification = newAlarm;
+  };
 
   public cancel(): void {
     this.$uibModalInstance.dismiss();
