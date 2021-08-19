@@ -67,6 +67,7 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_ALARMCONFIGURER_COM
 
       this.alarmChanged = (newAlarm) => {
         this.command.alarm = newAlarm;
+        this.updateChart();
       };
 
       this.updateChart = () => this.alarmUpdated.next();

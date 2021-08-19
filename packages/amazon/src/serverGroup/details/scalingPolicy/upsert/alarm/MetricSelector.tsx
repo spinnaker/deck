@@ -7,7 +7,6 @@ import {
   ICloudMetricDescriptor,
   IMetricAlarmDimension,
   ReactSelectInput,
-  Spinner,
   useData,
 } from '@spinnaker/core';
 
@@ -81,7 +80,7 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
     );
   };
 
-  const { result: metrics, status } = useData(fetchCloudMetrics, [], [serverGroup, alarm.namespace]);
+  const { result: metrics } = useData(fetchCloudMetrics, [], [serverGroup, alarm.namespace]);
   // TODO: Once rendering speeds improve, infer `selectedMetric` from the result of useData metrics. useState is needed now to update dropdown until data propagates.
 
   const toggleMode = () => {
@@ -108,6 +107,8 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
 
     const newMetric = metrics.find((m) => m.namespace === metric.namespace && m.name === metric.name);
     setSelectedMetric(newMetric);
+    setMetricName(newMetric.name);
+    setNamespace(newMetric.namespace);
     updateAlarm(newAlarm);
   };
 
@@ -129,10 +130,6 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
     };
     updateAlarm(newAlarm);
   };
-
-  if (status === 'PENDING') {
-    return <Spinner size="small" mode="circular" />;
-  }
 
   if (!advancedMode) {
     return (

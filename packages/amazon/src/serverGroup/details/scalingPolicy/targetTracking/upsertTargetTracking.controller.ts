@@ -78,6 +78,7 @@ export class UpsertTargetTrackingController implements IComponentController {
 
   public alarmChanged = (newAlarm: ICustomizedMetricSpecification) => {
     this.command.targetTrackingConfiguration.customizedMetricSpecification = newAlarm;
+    this.alarmUpdated.next();
   };
 
   public cancel(): void {
