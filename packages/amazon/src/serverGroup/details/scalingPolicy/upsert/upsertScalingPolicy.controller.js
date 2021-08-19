@@ -1,6 +1,7 @@
 'use strict';
 
 import { module } from 'angular';
+import { linen } from 'color-name';
 import { cloneDeep } from 'lodash';
 
 import { TaskMonitor } from '@spinnaker/core';
@@ -11,7 +12,6 @@ import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTI
 import { STEP_POLICY_ACTION_COMPONENT } from './step/stepPolicyAction.component';
 
 import './upsertScalingPolicy.modal.less';
-import { linen } from 'color-name';
 
 export const AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER =
   'spinnaker.amazon.serverGroup.details.scalingPolicy.upsertScalingPolicy.controller';
