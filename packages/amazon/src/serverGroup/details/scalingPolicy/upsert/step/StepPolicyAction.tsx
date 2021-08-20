@@ -67,7 +67,7 @@ export const StepPolicyAction = ({
 
   React.useEffect(() => {
     setSteps(step.stepAdjustments);
-  }, step?.stepAdjustments);
+  }, [step?.stepAdjustments]);
 
   return (
     <div className="StepPolicyAction row">
