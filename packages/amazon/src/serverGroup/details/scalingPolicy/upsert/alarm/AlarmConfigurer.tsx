@@ -5,6 +5,8 @@ import { ICloudMetricStatistics, NumberInput, ReactSelectInput } from '@spinnake
 import { MetricAlarmChart } from '../../chart/MetricAlarmChart';
 import { IAmazonServerGroup, IScalingPolicyAlarm, IStepAdjustment } from '../../../../../domain';
 
+import './AlarmConfigurer.less';
+
 export interface IAlarmConfigurerProps {
   alarm: IScalingPolicyAlarm;
   multipleAlarms: boolean;
@@ -40,8 +42,9 @@ export const AlarmConfigurer = ({
   stepsChanged,
   updateAlarm,
 }: IAlarmConfigurerProps) => {
-  const [unit, setUnit] = React.useState<string>(alarm.unit);
   const comparatorBound = alarm.comparisonOperator?.indexOf('Greater') === 0 ? 'max' : 'min';
+  const [unit, setUnit] = React.useState<string>(alarm?.unit);
+  const [alarmView, setAlarmView] = React.useState<IScalingPolicyAlarm>(alarm);
 
   React.useEffect(() => {
     if (stepAdjustments) {
@@ -56,17 +59,17 @@ export const AlarmConfigurer = ({
 
   const onChartLoaded = (stats: ICloudMetricStatistics) => setUnit(stats.unit);
 
-  // TODO: If needed, dual-updates with useState for rendering speeds on the inputs
   const onAlarmChange = (key: string, value: any) => {
     const newAlarm = {
       ...alarm,
       [key]: value,
     };
+    setAlarmView(newAlarm);
     updateAlarm(newAlarm);
   };
 
   return (
-    <div>
+    <div className="AlarmConfigurer">
       {multipleAlarms && (
         <div className="row">
           <div className="col-md-12">
@@ -92,57 +95,63 @@ export const AlarmConfigurer = ({
           </div>
         </div>
       )}
-      <div className="row">
+      <div className="row sp-margin-s-yaxis">
         <div className="col-md-2 sm-label-right">Whenever</div>
-        <div className="col-md-10 content-fields">
+        <div className="col-md-10 horizontal middle">
           <ReactSelectInput
-            value={alarm.statistic}
+            value={alarmView.statistic}
             onChange={(e) => onAlarmChange('statistic', e.target.value)}
             stringOptions={STATISTICS}
-            inputClassName="sp-margin-xs-right"
+            clearable={false}
+            inputClassName="sp-margin-xs-right configurer-field-lg"
           />
-          <span className="input-label"> of </span>
+          <span className="input-label sp-margin-xs-right"> of </span>
           <span>ADD METRIC SELECTOR HERE WHEN IT HAS MERGED</span>
         </div>
       </div>
-      <div className="row">
+      <div className="row sp-margin-s-yaxis">
         <div className="col-md-2 sm-label-right">is</div>
-        <div className="col-md-10 content-fields">
+        <div className="col-md-10 horizontal middle">
           <ReactSelectInput
-            value={alarm.comparisonOperator}
+            value={alarmView.comparisonOperator}
             onChange={(e) => onAlarmChange('comparisonOperator', e.target.value)}
             options={COMPARATORS}
-            inputClassName="sp-margin-xs-right"
+            clearable={false}
+            inputClassName="sp-margin-s-right configurer-field-small"
           />
-          <NumberInput
-            value={alarm.threshold}
-            onChange={(e) => onAlarmChange('threshold', Number.parseInt(e.target.value))}
-            inputClassName="sp-margin-xs-right"
-          />
+          <div className="sp-margin-xl-left">
+            <NumberInput
+              value={alarmView.threshold}
+              onChange={(e) => onAlarmChange('threshold', Number.parseInt(e.target.value))}
+              inputClassName="sp-margin-xs-right configurer-field-lg"
+            />
+          </div>
           <span className="input-label">{unit}</span>
         </div>
       </div>
-      <div className="row">
+      <div className="row sp-margin-s-yaxis">
         <div className="col-md-2 sm-label-right">for at least</div>
-        <div className="col-md-10 content-fields">
+        <div className="col-md-10 horizontal middle">
           <NumberInput
-            value={alarm.evaluationPeriods}
+            value={alarmView.evaluationPeriods}
             onChange={(e) => onAlarmChange('evaluationPeriods', Number.parseInt(e.target.value))}
+            inputClassName="configurer-field-med number-input-field"
           />
-          <span className="input-label"> consecutive period(s) of </span>
+          <span className="input-label sp-margin-s-xaxis"> consecutive period(s) of </span>
           <ReactSelectInput
-            value={alarm.period}
+            value={alarmView.period}
             onChange={(e) => onAlarmChange('period', e.target.value)}
             options={PERIODS}
-            inputClassName="sp-margin-xs-right"
+            clearable={false}
+            inputClassName="sp-margin-xs-right configurer-field-lg"
           />
         </div>
       </div>
-      <div className="row" ng-if="$ctrl.alarm.metricName">
+      <div className="row sp-margin-s-yaxis" ng-if="$ctrl.alarm.metricName">
         <div className="col-md-10 col-md-offset-1">
           {alarm && (
             <div>
-              <MetricAlarmChart alarm={alarm} serverGroup={serverGroup} onChartLoaded={onChartLoaded} />
+              <MetricAlarmChart alarm={alarmView} serverGroup={serverGroup} onChartLoaded={onChartLoaded} />
             </div>
           )}
         </div>
