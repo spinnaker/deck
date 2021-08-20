@@ -131,6 +131,10 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTR
       this.boundsChanged();
     };
 
+    this.alarmChanged = (newAlarm) => {
+      this.command.alarm = newAlarm;
+    };
+
     this.adjustmentTypeChanged = (action, type) => {
       this.viewState.operator = action;
       this.viewState.adjustmentType = type;
