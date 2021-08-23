@@ -115,7 +115,7 @@ export class ServerGroupBasicSettings
 
     if (AWSProviderSettings.serverGroups?.enableIMDSv2) {
       const isIMDSv2AllowedOnAccount = !AWSProviderSettings?.serverGroups?.accountDenyListIMDSv2?.includes(account);
-      const appAgeRequirement = AWSProviderSettings.serverGroups.defaultIMDSv2AppAgeLimit;
+      const appAgeRequirement = AWSProviderSettings.serverGroups?.defaultIMDSv2AppAgeLimit;
       const creationDate = this.props.app?.attributes?.createTs;
       const setIMDSv2 =
         isIMDSv2AllowedOnAccount && appAgeRequirement && creationDate && Number(creationDate) > appAgeRequirement;
