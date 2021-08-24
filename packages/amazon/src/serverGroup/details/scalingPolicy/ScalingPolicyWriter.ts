@@ -29,6 +29,7 @@ export interface ISimplePolicyDescription {
 }
 
 export interface IStepPolicyDescription {
+  cooldown?: number;
   stepAdjustments: IStepAdjustment[];
   estimatedInstanceWarmup: number;
   cooldown?: number;
