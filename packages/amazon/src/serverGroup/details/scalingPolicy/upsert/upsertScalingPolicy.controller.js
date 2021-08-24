@@ -1,6 +1,7 @@
 'use strict';
 
 import { module } from 'angular';
+import { linen } from 'color-name';
 import { cloneDeep } from 'lodash';
 
 import { TaskMonitor } from '@spinnaker/core';
@@ -8,18 +9,15 @@ import { TaskMonitor } from '@spinnaker/core';
 import { ScalingPolicyWriter } from '../ScalingPolicyWriter';
 import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_ALARMCONFIGURER_COMPONENT } from './alarm/alarmConfigurer.component';
 import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT } from './simple/simplePolicyAction.component';
-import { STEP_POLICY_ACTION } from './step/awsStepPolicyAction.component';
 import { STEP_POLICY_ACTION_COMPONENT } from './step/stepPolicyAction.component';
 
 import './upsertScalingPolicy.modal.less';
-import { linen } from 'color-name';
 
 export const AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER =
   'spinnaker.amazon.serverGroup.details.scalingPolicy.upsertScalingPolicy.controller';
 export const name = AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER; // for backwards compatibility
 module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER, [
   AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT,
-  STEP_POLICY_ACTION,
   STEP_POLICY_ACTION_COMPONENT,
   AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_ALARMCONFIGURER_COMPONENT,
 ]).controller('awsUpsertScalingPolicyCtrl', [

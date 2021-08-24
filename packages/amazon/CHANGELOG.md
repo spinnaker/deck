@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.14](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.7.13...@spinnaker/amazon@0.7.14) (2021-08-20)
+
+
+### Bug Fixes
+
+* **titus:** Update props in StepPolicyAction ([#9605](https://github.com/spinnaker/deck/issues/9605)) ([f1b039c](https://github.com/spinnaker/deck/commit/f1b039cd1b4f2df750b028569b1c3f2f2925897f))
+
+
+
+
+
+## [0.7.13](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.7.12...@spinnaker/amazon@0.7.13) (2021-08-20)
+
+
+### Bug Fixes
+
+* **amazon:** Pass in entire step policy object ([#9604](https://github.com/spinnaker/deck/issues/9604)) ([cc0a0d2](https://github.com/spinnaker/deck/commit/cc0a0d239f38ac15a44eae1df9c67fccec4806e6))
+
+
+
+
+
+## [0.7.12](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.7.11...@spinnaker/amazon@0.7.12) (2021-08-18)
+
+**Note:** Version bump only for package @spinnaker/amazon
+
+
+
+
+
+## [0.7.11](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.7.10...@spinnaker/amazon@0.7.11) (2021-08-17)
+
+**Note:** Version bump only for package @spinnaker/amazon
+
+
+
+
+
 ## [0.7.10](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.7.9...@spinnaker/amazon@0.7.10) (2021-08-13)
 
 

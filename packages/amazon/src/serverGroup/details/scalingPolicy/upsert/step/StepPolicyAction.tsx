@@ -1,7 +1,8 @@
 import * as React from 'react';
 
-import { ReactSelectInput, NumberInput } from '@spinnaker/core';
-import { IStepAdjustment, IScalingPolicyAlarm } from '../../../../../domain';
+import { NumberInput, ReactSelectInput } from '@spinnaker/core';
+
+import { IScalingPolicyAlarm, IStepAdjustment } from '../../../../../domain';
 
 import './StepPolicyAction.less';
 
@@ -14,7 +15,8 @@ export interface IStepPolicyActionProps {
   alarm: IScalingPolicyAlarm;
   isMin: boolean;
   operator: Operator;
-  stepAdjustments: IStepAdjustment[];
+  step: { stepAdjustments: IStepAdjustment[] };
+  stepAdjustments?: IStepAdjustment[];
   stepsChanged: (steps: IStepAdjustment[]) => void;
 }
 
@@ -24,6 +26,7 @@ export const StepPolicyAction = ({
   alarm,
   isMin,
   operator,
+  step,
   stepAdjustments,
   stepsChanged,
 }: IStepPolicyActionProps) => {
@@ -43,11 +46,10 @@ export const StepPolicyAction = ({
     adjustmentTypeChanged(action, type);
   };
 
-  const [steps, setSteps] = React.useState<IStepAdjustment[]>(stepAdjustments);
+  const [steps, setSteps] = React.useState<IStepAdjustment[]>(step?.stepAdjustments || stepAdjustments);
   const addStep = () => {
     const newStep = { scalingAdjustment: 1 } as IStepAdjustment;
     const newSteps = [...steps, newStep];
-    stepAdjustments = newSteps;
     setSteps(newSteps);
     stepsChanged(newSteps);
   };
@@ -62,6 +64,10 @@ export const StepPolicyAction = ({
     setSteps(newSteps);
     stepsChanged(newSteps);
   };
+
+  React.useEffect(() => {
+    setSteps(step.stepAdjustments);
+  }, [step?.stepAdjustments]);
 
   return (
     <div className="StepPolicyAction row">

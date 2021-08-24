@@ -3,6 +3,53 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.5.0...@spinnaker/core@0.6.0) (2021-08-20)
+
+
+### Bug Fixes
+
+* **md:** increased pinned icon size ([#9600](https://github.com/spinnaker/deck/issues/9600)) ([e5e2de1](https://github.com/spinnaker/deck/commit/e5e2de1659db230e047e0b48b8812ec40ec4c593))
+
+
+* remove postcss nested (#9602) ([a20faf1](https://github.com/spinnaker/deck/commit/a20faf1b6020cf7f079b9486e6662530024a4336)), closes [#9602](https://github.com/spinnaker/deck/issues/9602)
+
+
+### BREAKING CHANGES
+
+* removed postcss-nested plugin.  Unlikely that this will break anything, but it's possible.
+
+
+
+
+
+# [0.5.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.4.0...@spinnaker/core@0.5.0) (2021-08-18)
+
+
+### Bug Fixes
+
+* **core:** Group execution popover too wide ([#9585](https://github.com/spinnaker/deck/issues/9585)) ([3121ffa](https://github.com/spinnaker/deck/commit/3121ffa89295dbb252bf4b1f81ba6f1abc0c7e25))
+
+
+### Features
+
+* **md:** use isCurrent to identify the current version + show secondary status when needed (deploying/vetoed) ([#9594](https://github.com/spinnaker/deck/issues/9594)) ([847905b](https://github.com/spinnaker/deck/commit/847905b44c44fba72009c2f31b288cd0760e5f4b))
+
+
+
+
+
+# [0.4.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.3.1...@spinnaker/core@0.4.0) (2021-08-17)
+
+
+### Features
+
+* **md:** support max and actual deploys in allowed times constraint ([#9589](https://github.com/spinnaker/deck/issues/9589)) ([9f8aa7d](https://github.com/spinnaker/deck/commit/9f8aa7d253c62bf60d2157c901387dddecf9f1cb))
+* **md:** updated preview environment titles to use the branch name, link to the PR, and show basedOn ([#9587](https://github.com/spinnaker/deck/issues/9587)) ([13e3f8f](https://github.com/spinnaker/deck/commit/13e3f8fadcb51d06dcc0f4bccfeeabd7127feb17))
+
+
+
+
+
 ## [0.3.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.3.0...@spinnaker/core@0.3.1) (2021-08-13)
 
 
