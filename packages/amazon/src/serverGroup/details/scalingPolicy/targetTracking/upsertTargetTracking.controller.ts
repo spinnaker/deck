@@ -84,6 +84,10 @@ export class UpsertTargetTrackingController implements IComponentController {
     this.command.targetTrackingConfiguration.customizedMetricSpecification = newAlarm;
     this.alarmUpdated.next();
   };
+  
+  public commandChanged = (updatedCommand: ITargetTrackingPolicyCommand) => {
+    this.command = updatedCommand;
+  };
 
   public cancel(): void {
     this.$uibModalInstance.dismiss();
