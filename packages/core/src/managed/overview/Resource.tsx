@@ -9,6 +9,7 @@ import { showResourceDefinitionModal } from '../resources/ResourceDefinitionModa
 import { ResourceTitle } from '../resources/ResourceTitle';
 import { IResourceLinkProps, resourceManager } from '../resources/resourceRegistry';
 import { QueryResource } from './types';
+import { getIsDebugMode } from '../utils/debugMode';
 import { useLogEvent } from '../utils/logging';
 import { Spinner } from '../../widgets';
 
@@ -82,6 +83,7 @@ export const Resource = ({ resource, environment }: { resource: QueryResource; e
   const icon = resourceManager.getIcon(resource.kind);
   const app = useApplicationContextSafe();
   const logEvent = useLogEvent('Resource');
+  const isDebug = getIsDebugMode();
 
   const account = resource.location?.account;
 
@@ -124,18 +126,20 @@ export const Resource = ({ resource, environment }: { resource: QueryResource; e
             View history
           </a>
         </span>
-        <span>
-          <a
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              showResourceDefinitionModal({ resource: resource });
-              logEvent({ action: 'ViewDefinition' });
-            }}
-          >
-            View definition
-          </a>
-        </span>
+        {isDebug && (
+          <span>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                showResourceDefinitionModal({ resource: resource });
+                logEvent({ action: 'ViewDefinition' });
+              }}
+            >
+              View definition
+            </a>
+          </span>
+        )}
       </div>
       <div>
         <Status appName={app.name} environmentName={environment} resourceId={resource.id} />
