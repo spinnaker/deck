@@ -152,5 +152,5 @@ SPINNAKER_PROPERTY_key2=value2
 SPINNAKER_CONFIG_JSON={"key3": "value3", "key4": "value4"}</pre
   >
   The properties will be available in the stage context under the key <code>propertyFileContents</code>.<br />Example
-  using SpEL: <code>${#stage('{{ stage.name }}').context.propertyFileContents.key2}</code>.
+  using SpEL: <code>$&lbrace; stage('{{ stage.name }}').context.propertyFileContents.key2 &rbrace;</code>
 </div>

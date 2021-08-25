@@ -26,7 +26,6 @@ export class TravisTrigger extends React.Component<IBaseBuildTriggerConfigProps>
           <code>
             ${'{'}trigger.properties.key2{'}'}
           </code>
-          .
         </div>
       </div>
     );
