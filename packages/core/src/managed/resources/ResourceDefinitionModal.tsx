@@ -14,7 +14,7 @@ export const showResourceDefinitionModal = (props: IResourceDefinitionModalProps
 export const ResourceDefinitionModal = ({ resource }: IResourceDefinitionModalProps) => {
   if (!resource.rawDefinition) return null;
   return (
-    <>
+    <div className="ResourceDefinitionModal">
       <ModalHeader>
         Resource definition - {resource.displayName}
         <div className="modal-subtitle">(Includes resolved fields and metadata added by the system)</div>
@@ -22,6 +22,6 @@ export const ResourceDefinitionModal = ({ resource }: IResourceDefinitionModalPr
       <ModalBody>
         <YamlViewer content={resource.rawDefinition} />
       </ModalBody>
-    </>
+    </div>
   );
 };
