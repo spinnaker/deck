@@ -38,7 +38,7 @@ export const ResourceDefinitionModal = ({ resource }: IResourceDefinitionModalPr
                 showFoldWidgets: true,
               }}
               style={{ width: 'auto' }}
-              className="ace-editor sp-margin-s-top"
+              className="ace-editor sp-margin-m-top"
               editorProps={{ $blockScrolling: true }}
               onLoad={(editor) => {
                 // This removes the built-in search box (as it doesn't scroll properly to matches)
