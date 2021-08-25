@@ -4,24 +4,22 @@ import AceEditor from 'react-ace';
 import { QueryResource } from '../overview/types';
 import { IModalComponentProps, ModalBody, ModalHeader, showModal } from '../../presentation/modal';
 
-import './ManagedResourceDefinitionModal.less';
+import './ResourceDefinitionModal.less';
 
-export type IManagedResourceDefinitionModalProps = IModalComponentProps & { resource: QueryResource };
+export type IResourceDefinitionModalProps = IModalComponentProps & { resource: QueryResource };
 
-export const showManagedResourceDefinitionModal = (props: IManagedResourceDefinitionModalProps) =>
-  showModal(ManagedResourceDefinitionModal, props);
+export const showResourceDefinitionModal = (props: IResourceDefinitionModalProps) =>
+  showModal(ResourceDefinitionModal, props);
 
-export const ManagedResourceDefinitionModal = ({ resource }: IManagedResourceDefinitionModalProps) => {
+export const ResourceDefinitionModal = ({ resource }: IResourceDefinitionModalProps) => {
   return (
     <>
       <ModalHeader>
         Resource definition - {resource.displayName}
-        <div className="ManagedResourceDefinitionSubtitle">
-          (Includes resolved fields and metadata added by the system)
-        </div>
+        <div className="modal-subtitle">(Includes resolved fields and metadata added by the system)</div>
       </ModalHeader>
       <ModalBody>
-        <div className="ManagedResourceDefinitionModal">
+        <div className="full-width">
           <div className="sp-margin-xl-bottom">
             <AceEditor
               mode="yaml"

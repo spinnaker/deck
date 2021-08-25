@@ -5,7 +5,7 @@ import { EnvironmentItem } from '../environmentBaseElements/EnvironmentItem';
 import { MdResourceActuationState, useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
 import { Icon, useApplicationContextSafe } from '../../presentation';
 import { showManagedResourceHistoryModal } from '../resourceHistory/ManagedResourceHistoryModal';
-import { showManagedResourceDefinitionModal } from '../resources/ManagedResourceDefinitionModal';
+import { showResourceDefinitionModal } from '../resources/ResourceDefinitionModal';
 import { ResourceTitle } from '../resources/ResourceTitle';
 import { IResourceLinkProps, resourceManager } from '../resources/resourceRegistry';
 import { QueryResource } from './types';
@@ -129,7 +129,7 @@ export const Resource = ({ resource, environment }: { resource: QueryResource; e
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              showManagedResourceDefinitionModal({ resource: resource });
+              showResourceDefinitionModal({ resource: resource });
               logEvent({ action: 'ViewDefinition' });
             }}
           >
