@@ -15,11 +15,11 @@ export class TravisTrigger extends React.Component<IBaseBuildTriggerConfigProps>
             formats:
           </p>
           <pre>
-            SPINNAKER_PROPERTY_key1=value1
+            echo SPINNAKER_PROPERTY_key1=value1
             <br />
-            SPINNAKER_PROPERTY_key2=value2
+            echo SPINNAKER_PROPERTY_key2=value2
             <br />
-            SPINNAKER_CONFIG_JSON={'{'}"key3": "value3", "key4": "value4"{'}'}
+            echo SPINNAKER_CONFIG_JSON={'{'}"key3": "value3", "key4": "value4"{'}'}
           </pre>
           The properties will be available in the trigger context under the key <code>properties</code>.<br />
           Example using SpEL:{' '}
