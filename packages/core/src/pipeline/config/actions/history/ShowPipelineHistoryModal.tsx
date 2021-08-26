@@ -45,7 +45,7 @@ export function ShowPipelineHistoryModal(props: IShowHistoryModalProps) {
 
   const { result: history, status, error } = useData(
     () => {
-      return PipelineConfigService.getHistory(pipelineConfigId, isStrategy, 100).then(historyLoaded);
+      return PipelineConfigService.getHistory(pipelineConfigId, isStrategy, 50).then(historyLoaded);
     },
     [],
     [],
