@@ -124,6 +124,7 @@ query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironm
             account
             regions
           }
+          rawDefinition
         }
       }
     }
@@ -282,7 +283,6 @@ query fetchApplicationManagementData($appName: String!) {
       isEnabled
       link
     }
-    # rawConfig
   }
 }
 
