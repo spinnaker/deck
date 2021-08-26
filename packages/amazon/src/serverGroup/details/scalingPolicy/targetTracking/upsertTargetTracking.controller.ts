@@ -52,7 +52,11 @@ export class UpsertTargetTrackingController implements IComponentController {
     };
   }
 
-  public toggleMetricType(): void {
+  public metricTypeChanged = (type: MetricType) => {
+    this.state.metricType = type;
+  };
+
+  public toggleMetricType = (): void => {
     const config = this.command.targetTrackingConfiguration;
     if (this.state.metricType === 'predefined') {
       config.predefinedMetricSpecification = null;
@@ -70,7 +74,7 @@ export class UpsertTargetTrackingController implements IComponentController {
       };
       this.state.metricType = 'predefined';
     }
-  }
+  };
 
   public updateUnit = (unit: string) => {
     this.state.unit = unit;
@@ -84,7 +88,7 @@ export class UpsertTargetTrackingController implements IComponentController {
     this.command.targetTrackingConfiguration.customizedMetricSpecification = newAlarm;
     this.alarmUpdated.next();
   };
-  
+
   public commandChanged = (updatedCommand: ITargetTrackingPolicyCommand) => {
     this.command = updatedCommand;
   };

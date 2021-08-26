@@ -4,14 +4,19 @@ import * as React from 'react';
 import { NumberInput, ReactSelectInput } from '@spinnaker/core';
 
 import { ITargetTrackingPolicyCommand } from '../ScalingPolicyWriter';
-import { ICustomizedMetricSpecification } from '../../../../domain';
+import { IAmazonServerGroup, ICustomizedMetricSpecification, IScalingPolicyAlarmView } from '../../../../domain';
+import { MetricSelector } from '../upsert/alarm/MetricSelector';
 
+import './TargetMetricFields.less';
+
+export type MetricType = 'custom' | 'predefined';
 export interface ITargetMetricFieldsProps {
   allowDualMode?: boolean;
   cloudwatch?: boolean;
   command: ITargetTrackingPolicyCommand;
   isCustomMetric: boolean;
-  toggleMetricType?: () => void;
+  serverGroup: IAmazonServerGroup;
+  toggleMetricType?: (type: MetricType) => void;
   unit: string;
   updateCommand: (command: ITargetTrackingPolicyCommand) => void;
 }
@@ -21,6 +26,7 @@ export const TargetMetricFields = ({
   cloudwatch,
   command,
   isCustomMetric,
+  serverGroup,
   toggleMetricType,
   unit,
   updateCommand,
@@ -28,6 +34,7 @@ export const TargetMetricFields = ({
   const predefinedMetrics = ['ASGAverageCPUUtilization', 'ASGAverageNetworkOut', 'ASGAverageNetworkIn'];
   const statistics = ['Average', 'Maximum', 'Minimum', 'SampleCount', 'Sum'];
   const [commandView, setCommandView] = React.useState<ITargetTrackingPolicyCommand>(command);
+  const [isCustom, setIsCustom] = React.useState<boolean>(isCustomMetric);
 
   const setCommandField = (path: string, value: any) => {
     const newCommand = { ...command };
@@ -39,9 +46,33 @@ export const TargetMetricFields = ({
   const updateAlarm = (newAlarm: ICustomizedMetricSpecification) => {
     setCommandField('targetTrackingConfiguration.customizedMetricSpecification', newAlarm);
   };
-  // TODO: Check toggle function, create react2angular compnonent, test
+
+  const onMetricTypeChange = () => {
+    const newCommand = { ...command };
+    if (isCustom) {
+      set(newCommand, 'targetTrackingConfiguration.predefinedMetricSpecification', {
+        predefinedMetricType: 'ASGAverageCPUUtilization',
+      });
+      set(newCommand, 'targetTrackingConfiguration.customizedMetricSpecification', null);
+    } else {
+      set(newCommand, 'targetTrackingConfiguration.predefinedMetricSpecification', null);
+      set(newCommand, 'targetTrackingConfiguration.customizedMetricSpecification', {
+        metricName: 'CPUUtilization',
+        namespace: 'AWS/EC2',
+        dimensions: [{ name: 'AutoScalingGroupName', value: serverGroup.name }],
+        statistic: 'Average',
+      });
+    }
+
+    setCommandView(newCommand);
+    updateCommand(newCommand);
+    setIsCustom(!isCustom);
+    toggleMetricType(isCustom ? 'predefined' : 'custom');
+  };
+  // eslint-disable-next-line
+  console.log(commandView.targetTrackingConfiguration.customizedMetricSpecification);
   return (
-    <div>
+    <div className="TargetMetricFields sp-margin-l-xaxis">
       <p>
         With target tracking policies, Amazon will automatically adjust the size of your ASG to keep the selected metric
         as close as possible to the selected value.
@@ -53,12 +84,12 @@ export const TargetMetricFields = ({
           Atlas to CloudWatch.
         </p>
       )}
-      <div className="row">
+      <div className="row sp-margin-s-yaxis">
         <div className="col-md-2 sm-label-right">Metric</div>
         <div className="col-md-10 content-fields">
-          {!isCustomMetric && (
+          {!isCustom && (
             <ReactSelectInput
-              value={commandView.targetTrackingConfiguration.predefinedMetricSpecification.predefinedMetricType}
+              value={commandView.targetTrackingConfiguration.predefinedMetricSpecification?.predefinedMetricType}
               stringOptions={predefinedMetrics}
               onChange={(e) =>
                 setCommandField(
@@ -66,28 +97,35 @@ export const TargetMetricFields = ({
                   e.target.value,
                 )
               }
+              inputClassName="metric-select-input"
             />
           )}
-          {isCustomMetric && <div>ADD METRIC SELECTOR</div>}
+          {isCustom && (
+            <MetricSelector
+              alarm={commandView.targetTrackingConfiguration.customizedMetricSpecification as IScalingPolicyAlarmView}
+              serverGroup={serverGroup}
+              updateAlarm={updateAlarm}
+            />
+          )}
           {allowDualMode && (
-            <a className="clickable" onClick={toggleMetricType}>
-              {isCustomMetric ? 'Use a predefined metrc' : 'Select a custom metric'}
+            <a className="clickable" onClick={onMetricTypeChange}>
+              {isCustom ? 'Use a predefined metric' : 'Select a custom metric'}
             </a>
           )}
         </div>
       </div>
-      <div className="row">
+      <div className="row sp-margin-s-yaxis">
         <div className="col-md-2 sm-label-right">Target</div>
-        <div className="col-md-10 content-fields">
-          {isCustomMetric && (
-            <div>
+        <div className="col-md-10 content-fields horizontal">
+          {isCustom && (
+            <div className="horizontal middle">
               <ReactSelectInput
                 value={commandView.targetTrackingConfiguration.customizedMetricSpecification?.statistic}
                 stringOptions={statistics}
                 onChange={(e) =>
                   setCommandField('targetTrackingConfiguration.customizedMetricSpecification.statistic', e.target.value)
                 }
-                inputClassName="form-control input-sm"
+                inputClassName="form-control input-sm target-input"
               />
               <span className="sp-margin-xs-xaxis">of</span>
             </div>
