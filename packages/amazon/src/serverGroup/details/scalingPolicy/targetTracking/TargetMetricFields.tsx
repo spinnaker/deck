@@ -1,9 +1,10 @@
-import { set } from 'lodash';
+import { cloneDeep, set } from 'lodash';
 import * as React from 'react';
 
 import { NumberInput, ReactSelectInput } from '@spinnaker/core';
 
 import { ITargetTrackingPolicyCommand } from '../ScalingPolicyWriter';
+import { TargetTrackingChart } from './TargetTrackingChart';
 import { IAmazonServerGroup, ICustomizedMetricSpecification, IScalingPolicyAlarmView } from '../../../../domain';
 import { MetricSelector } from '../upsert/alarm/MetricSelector';
 
@@ -35,9 +36,10 @@ export const TargetMetricFields = ({
   const statistics = ['Average', 'Maximum', 'Minimum', 'SampleCount', 'Sum'];
   const [commandView, setCommandView] = React.useState<ITargetTrackingPolicyCommand>(command);
   const [isCustom, setIsCustom] = React.useState<boolean>(isCustomMetric);
+  const [unitView, setUnitView] = React.useState<string>(unit);
 
   const setCommandField = (path: string, value: any) => {
-    const newCommand = { ...command };
+    const newCommand = cloneDeep(commandView);
     set(newCommand, path, value);
     setCommandView(newCommand);
     updateCommand(newCommand);
@@ -48,7 +50,7 @@ export const TargetMetricFields = ({
   };
 
   const onMetricTypeChange = () => {
-    const newCommand = { ...command };
+    const newCommand = cloneDeep(commandView);
     if (isCustom) {
       set(newCommand, 'targetTrackingConfiguration.predefinedMetricSpecification', {
         predefinedMetricType: 'ASGAverageCPUUtilization',
@@ -69,8 +71,7 @@ export const TargetMetricFields = ({
     setIsCustom(!isCustom);
     toggleMetricType(isCustom ? 'predefined' : 'custom');
   };
-  // eslint-disable-next-line
-  console.log(commandView.targetTrackingConfiguration.customizedMetricSpecification);
+
   return (
     <div className="TargetMetricFields sp-margin-l-xaxis">
       <p>
@@ -132,14 +133,24 @@ export const TargetMetricFields = ({
           )}
           <div>
             <NumberInput
-              value={command.targetTrackingConfiguration.targetValue}
+              value={commandView.targetTrackingConfiguration.targetValue}
               onChange={(e) =>
                 setCommandField('targetTrackingConfiguration.targetValue', Number.parseInt(e.target.value))
               }
               inputClassName="form-control input-sm sp-margin-xs-right"
             />
-            <span>{unit}</span>
+            <span>{unitView}</span>
           </div>
+        </div>
+      </div>
+      <div className="row">
+        <div className="col-md-10 col-md-offset-1">
+          <TargetTrackingChart
+            config={commandView.targetTrackingConfiguration}
+            serverGroup={serverGroup}
+            unit={unitView}
+            updateUnit={(u) => setUnitView(u)}
+          />
         </div>
       </div>
     </div>
