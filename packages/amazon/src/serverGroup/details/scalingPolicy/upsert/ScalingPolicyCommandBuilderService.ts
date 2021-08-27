@@ -25,7 +25,7 @@ export const ScalingPolicyCommandBuilder = {
       insufficientDataActionArns: alarm.insufficientDataActions,
       metricName: alarm.metricName,
       namespace: alarm.namespace,
-      okActionArns: alarm.okActions,
+      okActionArns: alarm.okactions,
       period: alarm.period,
       region,
       statistic: alarm.statistic,
