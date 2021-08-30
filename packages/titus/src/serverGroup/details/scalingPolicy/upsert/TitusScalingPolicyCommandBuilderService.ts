@@ -63,6 +63,7 @@ export const TitusScalingPolicyCommandBuilder = {
       cloudProvider: serverGroup.cloudProvider,
       credentials: serverGroup.account,
       jobId: serverGroup.disabledDate,
+      name: policy.id,
       region: serverGroup.region,
       scalingPolicyID: policy.id,
       serverGroupName: serverGroup.name,
@@ -79,7 +80,6 @@ export const TitusScalingPolicyCommandBuilder = {
     }
 
     if (type === 'TargetTracking') {
-      command.estimatedInstanceWarmup = policy.estimatedInstanceWarmup || 600;
       command.targetTrackingConfiguration = { ...policy.targetTrackingConfiguration };
     }
 
