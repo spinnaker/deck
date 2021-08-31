@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import React from 'react';
-import { Tooltip } from '../../presentation';
 import './MessageBox.less';
 
 interface IMessageBoxProps {
@@ -23,15 +22,9 @@ export const MessageBox: React.FC<IMessageBoxProps> = ({ children, type, onDismi
       )}
       <div>{children}</div>
       {onDismiss && (
-        <Tooltip
-          delayShow={100}
-          value="Clicking this will dismiss the notification permanently for all users"
-          placement="left"
-        >
-          <button className="as-link dismiss sp-margin-m-left" onClick={onDismiss}>
-            Dismiss
-          </button>
-        </Tooltip>
+        <button className="as-link dismiss sp-margin-m-left" onClick={onDismiss}>
+          Dismiss
+        </button>
       )}
     </div>
   );

@@ -10,15 +10,15 @@ import {
   useFetchNotificationsQuery,
 } from '../graphql/graphql-sdk';
 import { useApplicationContextSafe } from '../../presentation';
+import { getIsDebugMode } from '../utils/debugMode';
 import { useLogEvent } from '../utils/logging';
-import { NotifierService } from '../../widgets';
 
 const AppNotifications = () => {
   const app = useApplicationContextSafe();
   const logEvent = useLogEvent('Error', 'AppNotifications');
   const variables: FetchNotificationsQueryVariables = { appName: app.name };
   const { data, error } = useFetchNotificationsQuery({ variables });
-  const [onDismiss, { error: onDismissError }] = useDismissNotificationMutation({
+  const [onDismiss] = useDismissNotificationMutation({
     refetchQueries: [{ query: FetchNotificationsDocument, variables }],
   });
 
@@ -28,13 +28,8 @@ const AppNotifications = () => {
     }
   }, [error, logEvent]);
 
-  React.useEffect(() => {
-    if (!onDismissError) return;
-    NotifierService.publish({ content: 'Failed to dismiss message', key: `dismiss-notification` });
-    logEvent({ level: 'ERROR', error: onDismissError });
-  }, [onDismissError, logEvent]);
-
   const notifications = data?.application?.notifications || [];
+  const isDebug = getIsDebugMode();
 
   if (!notifications.length) return null;
 
@@ -44,7 +39,11 @@ const AppNotifications = () => {
         <MessageBox
           key={notification.id}
           type={notification.level}
-          onDismiss={() => onDismiss({ variables: { payload: { application: app.name, id: notification.id } } })}
+          onDismiss={
+            isDebug
+              ? () => onDismiss({ variables: { payload: { application: app.name, id: notification.id } } })
+              : undefined
+          }
         >
           {notification.message}{' '}
           {notification.triggeredAt && (
