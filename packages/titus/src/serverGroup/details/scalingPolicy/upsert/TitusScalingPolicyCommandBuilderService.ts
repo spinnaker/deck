@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash';
 import {
   IAmazonServerGroup,
   IScalingPolicy,
+  IScalingPolicyAlarmView,
   IStepAdjustment,
   IStepPolicyDescription,
   ITargetTrackingPolicy,
@@ -14,7 +15,7 @@ type PolicyType = 'Step' | 'TargetTracking';
 
 export const TitusScalingPolicyCommandBuilder = {
   buildAlarm: (policy: IScalingPolicy, region: string): IUpsertAlarmDescription => {
-    const alarm = policy?.alarms[0];
+    const alarm = policy?.alarms[0] as IScalingPolicyAlarmView;
     return {
       comparisonOperator: alarm.comparisonOperator,
       region,
@@ -27,7 +28,7 @@ export const TitusScalingPolicyCommandBuilder = {
       statistic: alarm.statistic,
       threshold: alarm.threshold,
       unit: alarm.unit,
-    };
+    } as IUpsertAlarmDescription;
   },
 
   buildStepPolicy: (policy: IScalingPolicy, threshold: number, cooldown: number): IStepPolicyDescription => {
@@ -48,6 +49,7 @@ export const TitusScalingPolicyCommandBuilder = {
 
     return {
       cooldown: cooldown || 600,
+      estimatedInstanceWarmup: cooldown || 600,
       metricAggregationType: 'Average',
       stepAdjustments,
     };
