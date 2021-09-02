@@ -87,7 +87,7 @@ const skipIfUndefined = (actualValidator: IValidator): IValidator => {
 
 const skipIfSpel = (actualValidator: IValidator): IValidator => {
   return function skipIfSpel(val: any, label = THIS_FIELD) {
-    return typeof val === 'string' && val.indexOf('${') !== 0 && actualValidator(val, label);
+    return typeof val === 'string' && val.includes('${') ? undefined : actualValidator(val, label);
   };
 };
 
