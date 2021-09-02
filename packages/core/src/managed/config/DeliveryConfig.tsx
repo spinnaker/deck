@@ -37,7 +37,11 @@ const ReImportConfig = () => {
     <>
       <small>
         (
-        <button className="btn-link no-padding no-margin" onClick={() => importDeliveryConfig()} disabled={loading}>
+        <button
+          className="btn-link no-padding no-margin no-border"
+          onClick={() => importDeliveryConfig()}
+          disabled={loading}
+        >
           Import now
         </button>
         )
@@ -52,7 +56,7 @@ export const DeliveryConfig: React.FC<IDeliveryConfigProps> = ({ config, updated
     <div className="sp-margin-xl-top">
       <div className="sp-margin-m-bottom">
         <h4 className="sp-margin-3xs-bottom">{isProcessed ? 'Processed Delivery Config' : 'Delivery config'}</h4>
-        <div className="horizontal middle">
+        <div className="horizontal middle sp-margin-xs-top">
           {updatedAt && (
             <small className="sp-margin-xs-right">
               Last update: <RelativeTimestamp timestamp={updatedAt} withSuffix removeStyles />
