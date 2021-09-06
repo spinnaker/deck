@@ -64,7 +64,7 @@ function getOptions(subnets: ISubnet[], isClassicHidden: boolean): Array<Option<
   return classicOption.concat(activeOptions).concat(deprecatedOptions) as Array<Option<string>>;
 }
 
-function getDefaultSubnet(subnets: ISubnet[], defaultSubnetTypes: string[]): ISubnet {
+function getDefaultSubnet(subnets: ISubnet[], defaultSubnetTypes: string[] = []): ISubnet {
   for (const subnetType of defaultSubnetTypes) {
     const defaultSubnet = subnets.find((subnet) => subnetType === subnet.purpose);
     if (defaultSubnet) {
