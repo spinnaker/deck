@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.320](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.319...@spinnaker/ecs@0.0.320) (2021-09-07)
+
+
+### Bug Fixes
+
+* **help:** change entering to entered ([#9616](https://github.com/spinnaker/deck/issues/9616)) ([1020f7a](https://github.com/spinnaker/deck/commit/1020f7a114d07c0e5a85faa95eba53c171392cc1))
+
+
+
+
+
+## [0.0.319](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.318...@spinnaker/ecs@0.0.319) (2021-09-06)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.318](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.317...@spinnaker/ecs@0.0.318) (2021-09-02)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
 ## [0.0.317](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.316...@spinnaker/ecs@0.0.317) (2021-08-30)
 
 **Note:** Version bump only for package @spinnaker/ecs
