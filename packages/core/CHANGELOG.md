@@ -3,6 +3,55 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.9.0...@spinnaker/core@0.9.1) (2021-09-06)
+
+
+### Bug Fixes
+
+* **core/application:** Fix for `requiredGroupMembership` breaking UI ([#9610](https://github.com/spinnaker/deck/issues/9610)) ([0a1f6ab](https://github.com/spinnaker/deck/commit/0a1f6abc4c912068beee3bb55b4500ef827bd98c))
+
+
+
+
+
+# [0.9.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.8.0...@spinnaker/core@0.9.0) (2021-09-02)
+
+
+### Features
+
+* **md:** added "import now" to delivery config ([#9634](https://github.com/spinnaker/deck/issues/9634)) ([9777658](https://github.com/spinnaker/deck/commit/9777658f2d5b090228da8d339f5385f535d4c4b8))
+
+
+
+
+
+# [0.8.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.7.0...@spinnaker/core@0.8.0) (2021-08-30)
+
+
+### Features
+
+* **core/pipeline:** pipeline graph minimize based on number of stages ([#9562](https://github.com/spinnaker/deck/issues/9562)) ([86c5c7c](https://github.com/spinnaker/deck/commit/86c5c7cde993749384a062e24102675ccb290e92))
+
+
+
+
+
+# [0.7.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.6.0...@spinnaker/core@0.7.0) (2021-08-25)
+
+
+### Bug Fixes
+
+* **md:** always show the config component ([#9613](https://github.com/spinnaker/deck/issues/9613)) ([ed35f1c](https://github.com/spinnaker/deck/commit/ed35f1c2ee17636f3090b3269cdb9ef80bd719ff))
+
+
+### Features
+
+* **managed-delivery:** Expose resource definition on the UI ([#9611](https://github.com/spinnaker/deck/issues/9611)) ([d264840](https://github.com/spinnaker/deck/commit/d264840ee86beb3dd5581556d957f468ebb4e4cd))
+
+
+
+
+
 # [0.6.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.5.0...@spinnaker/core@0.6.0) (2021-08-20)
 
 
