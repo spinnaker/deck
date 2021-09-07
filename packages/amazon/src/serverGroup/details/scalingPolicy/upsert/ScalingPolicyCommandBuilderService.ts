@@ -6,13 +6,19 @@ import {
   IUpsertAlarmDescription,
   IUpsertScalingPolicyCommand,
 } from '../ScalingPolicyWriter';
-import { IAmazonServerGroup, IScalingPolicy, IStepAdjustment, ITargetTrackingPolicy } from '../../../../domain';
+import {
+  IAmazonServerGroup,
+  IScalingPolicy,
+  IScalingPolicyAlarm,
+  IStepAdjustment,
+  ITargetTrackingPolicy,
+} from '../../../../domain';
 
 type PolicyType = 'Step' | 'TargetTracking';
 
 export const ScalingPolicyCommandBuilder = {
   buildAlarm: (policy: IScalingPolicy, region: string, asgName: string): IUpsertAlarmDescription => {
-    const alarm = policy?.alarms[0];
+    const alarm = policy?.alarms ? policy.alarms[0] : ({} as IScalingPolicyAlarm);
     return {
       name: alarm.alarmName,
       actionsEnabled: true,
@@ -51,15 +57,15 @@ export const ScalingPolicyCommandBuilder = {
     });
 
     return {
-      estimatedInstanceWarmup: policy.estimatedInstanceWarmup || cooldown || 600,
+      estimatedInstanceWarmup: policy.estimatedInstanceWarmup ?? cooldown ?? 600,
       metricAggregationType: 'Average',
       stepAdjustments,
     };
   },
 
   buildSimplePolicy: (policy: IScalingPolicy): ISimplePolicyDescription => ({
-    cooldown: policy.cooldown || 600,
-    scalingAdjustment: Math.abs(policy.scalingAdjustment) || 1,
+    cooldown: policy.cooldown ?? 600,
+    scalingAdjustment: Math.abs(policy.scalingAdjustment) ?? 1,
   }),
 
   buildNewCommand: (
@@ -79,7 +85,7 @@ export const ScalingPolicyCommandBuilder = {
 
     if (type === 'Step') {
       command.alarm = ScalingPolicyCommandBuilder.buildAlarm(policy, serverGroup.region, serverGroup.name);
-      command.minAdjustmentMagnitude = policy.minAdjustmentMagnitude || 1;
+      command.minAdjustmentMagnitude = policy.minAdjustmentMagnitude ?? 1;
 
       if (policy.stepAdjustments?.length) {
         command.step = ScalingPolicyCommandBuilder.buildStepPolicy(policy, command.alarm.threshold, command.cooldown);
@@ -89,7 +95,7 @@ export const ScalingPolicyCommandBuilder = {
     }
 
     if (type === 'TargetTracking') {
-      command.estimatedInstanceWarmup = policy.estimatedInstanceWarmup || 600;
+      command.estimatedInstanceWarmup = policy.estimatedInstanceWarmup ?? 600;
       command.targetTrackingConfiguration = { ...policy.targetTrackingConfiguration };
     }
 
