@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.24](https://github.com/spinnaker/deck/compare/@spinnaker/dcos@0.0.23...@spinnaker/dcos@0.0.24) (2021-09-06)
+
+**Note:** Version bump only for package @spinnaker/dcos
+
+
+
+
+
+## [0.0.23](https://github.com/spinnaker/deck/compare/@spinnaker/dcos@0.0.22...@spinnaker/dcos@0.0.23) (2021-09-02)
+
+**Note:** Version bump only for package @spinnaker/dcos
+
+
+
+
+
+## [0.0.22](https://github.com/spinnaker/deck/compare/@spinnaker/dcos@0.0.21...@spinnaker/dcos@0.0.22) (2021-08-30)
+
+**Note:** Version bump only for package @spinnaker/dcos
+
+
+
+
+
+## [0.0.21](https://github.com/spinnaker/deck/compare/@spinnaker/dcos@0.0.20...@spinnaker/dcos@0.0.21) (2021-08-25)
+
+**Note:** Version bump only for package @spinnaker/dcos
+
+
+
+
+
 ## [0.0.20](https://github.com/spinnaker/deck/compare/@spinnaker/dcos@0.0.19...@spinnaker/dcos@0.0.20) (2021-08-20)
 
 **Note:** Version bump only for package @spinnaker/dcos
