@@ -3,6 +3,67 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.5](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.8.4...@spinnaker/amazon@0.8.5) (2021-09-07)
+
+
+### Bug Fixes
+
+* **amazon/serverGroup:** SubnetSelectField: Use default subnets from settings if no defaultSubnetTypes prop is passed ([#9643](https://github.com/spinnaker/deck/issues/9643)) ([1141bc5](https://github.com/spinnaker/deck/commit/1141bc569ca6c854614d1d51172c2545047adb5b))
+* **help:** Correct And to Add ([#9617](https://github.com/spinnaker/deck/issues/9617)) ([5f38547](https://github.com/spinnaker/deck/commit/5f38547b1d7ea45337dbbf545677f5f2c1431579))
+
+
+
+
+
+## [0.8.4](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.8.3...@spinnaker/amazon@0.8.4) (2021-09-06)
+
+
+### Bug Fixes
+
+* **titus/subnet:** Support default titus subnetType in SubnetSelectInput ([#9641](https://github.com/spinnaker/deck/issues/9641)) ([cfde788](https://github.com/spinnaker/deck/commit/cfde7889cf72986e53418b76ff8aa354cc6875a5))
+
+
+
+
+
+## [0.8.3](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.8.2...@spinnaker/amazon@0.8.3) (2021-09-02)
+
+**Note:** Version bump only for package @spinnaker/amazon
+
+
+
+
+
+## [0.8.2](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.8.1...@spinnaker/amazon@0.8.2) (2021-08-30)
+
+
+### Bug Fixes
+
+* **aws:** Clarify compatible target groups ([#9626](https://github.com/spinnaker/deck/issues/9626)) ([a28013b](https://github.com/spinnaker/deck/commit/a28013b8db11ad0ed288104d624cf1ea3ed19d34))
+
+
+
+
+
+## [0.8.1](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.8.0...@spinnaker/amazon@0.8.1) (2021-08-30)
+
+**Note:** Version bump only for package @spinnaker/amazon
+
+
+
+
+
+# [0.8.0](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.7.14...@spinnaker/amazon@0.8.0) (2021-08-25)
+
+
+### Features
+
+* **amazon/serverGroup:** Automatically check IMDSv2 on valid accounts ([#9607](https://github.com/spinnaker/deck/issues/9607)) ([7fcb843](https://github.com/spinnaker/deck/commit/7fcb843d2eefdbe074ce0426913946b651b8f2f3))
+
+
+
+
+
 ## [0.7.14](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.7.13...@spinnaker/amazon@0.7.14) (2021-08-20)
 
 

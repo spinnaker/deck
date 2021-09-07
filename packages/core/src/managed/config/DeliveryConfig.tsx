@@ -1,36 +1,15 @@
 import React from 'react';
-import AceEditor from 'react-ace';
-import { RelativeTimestamp } from '../RelativeTimestamp';
 
-const DeliveryConfigContentRenderer = ({ content }: { content: string }) => {
-  return (
-    <AceEditor
-      mode="yaml"
-      theme="textmate"
-      readOnly
-      fontSize={12}
-      cursorStart={0}
-      showPrintMargin={false}
-      highlightActiveLine={true}
-      maxLines={Infinity}
-      value={content}
-      setOptions={{
-        firstLineNumber: 1,
-        tabSize: 2,
-        showLineNumbers: true,
-        showFoldWidgets: true,
-      }}
-      style={{ width: 'auto' }}
-      className="ace-editor sp-margin-s-top"
-      editorProps={{ $blockScrolling: true }}
-      onLoad={(editor) => {
-        // This removes the built-in search box (as it doesn't scroll properly to matches)
-        // commands is missing in the type def and therefore we have to cast as any
-        (editor as any).commands?.removeCommand('find');
-      }}
-    />
-  );
-};
+import { RelativeTimestamp } from '../RelativeTimestamp';
+import {
+  FetchApplicationManagementDataDocument,
+  FetchApplicationManagementDataQueryVariables,
+  useImportDeliveryConfigMutation,
+} from '../graphql/graphql-sdk';
+import { useApplicationContextSafe } from '../../presentation/hooks/useApplicationContext.hook';
+import { YamlViewer } from '../utils/YamlViewer';
+import { useLogEvent } from '../utils/logging';
+import { NotifierService, Spinner } from '../../widgets';
 
 interface IDeliveryConfigProps {
   config?: string;
@@ -38,21 +17,61 @@ interface IDeliveryConfigProps {
   isProcessed?: boolean;
 }
 
+const ReImportConfig = () => {
+  const appName = useApplicationContextSafe().name;
+  const refetchVariables: FetchApplicationManagementDataQueryVariables = { appName };
+  const [importDeliveryConfig, { error, loading }] = useImportDeliveryConfigMutation({
+    variables: { application: appName },
+    refetchQueries: [{ query: FetchApplicationManagementDataDocument, variables: refetchVariables }],
+  });
+  const logEvent = useLogEvent('GitIntegration', 'ImportNow');
+
+  React.useEffect(() => {
+    if (!error) return;
+    NotifierService.publish({
+      key: 'import-error',
+      content: `Failed to import delivery config - ${error.message}`,
+      options: { type: 'error' },
+    });
+  }, [error]);
+
+  return (
+    <>
+      <small>
+        (
+        <button
+          className="btn-link no-padding no-margin no-border"
+          onClick={() => {
+            importDeliveryConfig();
+            logEvent();
+          }}
+          disabled={loading}
+        >
+          Import now
+        </button>
+        )
+      </small>
+      {loading && <Spinner mode="circular" size="nano" color="var(--color-accent)" className="sp-margin-xs-left" />}
+    </>
+  );
+};
+
 export const DeliveryConfig: React.FC<IDeliveryConfigProps> = ({ config, updatedAt, isProcessed, children }) => {
-  if (!config) return null;
   return (
     <div className="sp-margin-xl-top">
       <div className="sp-margin-m-bottom">
         <h4 className="sp-margin-3xs-bottom">{isProcessed ? 'Processed Delivery Config' : 'Delivery config'}</h4>
-
-        {updatedAt && (
-          <small>
-            Last update: <RelativeTimestamp timestamp={updatedAt} withSuffix removeStyles />
-          </small>
-        )}
+        <div className="horizontal middle sp-margin-xs-top">
+          {updatedAt && (
+            <small className="sp-margin-xs-right">
+              Last update: <RelativeTimestamp timestamp={updatedAt} withSuffix removeStyles />
+            </small>
+          )}
+          {!isProcessed && <ReImportConfig />}
+        </div>
       </div>
       {children}
-      <DeliveryConfigContentRenderer content={config} />
+      {config && <YamlViewer content={config} />}
     </div>
   );
 };

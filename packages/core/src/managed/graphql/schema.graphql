@@ -22,6 +22,7 @@ type MdGitIntegration {
   repository: String
   branch: String
   isEnabled: Boolean
+  manifestPath: String
   link: String
 }
 
@@ -73,11 +74,7 @@ type MdArtifact {
   name: String!
   type: String!
   reference: String!
-  versions(
-    statuses: [MdArtifactStatusInEnvironment!]
-    versions: [String!]
-    limit: Int
-  ): [MdArtifactVersionInEnvironment!]
+  versions(statuses: [MdArtifactStatusInEnvironment!], versions: [String!], limit: Int): [MdArtifactVersionInEnvironment!]
   pinnedVersion: MdPinnedVersion
 }
 
@@ -112,16 +109,16 @@ enum MdLifecycleEventScope {
 }
 
 enum MdLifecycleEventType {
-  BAKE
+  BAKE,
   BUILD
 }
 
 enum MdLifecycleEventStatus {
-  NOT_STARTED
-  RUNNING
-  SUCCEEDED
-  FAILED
-  ABORTED
+  NOT_STARTED,
+  RUNNING,
+  SUCCEEDED,
+  FAILED,
+  ABORTED,
   UNKNOWN
 }
 
@@ -210,6 +207,7 @@ type MdResource {
   artifact: MdArtifact
   displayName: String
   location: MdLocation
+  rawDefinition: String
 }
 
 type MdMoniker {
@@ -232,12 +230,12 @@ enum MdConstraintStatus {
 }
 
 enum MdArtifactStatusInEnvironment {
-  PENDING
-  APPROVED
-  DEPLOYING
-  CURRENT
+  PENDING,
+  APPROVED,
+  DEPLOYING,
+  CURRENT,
   PREVIOUS
-  VETOED
+  VETOED,
   SKIPPED
 }
 
@@ -277,7 +275,7 @@ type MdAction {
 
 type Mutation @extends {
   updateConstraintStatus(payload: MdConstraintStatusPayload!): Boolean
-  toggleManagement(application: String!, isPaused: Boolean!, comment: String): Boolean
+  toggleManagement(application: ID!, isPaused: Boolean!, comment: String): Boolean
   pinArtifactVersion(payload: MdArtifactVersionActionPayload!): Boolean
   markArtifactVersionAsBad(payload: MdArtifactVersionActionPayload!): Boolean
   unpinArtifactVersion(payload: MdUnpinArtifactVersionPayload!): Boolean
@@ -285,11 +283,19 @@ type Mutation @extends {
   retryArtifactVersionAction(payload: MdRetryArtifactActionPayload): MdAction
   dismissNotification(payload: MdDismissNotificationPayload!): Boolean
   updateGitIntegration(payload: MdUpdateGitIntegrationPayload): MdGitIntegration
+  toggleResourceManagement(payload: MdToggleResourceManagementPayload): Boolean
+  importDeliveryConfig(application: String!): Boolean
+}
+
+input MdToggleResourceManagementPayload {
+  id: ID!
+  isPaused: Boolean!
 }
 
 input MdUpdateGitIntegrationPayload {
   application: String!
-  isEnabled: Boolean!
+  isEnabled: Boolean
+  manifestPath: String
 }
 
 input MdRetryArtifactActionPayload {
@@ -345,10 +351,7 @@ type MdNotification {
 }
 
 enum MdEventLevel {
-  SUCCESS
-  INFO
-  WARNING
-  ERROR
+  SUCCESS, INFO, WARNING, ERROR
 }
 
 input MdDismissNotificationPayload {
