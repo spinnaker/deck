@@ -29,7 +29,8 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTR
   'serverGroup',
   'application',
   'policy',
-  function ($uibModalInstance, serverGroup, application, policy) {
+  '$scope',
+  function ($uibModalInstance, serverGroup, application, policy, $scope) {
     this.serverGroup = serverGroup;
 
     this.viewState = {
@@ -127,7 +128,9 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTR
     }
 
     this.commandChanged = (updatedCommand) => {
-      this.command = updatedCommand;
+      this.$scope.$applyAsync(() => {
+        this.command = updatedCommand;
+      });
     };
 
     this.scalingAdjustmentChanged = (adjustment) => {
