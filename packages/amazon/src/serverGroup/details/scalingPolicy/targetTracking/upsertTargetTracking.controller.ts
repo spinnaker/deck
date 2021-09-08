@@ -1,4 +1,4 @@
-import { IComponentController } from 'angular';
+import { IComponentController, IScope } from 'angular';
 import { IModalServiceInstance } from 'angular-ui-bootstrap';
 import { cloneDeep } from 'lodash';
 import { Subject } from 'rxjs';
@@ -34,12 +34,13 @@ export class UpsertTargetTrackingController implements IComponentController {
   public state: ITargetTrackingState;
   public command: ITargetTrackingPolicyCommand;
 
-  public static $inject = ['$uibModalInstance', 'policy', 'serverGroup', 'application'];
+  public static $inject = ['$uibModalInstance', 'policy', 'serverGroup', 'application', '$scope'];
   constructor(
     private $uibModalInstance: IModalServiceInstance,
     public policy: ITargetTrackingPolicy,
     public serverGroup: IServerGroup,
     public application: Application,
+    private $scope: IScope,
   ) {}
 
   public $onInit() {
@@ -90,7 +91,9 @@ export class UpsertTargetTrackingController implements IComponentController {
   };
 
   public commandChanged = (updatedCommand: ITargetTrackingPolicyCommand) => {
-    this.command = updatedCommand;
+    this.$scope.$applyAsync(() => {
+      this.command = updatedCommand;
+    });
   };
 
   public cancel(): void {
