@@ -32,7 +32,6 @@ export interface IStepPolicyDescription {
   cooldown?: number;
   stepAdjustments: IStepAdjustment[];
   estimatedInstanceWarmup: number;
-  cooldown?: number;
   metricAggregationType: MetricAggregationType;
 }
 
