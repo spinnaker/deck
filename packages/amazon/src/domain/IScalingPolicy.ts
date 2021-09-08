@@ -3,6 +3,7 @@ import { IMetricAlarmDimension } from '@spinnaker/core';
 export interface IScalingPolicyAlarm {
   alarmName?: string;
   alarmArn?: string;
+  alarmActionArns?: string[];
   metricName: string;
   namespace: string;
   statistic: AlarmStatisticType;
@@ -69,6 +70,7 @@ export interface IScalingPolicy {
   policyARN?: string;
   policyName?: string;
   policyType?: string;
+  id?: string;
   adjustmentType?: ScalingPolicyAdjustmentType;
   alarms: IScalingPolicyAlarm[];
 

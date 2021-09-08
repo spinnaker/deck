@@ -3,6 +3,38 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.48](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.47...@spinnaker/oracle@0.0.48) (2021-09-06)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.47](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.46...@spinnaker/oracle@0.0.47) (2021-09-02)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.46](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.45...@spinnaker/oracle@0.0.46) (2021-08-30)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.45](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.44...@spinnaker/oracle@0.0.45) (2021-08-25)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
 ## [0.0.44](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.43...@spinnaker/oracle@0.0.44) (2021-08-20)
 
 **Note:** Version bump only for package @spinnaker/oracle
