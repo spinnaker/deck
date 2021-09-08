@@ -11,7 +11,7 @@ import { IAmazonServerGroup, IScalingPolicy, IStepAdjustment, ITargetTrackingPol
 import { SimplePolicyAction } from './simple/SimplePolicyAction';
 import { AdjustmentTypeView, Operator, StepPolicyAction } from './step/StepPolicyAction';
 
-export interface IUpsertScalingPolicyModal extends IModalComponentProps {
+export interface IUpsertScalingPolicyModalProps extends IModalComponentProps {
   app: Application;
   policy: IScalingPolicy;
   serverGroup: IAmazonServerGroup;
@@ -23,10 +23,9 @@ export const UpsertScalingPolicyModal = ({
   dismissModal,
   policy,
   serverGroup,
-}: IUpsertScalingPolicyModal) => {
+}: IUpsertScalingPolicyModalProps) => {
   const modalProps = { closeModal, dismissModal };
   const [command, setCommand] = React.useState<IUpsertScalingPolicyCommand>({} as IUpsertScalingPolicyCommand);
-
   React.useEffect(() => {
     const baseCommand = ScalingPolicyCommandBuilder.buildNewCommand(
       'Step',
@@ -49,7 +48,7 @@ export const UpsertScalingPolicyModal = ({
   );
   const isStep = command.step;
   const mode = !policy.policyARN ? 'Create' : 'Edit';
-  const comparatorBound = command.alarm.comparisonOperator.indexOf('Greater') === 0 ? 'max' : 'min';
+  const comparatorBound = command?.alarm?.comparisonOperator?.indexOf('Greater') === 0 ? 'max' : 'min';
 
   const boundsChanged = (step: IStepPolicyDescription) => {
     const source = comparatorBound === 'min' ? 'metricIntervalLowerBound' : 'metricIntervalUpperBound';
@@ -134,8 +133,8 @@ export const UpsertScalingPolicyModal = ({
       application={app}
       description={`${mode} scaling policy for ${serverGroup.name}`}
       initialValues={command}
-      mapValuesToTask={(values) => {
-        const preppedValues = ScalingPolicyCommandBuilder.prepareCommandForUpsert(values, action === 'Remove');
+      mapValuesToTask={() => {
+        const preppedValues = ScalingPolicyCommandBuilder.prepareCommandForUpsert(command, action === 'Remove');
         return {
           application: app,
           job: [
@@ -201,7 +200,7 @@ export const UpsertScalingPolicyModal = ({
           </div>
           <ScalingPolicyAdditionalSettings
             command={command}
-            isInstanceType={}
+            isInstanceType={adjustmentTypeView === 'instances'}
             isNew={Boolean(!policy.policyARN)}
             operator={action}
             updateCommand={setCommand}

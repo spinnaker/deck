@@ -2,10 +2,11 @@
 
 import { module } from 'angular';
 
-import { ConfirmationModalService } from '@spinnaker/core';
+import { ConfirmationModalService, ReactModal } from '@spinnaker/core';
 
 import { ScalingPolicyWriter } from './ScalingPolicyWriter';
 import { SCALING_POLICY_POPOVER } from './popover/scalingPolicyPopover.component';
+import { UpsertScalingPolicyModal } from './upsert/UpsertScalingPolicyModal';
 import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTROLLER } from './upsert/upsertScalingPolicy.controller';
 
 import './scalingPolicySummary.component.less';
@@ -29,17 +30,13 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_ALARMBASEDSUMMARY_COMPONENT, [
       this.popoverTemplate = require('./popover/scalingPolicyDetails.popover.html');
 
       this.editPolicy = () => {
-        $uibModal.open({
-          templateUrl: require('./upsert/upsertScalingPolicy.modal.html'),
-          controller: 'awsUpsertScalingPolicyCtrl',
-          controllerAs: 'ctrl',
-          size: 'lg',
-          resolve: {
-            policy: () => this.policy,
-            serverGroup: () => this.serverGroup,
-            application: () => this.application,
-          },
-        });
+        const upsertProps = {
+          app: this.application,
+          policy: this.policy,
+          serverGroup: this.serverGroup,
+        };
+        const modalProps = { dialogClassName: 'wizard-modal modal-lg' };
+        ReactModal.show(UpsertScalingPolicyModal, upsertProps, modalProps);
       };
 
       this.deletePolicy = () => {
