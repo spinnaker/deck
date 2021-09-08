@@ -6,8 +6,8 @@ import { IScalingPolicyAlarm, IStepAdjustment } from '../../../../../domain';
 
 import './StepPolicyAction.less';
 
-type Operator = 'Add' | 'Remove' | 'Set to';
-type AdjustmentTypeView = 'instances' | 'percent of group';
+export type Operator = 'Add' | 'Remove' | 'Set to';
+export type AdjustmentTypeView = 'instances' | 'percent of group';
 
 export interface IStepPolicyActionProps {
   adjustmentType: AdjustmentTypeView;
