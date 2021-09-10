@@ -18,7 +18,6 @@ export interface ITargetMetricFieldsProps {
   isCustomMetric: boolean;
   serverGroup: IAmazonServerGroup;
   toggleMetricType?: (type: MetricType) => void;
-  unit: string;
   updateCommand: (command: ITargetTrackingPolicyCommand) => void;
 }
 
@@ -29,14 +28,13 @@ export const TargetMetricFields = ({
   isCustomMetric,
   serverGroup,
   toggleMetricType,
-  unit,
   updateCommand,
 }: ITargetMetricFieldsProps) => {
   const predefinedMetrics = ['ASGAverageCPUUtilization', 'ASGAverageNetworkOut', 'ASGAverageNetworkIn'];
   const statistics = ['Average', 'Maximum', 'Minimum', 'SampleCount', 'Sum'];
   const [commandView, setCommandView] = React.useState<ITargetTrackingPolicyCommand>(command);
   const [isCustom, setIsCustom] = React.useState<boolean>(isCustomMetric);
-  const [unitView, setUnitView] = React.useState<string>(unit);
+  const [unit, setUnit] = React.useState<string>(null);
 
   const setCommandField = (path: string, value: any) => {
     const newCommand = cloneDeep(commandView);
@@ -139,7 +137,7 @@ export const TargetMetricFields = ({
               }
               inputClassName="form-control input-sm sp-margin-xs-right"
             />
-            <span>{unitView}</span>
+            <span>{unit}</span>
           </div>
         </div>
       </div>
@@ -148,8 +146,8 @@ export const TargetMetricFields = ({
           <TargetTrackingChart
             config={commandView.targetTrackingConfiguration}
             serverGroup={serverGroup}
-            unit={unitView}
-            updateUnit={(u) => setUnitView(u)}
+            unit={unit}
+            updateUnit={(u) => setUnit(u)}
           />
         </div>
       </div>
