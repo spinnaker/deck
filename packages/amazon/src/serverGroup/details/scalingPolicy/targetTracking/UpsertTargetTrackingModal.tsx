@@ -2,14 +2,10 @@ import * as React from 'react';
 
 import { Application, IModalComponentProps, TaskMonitorModal } from '@spinnaker/core';
 
-import {
-  IStepPolicyDescription,
-  ITargetTrackingPolicyCommand,
-  IUpsertScalingPolicyCommand,
-} from '../ScalingPolicyWriter';
+import { ITargetTrackingPolicyCommand, IUpsertScalingPolicyCommand } from '../ScalingPolicyWriter';
 import { TargetMetricFields } from './TargetMetricFields';
 import { TargetTrackingAdditionalSettings } from './TargetTrackingAdditionalSettings';
-import { IAmazonServerGroup, IScalingPolicy, ITargetTrackingPolicy } from '../../../../domain';
+import { IAmazonServerGroup, ITargetTrackingPolicy } from '../../../../domain';
 import { ScalingPolicyCommandBuilder } from '../upsert/ScalingPolicyCommandBuilderService';
 
 export interface IUpsertTargetTrackingModalProps extends IModalComponentProps {
@@ -17,9 +13,6 @@ export interface IUpsertTargetTrackingModalProps extends IModalComponentProps {
   policy: ITargetTrackingPolicy;
   serverGroup: IAmazonServerGroup;
 }
-
-const PREDEFINED_METRICS = ['ASGAverageCPUUtilization', 'ASGAverageNetworkOut', 'ASGAverageNetworkIn'];
-const STATISTICS = ['Average', 'Maximum', 'Minimum', 'SampleCount', 'Sum'];
 
 export const UpsertTargetTrackingModal = ({
   app,
@@ -29,7 +22,7 @@ export const UpsertTargetTrackingModal = ({
   serverGroup,
 }: IUpsertTargetTrackingModalProps) => {
   const [isCustom, setIsCustom] = React.useState<boolean>(
-    policy.targetTrackingConfiguration?.customizedMetricSpecification,
+    Boolean(policy.targetTrackingConfiguration?.customizedMetricSpecification),
   );
 
   const [command, setCommand] = React.useState<IUpsertScalingPolicyCommand>({} as IUpsertScalingPolicyCommand);
