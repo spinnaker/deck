@@ -1,7 +1,6 @@
 import { cloneDeep } from 'lodash';
 
 import {
-  IAmazonServerGroup,
   IScalingPolicy,
   IScalingPolicyAlarmView,
   IStepAdjustment,
@@ -10,6 +9,7 @@ import {
   IUpsertAlarmDescription,
   IUpsertScalingPolicyCommand,
 } from '@spinnaker/amazon';
+import { ITitusServerGroup } from '../../../../domain';
 
 type PolicyType = 'Step' | 'TargetTracking';
 
@@ -57,7 +57,7 @@ export const TitusScalingPolicyCommandBuilder = {
 
   buildNewCommand: (
     type: PolicyType,
-    serverGroup: IAmazonServerGroup,
+    serverGroup: ITitusServerGroup,
     policy: ITargetTrackingPolicy,
   ): IUpsertScalingPolicyCommand => {
     const command = {
