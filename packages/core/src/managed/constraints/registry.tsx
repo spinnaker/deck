@@ -5,7 +5,7 @@ import React from 'react';
 import { IconNames } from '@spinnaker/presentation';
 
 import { AllowedTimesDescription, getAllowedTimesStatus } from './AllowedTimes';
-import { getDependsOnState as getDependsOnStatus } from './DependsOn';
+import { getDependsOnStatus } from './DependsOn';
 import { getManualJudgementStatus } from './ManualJudgement';
 import { ConstraintStatus, IBaseConstraint, IConstraint, IManagedArtifactVersionEnvironment } from '../../domain';
 import { BasePluginManager } from '../plugins/BasePluginManager';

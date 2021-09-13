@@ -4,7 +4,7 @@ export const isDependsOnConstraint = (constraint: IConstraint): constraint is ID
   return constraint.type === 'depends-on';
 };
 
-export const getDependsOnState = ({ constraint }: { constraint: IDependsOnConstraint }): string => {
+export const getDependsOnStatus = ({ constraint }: { constraint: IDependsOnConstraint }): string => {
   const prerequisiteEnv = constraint.attributes.dependsOnEnvironment.toUpperCase();
   switch (constraint.status) {
     case 'PASS':
