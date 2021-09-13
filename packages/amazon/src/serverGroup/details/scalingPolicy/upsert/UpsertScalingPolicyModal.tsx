@@ -41,11 +41,11 @@ export const UpsertScalingPolicyModal = ({
   const [action, setAction] = React.useState<Operator>(
     command.adjustmentType === 'ExactCapacity' ? 'Set to' : adjustmentBasis > 0 ? 'Add' : 'Remove',
   );
-  const [adjustmentTypeView, setAdjustmentTypeView] = React.useState<AdjustmentTypeView>(
-    policy.adjustmentType === 'ExactCapacity' || command.adjustmentType === 'ChangeInCapacity'
+  const adjustmentTypeView =
+    command.adjustmentType === 'ExactCapacity' || command.adjustmentType === 'ChangeInCapacity'
       ? 'instances'
-      : 'percent of group',
-  );
+      : 'percent of group';
+
   const isStep = command.step;
   const mode = !policy.policyARN ? 'Create' : 'Edit';
   const comparatorBound = command?.alarm?.comparisonOperator?.indexOf('Greater') === 0 ? 'max' : 'min';
@@ -79,7 +79,6 @@ export const UpsertScalingPolicyModal = ({
 
   const adjustmentTypeChanged = (action: Operator, type: AdjustmentTypeView) => {
     setAction(action);
-    setAdjustmentTypeView(type);
 
     const newType =
       type !== 'instances' ? 'PercentChangeInCapacity' : action === 'Set to' ? 'ExactCapacity' : 'ChangeInCapacity';

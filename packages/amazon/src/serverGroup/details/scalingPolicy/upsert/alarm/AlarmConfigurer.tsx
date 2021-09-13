@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { ICloudMetricStatistics, NumberInput, ReactSelectInput } from '@spinnaker/core';
+import { ICloudMetricStatistics, NumberInput, ReactSelectInput, usePrevious } from '@spinnaker/core';
 
 import { MetricSelector } from './MetricSelector';
 import { MetricAlarmChart } from '../../chart/MetricAlarmChart';
@@ -46,9 +46,10 @@ export const AlarmConfigurer = ({
   const comparatorBound = alarm.comparisonOperator?.indexOf('Greater') === 0 ? 'max' : 'min';
   const [alarmView, setAlarmView] = React.useState<IScalingPolicyAlarm>(alarm);
   const [unit, setUnit] = React.useState<string>(alarmView?.unit);
+  const prevComparator = usePrevious(comparatorBound);
 
   React.useEffect(() => {
-    if (stepAdjustments) {
+    if (stepAdjustments && prevComparator !== undefined) {
       const source = comparatorBound === 'max' ? 'metricIntervalLowerBound' : 'metricIntervalUpperBound';
       const newStep: IStepAdjustment = {
         scalingAdjustment: 1,
@@ -120,7 +121,7 @@ export const AlarmConfigurer = ({
       )}
       <div className="row sp-margin-s-yaxis">
         <div className="col-md-2 sm-label-right">Whenever</div>
-        <div className="col-md-10 horizontal middle">
+        <div className="col-md-10 horizontal">
           <ReactSelectInput
             value={alarmView.statistic}
             onChange={(e) => onAlarmChange('statistic', e.target.value)}
@@ -128,7 +129,7 @@ export const AlarmConfigurer = ({
             clearable={false}
             inputClassName="sp-margin-xs-right configurer-field-lg"
           />
-          <span className="input-label sp-margin-xs-right"> of </span>
+          <span className="input-label sp-margin-xs-right sp-margin-s-top"> of </span>
           <MetricSelector alarm={alarmView} serverGroup={serverGroup} updateAlarm={onMetricChange} />
         </div>
       </div>
