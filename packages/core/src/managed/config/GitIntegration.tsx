@@ -15,7 +15,62 @@ type IGitIntegrationProps = NonNullable<
   NonNullable<FetchApplicationManagementDataQuery['application']>['gitIntegration']
 >;
 
-export const GitIntegration = ({ isEnabled, branch, link, repository }: IGitIntegrationProps) => {
+const ManifestPath = ({ manifestPath }: Pick<IGitIntegrationProps, 'manifestPath'>) => {
+  const [currentPath, setCurrentPath] = React.useState(manifestPath);
+  const [isEditing, setIsEditing] = React.useState(false);
+  const appName = useApplicationContextSafe().name;
+  const [updateIntegration, { loading }] = useUpdateGitIntegrationMutation({
+    refetchQueries: [{ query: FetchApplicationManagementDataDocument, variables: { appName } }],
+    onCompleted: () => {
+      setIsEditing(false);
+    },
+  });
+
+  return (
+    <div className="sp-margin-s-top horizontal middle ManifestPath">
+      Config file path:{' '}
+      {isEditing ? (
+        <form
+          className="horizontal middle"
+          onSubmit={(e) => {
+            e.preventDefault();
+            updateIntegration({ variables: { payload: { application: appName, manifestPath: currentPath } } });
+          }}
+        >
+          <input
+            value={currentPath}
+            className="form-control horizontal manifest-input input-sm sp-margin-xs-left"
+            onChange={(e) => setCurrentPath(e.target.value)}
+            autoFocus
+          />
+          <button
+            className="btn md-btn md-btn-accent sp-padding-xs-yaxis sp-padding-s-xaxis sp-margin-s-left"
+            type="submit"
+            disabled={loading}
+          >
+            Save
+          </button>
+        </form>
+      ) : (
+        <code>{manifestPath}</code>
+      )}
+      {loading ? (
+        <Spinner mode="circular" size="nano" color="var(--color-accent)" className="sp-margin-s-left" />
+      ) : (
+        <button
+          className="btn-link no-padding no-border sp-margin-s-left"
+          onClick={() => {
+            setIsEditing((state) => !state);
+          }}
+        >
+          <i className={isEditing ? 'fas fa-times' : 'far fa-edit'} />
+        </button>
+      )}
+    </div>
+  );
+};
+
+export const GitIntegration = ({ isEnabled, branch, link, repository, manifestPath }: IGitIntegrationProps) => {
   const appName = useApplicationContextSafe().name;
   const [updateIntegration, { loading }] = useUpdateGitIntegrationMutation({
     refetchQueries: [{ query: FetchApplicationManagementDataDocument, variables: { appName } }],
@@ -56,6 +111,7 @@ export const GitIntegration = ({ isEnabled, branch, link, repository }: IGitInte
         Turning this on will automatically import your config from git when a new commit is made to{' '}
         {branch || 'your main branch'}
       </div>
+      <ManifestPath manifestPath={manifestPath} />
     </div>
   );
 };
