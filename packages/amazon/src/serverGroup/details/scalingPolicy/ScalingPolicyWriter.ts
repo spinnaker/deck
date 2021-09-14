@@ -4,6 +4,7 @@ import {
   AlarmStatisticType,
   IScalingPolicy,
   IStepAdjustment,
+  ITargetTrackingConfiguration,
   MetricAggregationType,
   ScalingPolicyAdjustmentType,
   StandardUnitType,
@@ -23,15 +24,20 @@ export interface IUpsertScalingPolicyCommand extends IJob {
   step?: IStepPolicyDescription;
 }
 
+export interface ITargetTrackingPolicyCommand extends IUpsertScalingPolicyCommand {
+  estimatedInstanceWarmup: number;
+  targetTrackingConfiguration: ITargetTrackingConfiguration;
+}
+
 export interface ISimplePolicyDescription {
   cooldown: number;
   scalingAdjustment: number;
 }
 
 export interface IStepPolicyDescription {
+  cooldown?: number;
   stepAdjustments: IStepAdjustment[];
   estimatedInstanceWarmup: number;
-  cooldown?: number;
   metricAggregationType: MetricAggregationType;
 }
 
@@ -53,6 +59,7 @@ export interface IUpsertAlarmDescription extends IConfigurableMetric {
   statistic: AlarmStatisticType;
   unit: StandardUnitType;
   disableEditingDimensions?: boolean;
+  actionsEnabled?: boolean;
   alarmActionArns: string[];
   insufficientDataActionArns: string[];
   okActionArns: string[];

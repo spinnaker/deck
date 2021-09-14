@@ -6,8 +6,10 @@ import { cloneDeep } from 'lodash';
 
 import { TaskMonitor } from '@spinnaker/core';
 
+import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_ADDITIONAL_SETTINGS_COMPONENT } from './ScalingPolicyAdditionalSettings';
 import { ScalingPolicyWriter } from '../ScalingPolicyWriter';
 import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_ALARMCONFIGURER_COMPONENT } from './alarm/alarmConfigurer.component';
+import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_ALARM_CONFIGURER_COMPONENT } from './alarm/awsAlarmConfigurer.component';
 import { AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT } from './simple/simplePolicyAction.component';
 import { STEP_POLICY_ACTION_COMPONENT } from './step/stepPolicyAction.component';
 
@@ -20,12 +22,15 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTR
   AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_SIMPLE_SIMPLEPOLICYACTION_COMPONENT,
   STEP_POLICY_ACTION_COMPONENT,
   AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_ALARM_ALARMCONFIGURER_COMPONENT,
+  AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_ALARM_CONFIGURER_COMPONENT,
+  AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_ADDITIONAL_SETTINGS_COMPONENT,
 ]).controller('awsUpsertScalingPolicyCtrl', [
   '$uibModalInstance',
   'serverGroup',
   'application',
   'policy',
-  function ($uibModalInstance, serverGroup, application, policy) {
+  '$scope',
+  function ($uibModalInstance, serverGroup, application, policy, $scope) {
     this.serverGroup = serverGroup;
 
     this.viewState = {
@@ -122,6 +127,12 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTR
       };
     }
 
+    this.commandChanged = (updatedCommand) => {
+      this.$scope.$applyAsync(() => {
+        this.command = updatedCommand;
+      });
+    };
+
     this.scalingAdjustmentChanged = (adjustment) => {
       this.command.simple.scalingAdjustment = adjustment;
     };
@@ -129,6 +140,10 @@ module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_UPSERT_UPSERTSCALINGPOLICY_CONTR
     this.stepsChanged = (newSteps) => {
       this.command.step.stepAdjustments = newSteps;
       this.boundsChanged();
+    };
+
+    this.alarmChanged = (newAlarm) => {
+      this.command.alarm = newAlarm;
     };
 
     this.adjustmentTypeChanged = (action, type) => {

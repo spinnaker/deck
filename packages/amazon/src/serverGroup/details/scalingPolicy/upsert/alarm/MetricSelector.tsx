@@ -34,10 +34,10 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
   const [advancedMode, setAdvancedMode] = React.useState<boolean>(false);
   // TODO: Remove useState once rendering speed improve (after refactoring to React)
   const [selectedMetric, setSelectedMetric] = React.useState({});
-  const [metricName, setMetricName] = React.useState<string>(alarm.metricName);
-  const [namespace, setNamespace] = React.useState<string>(alarm.namespace);
+  const [metricName, setMetricName] = React.useState<string>(alarm?.metricName);
+  const [namespace, setNamespace] = React.useState<string>(alarm?.namespace);
 
-  const dimensionsObject = (alarm.dimensions || []).reduce(
+  const dimensionsObject = (alarm?.dimensions || []).reduce(
     (acc: Dictionary<string>, dimension: IMetricAlarmDimension) => {
       acc[dimension.name] = dimension.value;
       return acc;
@@ -50,7 +50,7 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
       .sort((a: IMetricAlarmDimension, b: IMetricAlarmDimension) => a.name?.localeCompare(b.name))
       .map((d: IMetricAlarmDimension) => d.value)
       .join(', ');
-  const dimensionValuesStr = buildDimensionValues(alarm.dimensions);
+  const dimensionValuesStr = buildDimensionValues(alarm?.dimensions || []);
 
   const fetchCloudMetrics = () => {
     return CloudMetricsReader.listMetrics('aws', serverGroup.account, serverGroup.region, dimensionsObject).then(
@@ -67,26 +67,36 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
 
         const chosenMetric =
           sortedMetrics.find(
-            (m) =>
-              m.name === alarm.metricName &&
-              m.namespace === alarm.namespace &&
+            (m: IMetricOption) =>
+              m.name === alarm?.metricName &&
+              m.namespace === alarm?.namespace &&
               m.dimensionValues === dimensionValuesStr,
           ) ||
-          metrics.find((m) => m.name.match('CPUUtilization')) ||
-          metrics[0];
+          sortedMetrics.find((m) => m.name.match('CPUUtilization')) ||
+          sortedMetrics[0];
         setSelectedMetric(chosenMetric);
+        setMetricName(chosenMetric.name);
+        setNamespace(chosenMetric.namespace);
+
+        const newAlarm = {
+          ...alarm,
+          metricName: chosenMetric.name,
+          namespace: chosenMetric.namespace,
+          dimensions: chosenMetric.dimensions,
+        };
+        updateAlarm(newAlarm);
         return sortedMetrics;
       },
     );
   };
 
-  const { result: metrics } = useData(fetchCloudMetrics, [], [serverGroup, alarm.namespace]);
+  const { result: metrics } = useData(fetchCloudMetrics, [], [serverGroup, alarm?.namespace]);
   // TODO: Once rendering speeds improve, infer `selectedMetric` from the result of useData metrics. useState is needed now to update dropdown until data propagates.
 
   const toggleMode = () => {
     const newMode = !advancedMode;
     if (newMode) {
-      dimensionsObject.namespace = alarm.namespace;
+      dimensionsObject.namespace = alarm?.namespace;
     } else {
       const newAlarm = {
         ...alarm,
@@ -130,7 +140,6 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
     };
     updateAlarm(newAlarm);
   };
-
   if (!advancedMode) {
     return (
       <div className="MetricSelector horizontal middle">
@@ -154,13 +163,13 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
       <div className="horizontal middle">
         <ReactSelectInput
           value={namespace}
-          onChange={(e) => onAdvancedChange(e.target.value, alarm.metricName)}
+          onChange={(e) => onAdvancedChange(e.target.value, alarm?.metricName)}
           stringOptions={namespaces}
           inputClassName="advanced-input-namespace sp-margin-m-right"
         />
         <ReactSelectInput
           value={metricName}
-          onChange={(e) => onAdvancedChange(alarm.namespace, e.target.value)}
+          onChange={(e) => onAdvancedChange(alarm?.namespace, e.target.value)}
           stringOptions={metrics.map((m) => m.name)}
           placeholder="name"
           searchable={true}
