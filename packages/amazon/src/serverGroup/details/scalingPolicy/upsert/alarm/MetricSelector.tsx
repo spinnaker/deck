@@ -140,8 +140,6 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
     };
     updateAlarm(newAlarm);
   };
-  // eslint-disable-next-line
-  console.log(advancedMode, selectedMetric);
   if (!advancedMode) {
     return (
       <div className="MetricSelector horizontal middle">
