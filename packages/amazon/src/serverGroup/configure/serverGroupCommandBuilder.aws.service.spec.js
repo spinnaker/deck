@@ -3,16 +3,19 @@
 import { AccountService, SubnetReader } from '@spinnaker/core';
 
 import { AWSProviderSettings } from '../../aws.settings';
+import { mockLaunchTemplate, mockServerGroup } from '@spinnaker/mocks';
 
 describe('Service: awsServerGroup', function () {
   beforeEach(window.module(require('./serverGroupCommandBuilder.service').name));
 
+  let instanceTypeService;
   beforeEach(
     window.inject(function (awsServerGroupCommandBuilder, _instanceTypeService_, _$q_, $rootScope) {
       this.service = awsServerGroupCommandBuilder;
       this.$q = _$q_;
       this.$scope = $rootScope;
-      spyOn(_instanceTypeService_, 'getCategoryForInstanceType').and.returnValue(_$q_.when('custom'));
+      instanceTypeService = _instanceTypeService_;
+      spyOn(instanceTypeService, 'getCategoryForMultipleInstanceTypes').and.returnValue(_$q_.when('custom'));
     }),
   );
 
@@ -30,6 +33,7 @@ describe('Service: awsServerGroup', function () {
           min: 1,
           max: 1,
         },
+        instanceType: 'm5.large',
       };
 
       AWSProviderSettings.defaults = {
@@ -77,6 +81,85 @@ describe('Service: awsServerGroup', function () {
       this.$scope.$digest();
       expect(command.viewState.usePreferredZones).toBe(false);
     });
+
+    it('extracts instanceProfile from server group correctly', function () {
+      const clusters = [
+        {
+          cluster: {
+            ...this.cluster,
+            instanceType: 'r5.large',
+          },
+          expected: {
+            instanceTypes: ['r5.large'],
+            useSimpleInstanceTypeSelector: true,
+          },
+        },
+        {
+          cluster: {
+            ...this.cluster,
+            instanceType: 'm5.large',
+          },
+          expected: {
+            instanceTypes: ['m5.large'],
+            useSimpleInstanceTypeSelector: true,
+          },
+        },
+        {
+          cluster: {
+            ...this.cluster,
+            spotAllocationStrategy: 'capacity-optimized',
+            launchTemplateOverridesForInstanceType: [
+              {
+                instanceType: 't3.nano',
+                weightedCapacity: '2',
+              },
+              {
+                instanceType: 'm5.large',
+                weightedCapacity: '4',
+              },
+            ],
+          },
+          expected: {
+            instanceTypes: ['t3.nano', 'm5.large'],
+            useSimpleInstanceTypeSelector: false,
+          },
+        },
+        {
+          cluster: {
+            ...this.cluster,
+            spotAllocationStrategy: 'capacity-optimized',
+            launchTemplateOverridesForInstanceType: [
+              {
+                instanceType: 't3.nano',
+                weightedCapacity: '2',
+              },
+              {
+                instanceType: 't3.micro',
+                weightedCapacity: '4',
+              },
+            ],
+          },
+          expected: {
+            instanceTypes: ['t3.nano', 't3.micro'],
+            useSimpleInstanceTypeSelector: false,
+          },
+        },
+      ];
+
+      for (let test of clusters) {
+        let command = null;
+        this.service.buildServerGroupCommandFromPipeline({}, test.cluster).then(function (result) {
+          command = result;
+        });
+        this.$scope.$digest();
+
+        expect(instanceTypeService.getCategoryForMultipleInstanceTypes).toHaveBeenCalledWith(
+          'aws',
+          test.expected.instanceTypes,
+        );
+        expect(command.viewState.useSimpleInstanceTypeSelector).toBe(test.expected.useSimpleInstanceTypeSelector);
+      }
+    });
   });
 
   describe('buildServerGroupCommandFromExisting', function () {
@@ -97,6 +180,7 @@ describe('Service: awsServerGroup', function () {
             { processName: 'AddToLoadBalancer' },
           ],
         },
+        launchTemplate: mockLaunchTemplate,
       };
       var command = null;
       this.service.buildServerGroupCommandFromExisting({}, serverGroup).then(function (result) {
@@ -114,6 +198,7 @@ describe('Service: awsServerGroup', function () {
           vpczoneIdentifier: '',
           suspendedProcesses: [],
         },
+        launchTemplate: mockLaunchTemplate,
       };
       var command = null;
       this.service.buildServerGroupCommandFromExisting({}, serverGroup, 'editPipeline').then(function (result) {
@@ -124,6 +209,110 @@ describe('Service: awsServerGroup', function () {
 
       expect(command.viewState.useSimpleCapacity).toBe(false);
       expect(command.useSourceCapacity).toBe(true);
+    });
+
+    it('extracts instanceProfile and useSimpleInstanceTypeSelector from server group correctly', function () {
+      const asg = {
+        autoScalingGroupName: 'myasg-test-v000',
+        availabilityZones: [],
+        vpczoneIdentifier: '',
+        suspendedProcesses: [],
+        enabledMetrics: [],
+      };
+
+      const serverGroups = [
+        {
+          sg: {
+            ...mockServerGroup,
+            asg: asg,
+            launchConfig: {
+              instanceType: 'r5.large',
+              securityGroups: [],
+            },
+          },
+          expected: {
+            instanceTypes: ['r5.large'],
+            useSimpleInstanceTypeSelector: true,
+          },
+        },
+        {
+          sg: {
+            ...mockServerGroup,
+            asg: asg,
+            launchTemplate: mockLaunchTemplate,
+          },
+          expected: {
+            instanceTypes: ['m5.large'],
+            useSimpleInstanceTypeSelector: true,
+          },
+        },
+        {
+          sg: {
+            ...mockServerGroup,
+            asg: asg,
+            mixedInstancesPolicy: {
+              allowedInstanceTypes: ['m5.large'],
+              instancesDistribution: {
+                onDemandAllocationStrategy: 'prioritized',
+                onDemandBaseCapacity: 1,
+                onDemandPercentageAboveBaseCapacity: 50,
+                spotAllocationStrategy: 'capacity-optimized',
+                spotMaxPrice: '1.5',
+              },
+              launchTemplates: [mockLaunchTemplate],
+            },
+          },
+          expected: {
+            instanceTypes: ['m5.large'],
+            useSimpleInstanceTypeSelector: false,
+          },
+        },
+        {
+          sg: {
+            ...mockServerGroup,
+            asg: asg,
+            mixedInstancesPolicy: {
+              allowedInstanceTypes: ['t3.nano', 'm5.large'],
+              instancesDistribution: {
+                onDemandAllocationStrategy: 'prioritized',
+                onDemandBaseCapacity: 1,
+                onDemandPercentageAboveBaseCapacity: 50,
+                spotAllocationStrategy: 'capacity-optimized',
+                spotMaxPrice: '1.5',
+              },
+              launchTemplates: [mockLaunchTemplate],
+              launchTemplateOverridesForInstanceType: [
+                {
+                  instanceType: 't3.nano',
+                  weightedCapacity: '2',
+                },
+                {
+                  instanceType: 'm5.large',
+                  weightedCapacity: '4',
+                },
+              ],
+            },
+          },
+          expected: {
+            instanceTypes: ['t3.nano', 'm5.large'],
+            useSimpleInstanceTypeSelector: false,
+          },
+        },
+      ];
+
+      for (let test of serverGroups) {
+        let command = null;
+        this.service.buildServerGroupCommandFromExisting({}, test.sg, 'clone').then(function (result) {
+          command = result;
+        });
+        this.$scope.$digest();
+
+        expect(instanceTypeService.getCategoryForMultipleInstanceTypes).toHaveBeenCalledWith(
+          'aws',
+          test.expected.instanceTypes,
+        );
+        expect(command.viewState.useSimpleInstanceTypeSelector).toBe(test.expected.useSimpleInstanceTypeSelector);
+      }
     });
   });
 });

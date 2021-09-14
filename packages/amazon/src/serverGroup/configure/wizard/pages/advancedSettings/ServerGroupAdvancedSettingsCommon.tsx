@@ -221,7 +221,8 @@ export class ServerGroupAdvancedSettingsCommon extends React.Component<IServerGr
             </div>
           </div>
         )}
-        {!AWSProviderSettings.disableSpotPricing && (
+        {/*Display this field iff Spot Max Price is not already be set in Instance Types when multiple instance types are selected.*/}
+        {!AWSProviderSettings.disableSpotPricing && values.viewState.useSimpleInstanceTypeSelector && (
           <div className="form-group">
             <div className="col-md-5 sm-label-right">
               <b>Spot Instances Price (optional)</b> <HelpField id="aws.serverGroup.spotMaxPrice" />

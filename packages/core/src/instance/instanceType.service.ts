@@ -1,4 +1,6 @@
 import { module } from 'angular';
+import _ from 'lodash';
+
 import { PROVIDER_SERVICE_DELEGATE, ProviderServiceDelegate } from '../cloudProvider/providerService.delegate';
 
 export interface IInstanceType {
@@ -77,6 +79,15 @@ export class InstanceTypeService {
   public getCategoryForInstanceType(cloudProvider: string, instanceType: string) {
     return this.getInstanceTypeCategory(cloudProvider, instanceType).then((category: IInstanceTypeCategory) => {
       return category ? category.type : 'custom';
+    });
+  }
+
+  public getCategoryForMultipleInstanceTypes(cloudProvider: string, instanceTypes: string[]) {
+    const promises = instanceTypes.map((it) => this.getInstanceTypeCategory(cloudProvider, it));
+
+    return Promise.all(promises).then((categories: IInstanceTypeCategory[]) => {
+      const distinctCategories = _.uniq(categories.map((c) => c.type));
+      return distinctCategories.length === 1 ? distinctCategories[0] : 'custom';
     });
   }
 
