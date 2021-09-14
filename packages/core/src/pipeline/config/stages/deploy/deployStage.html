@@ -11,7 +11,7 @@
           <th ng-if="deployStageCtrl.hasSubnetDeployments()">Subnet</th>
           <th>Strategy</th>
           <th>Capacity</th>
-          <th ng-if="deployStageCtrl.hasInstanceTypeDeployments()">Instance Type</th>
+          <th ng-if="deployStageCtrl.hasInstanceTypeDeployments()">Instance Types</th>
           <th style="width: 58px">Actions</th>
         </tr>
       </thead>
@@ -46,7 +46,9 @@
             <div ng-if="!cluster.capacity">{{cluster.targetSize}}</div>
             <div ng-if="!(cluster.useSourceCapacity || cluster.capacity || cluster.targetSize)">N/A</div>
           </td>
-          <td ng-if="deployStageCtrl.hasInstanceTypeDeployments()">{{ cluster.instanceType || '[none]' }}</td>
+          <td ng-if="deployStageCtrl.hasInstanceTypeDeployments()">
+            {{ deployStageCtrl.getInstanceTypes(cluster) || '[none]' }}
+          </td>
           <td class="condensed-actions">
             <a class="btn btn-sm btn-link" href ng-click="deployStageCtrl.editCluster(cluster, $index)">
               <span class="glyphicon glyphicon-edit" uib-tooltip="Edit"></span
