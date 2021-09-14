@@ -134,14 +134,14 @@ describe('Service: InstanceType', function () {
     });
   });
 
-  describe('isBurstingSupported', function () {
+  describe('isBurstingSupportedForAllTypes', function () {
     it('identifies burstable performance instance types correctly', function () {
       const types = ['t2.small', 't3.nano', 't3a.medium', 't4g.large', 'm5.small', 'r5.4xlarge'];
       const service = this.awsInstanceTypeService;
 
       let supportedInstanceTypes = [];
       for (it of types) {
-        const actualResult = service.isBurstingSupported(it);
+        const actualResult = service.isBurstingSupportedForAllTypes([it]);
         if (actualResult) {
           supportedInstanceTypes.push(it);
         }
@@ -151,62 +151,27 @@ describe('Service: InstanceType', function () {
     });
   });
 
-  describe('isInstanceTypeInCategory', function () {
+  describe('getInstanceTypesInCategory', function () {
     it('identifies instance types in category correctly', function () {
       const input = [
-        { type: 'm5.large', cat: 'general' },
-        { type: 't2.small', cat: 'general' },
-        { type: 't2.medium', cat: 'general' },
-        { type: 'r5.large', cat: 'memory' },
-        { type: 'r5.xlarge', cat: 'memory' },
-        { type: 't2.nano', cat: 'micro' },
-        { type: 't2.micro', cat: 'micro' },
-        { type: 't2.small', cat: 'micro' },
-        { type: 't3.nano', cat: 'micro' },
-        { type: 't3.micro', cat: 'micro' },
-        { type: 't3.small', cat: 'micro' },
-        { type: 'm3.small', cat: 'custom' },
-        { type: 'a1.medium', cat: 'custom' },
+        { types: ['m5.large'], cat: 'general', result: ['m5.large'] },
+        { types: ['t2.small', 't2.medium'], cat: 'general', result: ['t2.small', 't2.medium'] },
+        { types: ['r5.large', 'r5.xlarge'], cat: 'memory', result: ['r5.large', 'r5.xlarge'] },
+        { types: ['t2.nano', 't2.micro', 't2.small'], cat: 'micro', result: ['t2.nano', 't2.micro', 't2.small'] },
+        { types: ['t3.nano', 't3.micro', 't3.small'], cat: 'micro', result: ['t3.nano', 't3.micro', 't3.small'] },
+        { types: ['m3.small', 'a1.medium'], cat: 'custom', result: ['m3.small', 'a1.medium'] },
+        { types: ['t3.nano', 'm3.large', 'r5.large'], cat: 'micro', result: ['t3.nano'] },
+        { types: ['m5.small', 'r5.large'], cat: 'memory', result: ['r5.large'] },
+        { types: ['invalid'], cat: 'micro', result: [] },
+        { types: ['invalid'], cat: 'invalid', result: [] },
+        { types: ['t2.invalid'], cat: 'micro', result: [] },
+        { types: ['m5.small', 'a1.medium'], cat: 'general', result: [] },
       ];
       let service = this.awsInstanceTypeService;
 
       for (let test of input) {
-        expect(service.isInstanceTypeInCategory(test.type, test.cat)).toBeTrue();
-      }
-    });
-
-    it('returns false for instance types NOT in category', function () {
-      const input = [
-        { type: 't2.nano', cat: 'general' },
-        { type: 't3.nano', cat: 'general' },
-        { type: 't2.micro', cat: 'general' },
-        { type: 't3.micro', cat: 'general' },
-        { type: 't2.medium', cat: 'micro' },
-        { type: 't3.medium', cat: 'micro' },
-      ];
-      let service = this.awsInstanceTypeService;
-
-      for (let test of input) {
-        expect(service.isInstanceTypeInCategory(test.type, test.cat)).toBeFalse();
-      }
-    });
-
-    it('returns undefined for instance families NOT in category or invalid input', function () {
-      const input = [
-        { type: 'm5.large', cat: 'memory' },
-        { type: 't2.small', cat: 'memory' },
-        { type: 't3.something', cat: 'memory' },
-        { type: 'r5.xlarge', cat: 'micro' },
-        { type: 'm5.large', cat: 'invalid' },
-        { type: 't2.invalid', cat: 'memory' },
-        { type: 't3.invalid', cat: 'memory' },
-        { type: 'invalid', cat: 'micro' },
-        { type: 'invalid', cat: 'invalid' },
-      ];
-      let service = this.awsInstanceTypeService;
-
-      for (let test of input) {
-        expect(service.isInstanceTypeInCategory(test.type, test.cat)).toBeFalsy();
+        const actual = service.getInstanceTypesInCategory(test.types, test.cat);
+        expect(actual).toEqual(test.result);
       }
     });
   });
