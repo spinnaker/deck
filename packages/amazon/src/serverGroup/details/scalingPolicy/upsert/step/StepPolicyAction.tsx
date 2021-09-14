@@ -68,7 +68,8 @@ export const StepPolicyAction = ({
   React.useEffect(() => {
     setSteps(step.stepAdjustments);
   }, [step?.stepAdjustments]);
-
+  // eslint-disable-next-line
+  console.log('step alarm', alarm);
   return (
     <div className="StepPolicyAction row">
       {steps?.map((step: IStepAdjustment, index: number) => (
