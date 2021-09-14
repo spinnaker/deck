@@ -171,7 +171,7 @@ export const AlarmConfigurer = ({
           />
         </div>
       </div>
-      <div className="row sp-margin-s-yaxis" ng-if="$ctrl.alarm.metricName">
+      <div className="row sp-margin-s-yaxis">
         <div className="col-md-10 col-md-offset-1">
           {alarm && (
             <div>
