@@ -15,7 +15,10 @@ type IGitIntegrationProps = NonNullable<
   NonNullable<FetchApplicationManagementDataQuery['application']>['gitIntegration']
 >;
 
-const ManifestPath = ({ manifestPath }: Pick<IGitIntegrationProps, 'manifestPath'>) => {
+const ManifestPath = ({
+  manifestPath,
+  baseManifestPath,
+}: Pick<IGitIntegrationProps, 'manifestPath' | 'baseManifestPath'>) => {
   const [currentPath, setCurrentPath] = React.useState(manifestPath);
   const [isEditing, setIsEditing] = React.useState(false);
   const appName = useApplicationContextSafe().name;
@@ -37,6 +40,7 @@ const ManifestPath = ({ manifestPath }: Pick<IGitIntegrationProps, 'manifestPath
             updateIntegration({ variables: { payload: { application: appName, manifestPath: currentPath } } });
           }}
         >
+          <code>{baseManifestPath}</code>
           <input
             value={currentPath}
             className="form-control horizontal manifest-input input-sm sp-margin-xs-left"
@@ -52,7 +56,10 @@ const ManifestPath = ({ manifestPath }: Pick<IGitIntegrationProps, 'manifestPath
           </button>
         </form>
       ) : (
-        <code>{manifestPath}</code>
+        <code>
+          {baseManifestPath}
+          {manifestPath}
+        </code>
       )}
       {loading ? (
         <Spinner mode="circular" size="nano" color="var(--color-accent)" className="sp-margin-s-left" />
@@ -70,7 +77,14 @@ const ManifestPath = ({ manifestPath }: Pick<IGitIntegrationProps, 'manifestPath
   );
 };
 
-export const GitIntegration = ({ isEnabled, branch, link, repository, manifestPath }: IGitIntegrationProps) => {
+export const GitIntegration = ({
+  isEnabled,
+  branch,
+  link,
+  repository,
+  manifestPath,
+  baseManifestPath,
+}: IGitIntegrationProps) => {
   const appName = useApplicationContextSafe().name;
   const [updateIntegration, { loading }] = useUpdateGitIntegrationMutation({
     refetchQueries: [{ query: FetchApplicationManagementDataDocument, variables: { appName } }],
@@ -111,7 +125,7 @@ export const GitIntegration = ({ isEnabled, branch, link, repository, manifestPa
         Turning this on will automatically import your config from git when a new commit is made to{' '}
         {branch || 'your main branch'}
       </div>
-      <ManifestPath manifestPath={manifestPath} />
+      <ManifestPath {...{ baseManifestPath, manifestPath }} />
     </div>
   );
 };
