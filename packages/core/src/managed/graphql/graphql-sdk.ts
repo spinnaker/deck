@@ -200,7 +200,6 @@ export interface MdGitIntegration {
   branch?: Maybe<Scalars['String']>;
   isEnabled?: Maybe<Scalars['Boolean']>;
   manifestPath?: Maybe<Scalars['String']>;
-  baseManifestPath?: Maybe<Scalars['String']>;
   link?: Maybe<Scalars['String']>;
 }
 
@@ -749,7 +748,7 @@ export type FetchApplicationManagementDataQuery = { __typename?: 'Query' } & {
         gitIntegration?: Maybe<
           { __typename?: 'MdGitIntegration' } & Pick<
             MdGitIntegration,
-            'id' | 'repository' | 'branch' | 'isEnabled' | 'link' | 'manifestPath' | 'baseManifestPath'
+            'id' | 'repository' | 'branch' | 'isEnabled' | 'link' | 'manifestPath'
           >
         >;
       }
@@ -1364,7 +1363,6 @@ export const FetchApplicationManagementDataDocument = gql`
         isEnabled
         link
         manifestPath
-        baseManifestPath
       }
     }
   }

@@ -283,7 +283,6 @@ query fetchApplicationManagementData($appName: String!) {
       isEnabled
       link
       manifestPath
-      baseManifestPath
     }
   }
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { SETTINGS } from '../../config';
 import {
   FetchApplicationManagementDataDocument,
   FetchApplicationManagementDataQuery,
@@ -15,10 +16,7 @@ type IGitIntegrationProps = NonNullable<
   NonNullable<FetchApplicationManagementDataQuery['application']>['gitIntegration']
 >;
 
-const ManifestPath = ({
-  manifestPath,
-  baseManifestPath,
-}: Pick<IGitIntegrationProps, 'manifestPath' | 'baseManifestPath'>) => {
+const ManifestPath = ({ manifestPath }: Pick<IGitIntegrationProps, 'manifestPath'>) => {
   const [currentPath, setCurrentPath] = React.useState(manifestPath);
   const [isEditing, setIsEditing] = React.useState(false);
   const appName = useApplicationContextSafe().name;
@@ -28,6 +26,8 @@ const ManifestPath = ({
       setIsEditing(false);
     },
   });
+
+  const baseManifestPath = SETTINGS.managedDelivery?.manifestBasePath + '/';
 
   return (
     <div className="sp-margin-s-top horizontal middle ManifestPath">
@@ -77,14 +77,7 @@ const ManifestPath = ({
   );
 };
 
-export const GitIntegration = ({
-  isEnabled,
-  branch,
-  link,
-  repository,
-  manifestPath,
-  baseManifestPath,
-}: IGitIntegrationProps) => {
+export const GitIntegration = ({ isEnabled, branch, link, repository, manifestPath }: IGitIntegrationProps) => {
   const appName = useApplicationContextSafe().name;
   const [updateIntegration, { loading }] = useUpdateGitIntegrationMutation({
     refetchQueries: [{ query: FetchApplicationManagementDataDocument, variables: { appName } }],
@@ -125,7 +118,7 @@ export const GitIntegration = ({
         Turning this on will automatically import your config from git when a new commit is made to{' '}
         {branch || 'your main branch'}
       </div>
-      <ManifestPath {...{ baseManifestPath, manifestPath }} />
+      <ManifestPath manifestPath={manifestPath} />
     </div>
   );
 };
