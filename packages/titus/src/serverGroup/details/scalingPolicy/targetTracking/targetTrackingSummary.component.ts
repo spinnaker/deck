@@ -1,5 +1,4 @@
 import { IComponentController, IComponentOptions, module } from 'angular';
-import { IModalService } from 'angular-ui-bootstrap';
 
 import { ITargetTrackingConfiguration, ITargetTrackingPolicy } from '@spinnaker/amazon';
 import {
