@@ -59,6 +59,16 @@ export const AlarmConfigurer = ({
     }
   }, [comparatorBound]);
 
+  React.useEffect(() => {
+    const source = comparatorBound === 'max' ? 'metricIntervalLowerBound' : 'metricIntervalUpperBound';
+    if (stepAdjustments?.length) {
+      const updatedStepAdjustments = [...stepAdjustments];
+      // Always set the first step at the alarm threshold
+      updatedStepAdjustments[0][source] = alarmView.threshold;
+      stepsChanged(updatedStepAdjustments);
+    }
+  }, [alarmView.threshold]);
+
   const onChartLoaded = (stats: ICloudMetricStatistics) => setUnit(stats.unit);
 
   const onAlarmChange = (key: string, value: any) => {
@@ -68,23 +78,6 @@ export const AlarmConfigurer = ({
     };
     setAlarmView(newAlarm);
     updateAlarm(newAlarm);
-  };
-
-  const onThresholdChange = (bound: number) => {
-    const newAlarm = {
-      ...alarmView,
-      threshold: bound,
-    };
-    setAlarmView(newAlarm);
-    updateAlarm(newAlarm);
-
-    const source = comparatorBound === 'max' ? 'metricIntervalLowerBound' : 'metricIntervalUpperBound';
-    if (stepAdjustments?.length) {
-      const updatedStepAdjustments = [...stepAdjustments];
-      // Always set the first step at the alarm threshold
-      updatedStepAdjustments[0][source] = bound;
-      stepsChanged(updatedStepAdjustments);
-    }
   };
 
   const onMetricChange = (newAlarm: IScalingPolicyAlarm) => {
@@ -146,7 +139,7 @@ export const AlarmConfigurer = ({
           <div className="sp-margin-xl-left">
             <NumberInput
               value={alarmView.threshold}
-              onChange={(e) => onThresholdChange(Number.parseInt(e.target.value))}
+              onChange={(e) => onAlarmChange('threshold', Number.parseInt(e.target.value))}
               inputClassName="sp-margin-xs-right configurer-field-lg"
             />
           </div>
