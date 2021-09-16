@@ -23,7 +23,7 @@ export interface IDimensionsEditorProps {
 }
 
 export const DimensionsEditor = ({ alarm, serverGroup, updateAvailableMetrics }: IDimensionsEditorProps) => {
-  const [dimensions, setDimensions] = React.useState(alarm.dimensions || []);
+  const dimensions = alarm.dimensions || [];
 
   const fetchDimensions = () => {
     return CloudMetricsReader.listMetrics('aws', serverGroup.account, serverGroup.region, {
@@ -38,19 +38,16 @@ export const DimensionsEditor = ({ alarm, serverGroup, updateAvailableMetrics }:
 
   const addDimension = () => {
     const newDimensions = [...dimensions, {} as IMetricAlarmDimension];
-    setDimensions(newDimensions);
     updateAvailableMetrics(newDimensions);
   };
   const removeDimension = (index: number) => {
     const newDimensions = alarm.dimensions.filter((_d, i) => i !== index);
-    setDimensions(newDimensions);
     updateAvailableMetrics(newDimensions);
   };
   const updateDimension = (key: 'name' | 'value', value: string, index: number) => {
     const newDimensions = [...dimensions];
     const updatedDimension = newDimensions[index];
     updatedDimension[key] = value;
-    setDimensions(newDimensions);
     updateAvailableMetrics(newDimensions);
   };
 

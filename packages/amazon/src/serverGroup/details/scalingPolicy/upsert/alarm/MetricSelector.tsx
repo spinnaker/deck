@@ -32,10 +32,6 @@ export interface IMetricSelectorProps {
 export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelectorProps) => {
   const namespaces = (AWSProviderSettings?.metrics?.customNamespaces || []).concat(NAMESPACES);
   const [advancedMode, setAdvancedMode] = React.useState<boolean>(false);
-  // TODO: Remove useState once rendering speed improve (after refactoring to React)
-  const [selectedMetric, setSelectedMetric] = React.useState({});
-  const [metricName, setMetricName] = React.useState<string>(alarm?.metricName);
-  const [namespace, setNamespace] = React.useState<string>(alarm?.namespace);
 
   const dimensionsObject = (alarm?.dimensions || []).reduce(
     (acc: Dictionary<string>, dimension: IMetricAlarmDimension) => {
@@ -65,34 +61,21 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
             ...m,
           }))
           .sort((a, b) => a.label?.localeCompare(b.label));
-
-        const chosenMetric =
-          sortedMetrics.find(
-            (m: IMetricOption) =>
-              m.name === alarm?.metricName &&
-              m.namespace === alarm?.namespace &&
-              m.dimensionValues === dimensionValuesStr,
-          ) ||
-          sortedMetrics.find((m) => m.name.match('CPUUtilization')) ||
-          sortedMetrics[0];
-        setSelectedMetric(chosenMetric);
-        setMetricName(chosenMetric.name);
-        setNamespace(chosenMetric.namespace);
-
-        const newAlarm = {
-          ...alarm,
-          metricName: chosenMetric.name,
-          namespace: chosenMetric.namespace,
-          dimensions: chosenMetric.dimensions,
-        };
-        updateAlarm(newAlarm);
         return sortedMetrics;
       },
     );
   };
 
   const { result: metrics } = useData(fetchCloudMetrics, [], [serverGroup, alarm?.namespace]);
-  // TODO: Once rendering speeds improve, infer `selectedMetric` from the result of useData metrics. useState is needed now to update dropdown until data propagates.
+
+  const selectedMetric =
+    metrics.find(
+      (m: IMetricOption) =>
+        m.name === alarm?.metricName && m.namespace === alarm?.namespace && m.dimensionValues === dimensionValuesStr,
+    ) ||
+    metrics.find((m) => m.name.match('CPUUtilization')) ||
+    metrics[0];
+  const { name: metricName, namespace } = selectedMetric;
 
   const toggleMode = () => {
     const newMode = !advancedMode;
@@ -115,11 +98,6 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
       namespace: metric.namespace,
       dimensions: metric.dimensions,
     };
-
-    const newMetric = metrics.find((m) => m.namespace === metric.namespace && m.name === metric.name);
-    setSelectedMetric(newMetric);
-    setMetricName(newMetric.name);
-    setNamespace(newMetric.namespace);
     updateAlarm(newAlarm);
   };
 
@@ -129,8 +107,6 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
       metricName: newName,
       namespace: newNamespace,
     };
-    setMetricName(newName);
-    setNamespace(newNamespace);
     updateAlarm(newAlarm);
   };
 
