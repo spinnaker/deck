@@ -36,7 +36,7 @@ export const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IVi
     iconName: 'mdActuating',
     popoverContents: () => (
       <p>
-        <b>Spinnaker is deleting the resource</b>
+        <b>Spinnaker is deleting this temporary managed resource</b>
       </p>
     ),
   },
