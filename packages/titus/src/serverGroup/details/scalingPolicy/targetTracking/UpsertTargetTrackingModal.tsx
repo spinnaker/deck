@@ -36,7 +36,8 @@ export const UpsertTargetTrackingModal = ({
     setCommand(baseCommand);
   }, []);
 
-  const mode = policy.policyName ? 'Update' : 'Create';
+  const mode = policy.id ? 'Update' : 'Create';
+
   return (
     <TaskMonitorModal<IUpsertScalingPolicyCommand>
       closeModal={closeModal}
