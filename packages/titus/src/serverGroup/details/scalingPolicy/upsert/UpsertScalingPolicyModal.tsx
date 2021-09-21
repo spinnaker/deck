@@ -54,7 +54,7 @@ export const UpsertScalingPolicyModal = ({
       ? 'instances'
       : 'percent of group';
 
-  const mode = !policy.policyARN ? 'Create' : 'Edit';
+  const mode = !policy.id ? 'Create' : 'Edit';
   const comparatorBound = command?.alarm?.comparisonOperator?.indexOf('Greater') === 0 ? 'max' : 'min';
 
   const boundsChanged = (step: IStepPolicyDescription) => {

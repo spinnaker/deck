@@ -49,7 +49,7 @@ export const TitusScalingPolicyCommandBuilder = {
 
     return {
       cooldown: cooldown || 600,
-      estimatedInstanceWarmup: cooldown || 600,
+      estimatedInstanceWarmup: null,
       metricAggregationType: 'Average',
       stepAdjustments,
     };
@@ -64,7 +64,7 @@ export const TitusScalingPolicyCommandBuilder = {
       adjustmentType: type === 'Step' ? policy.adjustmentType : null,
       cloudProvider: serverGroup.cloudProvider,
       credentials: serverGroup.account,
-      jobId: serverGroup.disabledDate,
+      jobId: serverGroup.id,
       name: policy.id,
       region: serverGroup.region,
       scalingPolicyID: policy.id,
@@ -74,11 +74,7 @@ export const TitusScalingPolicyCommandBuilder = {
     if (type === 'Step') {
       command.alarm = TitusScalingPolicyCommandBuilder.buildAlarm(policy, serverGroup.region);
       command.minAdjustmentMagnitude = policy.minAdjustmentMagnitude || 1;
-      command.step = TitusScalingPolicyCommandBuilder.buildStepPolicy(
-        policy,
-        command.alarm.threshold,
-        command.cooldown,
-      );
+      command.step = TitusScalingPolicyCommandBuilder.buildStepPolicy(policy, command.alarm.threshold, policy.cooldown);
     }
 
     if (type === 'TargetTracking') {
