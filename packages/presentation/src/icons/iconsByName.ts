@@ -69,6 +69,7 @@ import { ReactComponent as spMenuCanaryConfig } from './vectors/spMenuCanaryConf
 import { ReactComponent as spMenuCanaryReport } from './vectors/spMenuCanaryReport.svg';
 import { ReactComponent as spMenuClusters } from './vectors/spMenuClusters.svg';
 import { ReactComponent as spMenuConfig } from './vectors/spMenuConfig.svg';
+import { ReactComponent as spMenuFunctions } from './vectors/spMenuFunctions.svg';
 import { ReactComponent as spMenuK8s } from './vectors/spMenuK8s.svg';
 import { ReactComponent as spMenuLoadBalancers } from './vectors/spMenuLoadBalancers.svg';
 import { ReactComponent as spMenuMeme } from './vectors/spMenuMeme.svg';
@@ -221,6 +222,7 @@ export const iconsByName = {
   spMenuCanaryReport,
   spMenuClusters,
   spMenuConfig,
+  spMenuFunctions,
   spMenuK8s,
   spMenuLoadBalancers,
   spMenuMeme,
