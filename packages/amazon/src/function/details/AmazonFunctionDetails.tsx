@@ -127,7 +127,7 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
                   <strong>Event Source</strong>
                 </h5>
                 <dl>
-                  <dt>Arn</dt>
+                  <dt>ARN</dt>
                   <dd>{value.eventSourceArn}</dd>
                   <dt>State</dt>
                   <dd>{value.state}</dd>
