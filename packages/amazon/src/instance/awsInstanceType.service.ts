@@ -324,10 +324,6 @@ module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeServ
       return $q.when(categories);
     }
 
-    function getCategoriesWithoutPromise() {
-      return categories;
-    }
-
     const getAllTypesByRegion = function getAllTypesByRegion(): PromiseLike<IInstanceTypesByRegion> {
       return REST('/instanceTypes')
         .get()
