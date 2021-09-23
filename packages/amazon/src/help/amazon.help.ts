@@ -59,7 +59,7 @@ const helpContents: { [key: string]: string } = {
     '(Optional) <b>Detail</b> is a string of free-form alphanumeric characters and hyphens to describe any other variables.',
   'aws.serverGroup.imageName':
     '(Required) <b>Image</b> is the deployable Amazon Machine Image. Images are restricted to the account and region selected.',
-  'aws.serverGroup.storageType': `AWS offers various storage options like temporary block-level storage via instance store(SSD, HDD) and Amazon Elastic Block Store(EBS). This column lists the storage type supported for the instance type.`,
+  'aws.serverGroup.storageType': `AWS offers various storage options like temporary block-level storage via instance store (SSD, HDD) and Amazon Elastic Block Store (EBS). This column lists the storage type supported for the instance type.`,
   'aws.serverGroup.instancesDistribution': `Learn more in <a target="_blank" href="https://docs.aws.amazon.com/autoscaling/ec2/userguide/asg-purchase-options.html">AWS docs</a>.`,
   'aws.serverGroup.spotMaxPrice':
     'The maximum price per unit hour to pay for a Spot instance. By <b>default (empty)</b>, Amazon EC2 Auto Scaling uses the On-Demand price as the maximum Spot price.',
