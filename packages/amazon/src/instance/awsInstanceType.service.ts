@@ -479,7 +479,6 @@ module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeServ
       isEbsOptimized,
       isBurstingSupportedForAllTypes,
       getInstanceTypesInCategory,
-      getCategoriesWithoutPromise,
     };
   },
 ]);
