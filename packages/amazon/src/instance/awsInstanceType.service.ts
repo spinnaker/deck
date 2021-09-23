@@ -448,10 +448,8 @@ module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeServ
       if (!instanceTypes || !instanceTypes.length) {
         return false;
       }
-      const supportedTypes = _.filter(instanceTypes, (instanceType) => isBurstingSupported(instanceType));
-
       // for multiple instance types case, all instance types must support bursting in order to prevent incompatible configuration.
-      return supportedTypes.length == instanceTypes.length ? true : false;
+      return instanceTypes.every((instanceType) => isBurstingSupported(instanceType));
     }
 
     function isBurstingSupported(instanceType: string): boolean {
