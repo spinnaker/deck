@@ -1,7 +1,7 @@
 {
   "name": "@spinnaker/core",
   "license": "Apache-2.0",
-  "version": "0.11.4",
+  "version": "0.11.5",
   "module": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
@@ -17,7 +17,7 @@
     "@apollo/client": "3.3.14",
     "@fortawesome/fontawesome-free": "5.5.0",
     "@spinnaker/mocks": "1.0.7",
-    "@spinnaker/presentation": "^0.0.11",
+    "@spinnaker/presentation": "^0.0.12",
     "@spinnaker/styleguide": "1.0.28",
     "@uirouter/angularjs": "1.0.26",
     "@uirouter/core": "6.0.8",
@@ -78,7 +78,7 @@
     "recoil": "0.0.10",
     "rxjs": "6.6.7",
     "select2-bootstrap-css": "git://github.com/t0m/select2-bootstrap-css.git#v1.3.1",
-    "source-sans-pro": "2.0.10",
+    "source-sans": "3.46.0",
     "spel2js": "0.2.6",
     "ui-select": "0.19.8"
   },
