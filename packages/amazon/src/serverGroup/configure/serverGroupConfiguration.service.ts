@@ -666,9 +666,8 @@ export class AwsServerGroupConfigurationService {
       // this function exists for backwards compatibility with single instance type case, matching behavior in `cmd.instanceTypeChanged`
       // note: this parameter has no effect on instance types with EBS optimization enabled by default.
       command.ebsOptimized =
-        command.launchTemplateOverridesForInstanceType &&
-        command.launchTemplateOverridesForInstanceType.every(
-          (o) => this.awsInstanceTypeService.isEbsOptimized(o.instanceType) === true,
+        command.launchTemplateOverridesForInstanceType?.every(
+          (o) => this.awsInstanceTypeService.isEbsOptimized(o.instanceType),
         );
     };
 
