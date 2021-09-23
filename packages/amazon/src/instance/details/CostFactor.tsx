@@ -24,11 +24,12 @@ export function CostFactor(props: ICostFactorProps) {
 const CostFactorDollar = (props: { costF: number }): JSX.Element => {
   const MAX_LENGTH = 4;
   const DOLLAR = '$';
+  const costF = Math.floor(Math.min(MAX_LENGTH, Math.abs(props.costF)));
 
   return (
     <>
-      <span className="cost">{DOLLAR.repeat(props.costF)}</span>
-      {DOLLAR.repeat(MAX_LENGTH - props.costF)}
+      <span className="cost">{DOLLAR.repeat(costF)}</span>
+      {DOLLAR.repeat(MAX_LENGTH - costF)}
     </>
   );
 };
