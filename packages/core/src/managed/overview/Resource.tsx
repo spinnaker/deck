@@ -30,7 +30,11 @@ const statusUtils: {
   };
 } = {
   ERROR: { color: 'var(--color-status-error)', icon: 'fas fa-times', defaultReason: 'Failed to update resource' },
-  NOT_MANAGED: { color: 'var(--color-status-warning)', icon: 'fas fa-pause', defaultReason: 'Resource is not managed' },
+  NOT_MANAGED: {
+    color: 'var(--color-status-warning)',
+    icon: 'fas fa-pause',
+    defaultReason: 'Resource management is paused',
+  },
   WAITING: { icon: 'far fa-hourglass', defaultReason: 'Resource is currently locked and can not be updated' },
   PROCESSING: { icon: 'far fa-hourglass', defaultReason: 'Resource is being updated' },
   DELETING: { icon: 'far fa-trash-alt', defaultReason: 'Resource is being deleted' },
