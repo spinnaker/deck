@@ -28,11 +28,15 @@ export const DimensionsEditor = ({ alarm, serverGroup, updateAvailableMetrics }:
   const fetchDimensions = () => {
     return CloudMetricsReader.listMetrics('aws', serverGroup.account, serverGroup.region, {
       namespace: alarm.namespace,
-    }).then((results) => {
-      const allDimensions = flatMap(results, (r) => r.dimensions);
-      const sortedDimensions = uniq(allDimensions.map((d) => d.name)).sort();
-      return sortedDimensions;
-    });
+    })
+      .then((results) => {
+        const allDimensions = flatMap(results, (r) => r.dimensions);
+        const sortedDimensions = uniq(allDimensions.filter((d) => d).map((d) => d.name)).sort();
+        return sortedDimensions;
+      })
+      .catch(() => {
+        return [];
+      });
   };
   const { result: dimensionOptions } = useData(fetchDimensions, [], [alarm.namespace, serverGroup.name]);
 
@@ -50,7 +54,6 @@ export const DimensionsEditor = ({ alarm, serverGroup, updateAvailableMetrics }:
     updatedDimension[key] = value;
     updateAvailableMetrics(newDimensions);
   };
-
   return (
     <div>
       <div className="row">

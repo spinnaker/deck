@@ -46,36 +46,35 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
       .sort((a: IMetricAlarmDimension, b: IMetricAlarmDimension) => a.name?.localeCompare(b.name))
       .map((d: IMetricAlarmDimension) => d.value)
       .join(', ');
-  const dimensionValuesStr = buildDimensionValues(alarm?.dimensions || []);
 
   const fetchCloudMetrics = () => {
     const account = serverGroup.cloudProvider === 'aws' ? serverGroup.account : serverGroup?.awsAccount;
-    return CloudMetricsReader.listMetrics('aws', account, serverGroup.region, dimensionsObject).then(
-      (metrics: ICloudMetricDescriptor[]) => {
-        const sortedMetrics: IMetricOption[] = metrics
+    const queryParams = advancedMode ? { namespace: alarm?.namespace } : { AutoScalingGroupName: serverGroup.name };
+    return CloudMetricsReader.listMetrics('aws', account, serverGroup.region, queryParams)
+      .then((results: ICloudMetricDescriptor[]) => {
+        const sortedMetrics: IMetricOption[] = (results || [])
           .map((m) => ({
             label: `(${m.namespace}) ${m.name}`,
             dimensions: [],
-            dimensionValues: buildDimensionValues(m.dimensions),
+            dimensionValues: buildDimensionValues(m.dimensions || []),
             value: m,
             ...m,
           }))
           .sort((a, b) => a.label?.localeCompare(b.label));
         return sortedMetrics;
-      },
-    );
+      })
+      .catch(() => {
+        return [];
+      });
   };
 
   const { result: metrics } = useData(fetchCloudMetrics, [], [serverGroup, alarm?.namespace]);
-
+  const metricsByNamespace = (metrics || []).filter((m) => m.namespace === alarm?.namespace);
   const selectedMetric =
-    metrics.find(
-      (m: IMetricOption) =>
-        m.name === alarm?.metricName && m.namespace === alarm?.namespace && m.dimensionValues === dimensionValuesStr,
-    ) ||
-    metrics.find((m) => m.name.match('CPUUtilization')) ||
-    metrics[0];
-  const { name: metricName, namespace } = selectedMetric;
+    metricsByNamespace.find((m: IMetricOption) => m.name === alarm?.metricName && m.namespace === alarm?.namespace) ||
+    metricsByNamespace.find((m) => m.name.match('CPUUtilization')) ||
+    metricsByNamespace[0];
+  const { name: metricName, namespace } = selectedMetric || {};
 
   const toggleMode = () => {
     const newMode = !advancedMode;
@@ -117,6 +116,13 @@ export const MetricSelector = ({ alarm, updateAlarm, serverGroup }: IMetricSelec
     };
     updateAlarm(newAlarm);
   };
+
+  React.useEffect(() => {
+    if (selectedMetric) {
+      onMetricChange(selectedMetric);
+    }
+  }, [selectedMetric]);
+
   if (!advancedMode) {
     return (
       <div className="MetricSelector horizontal middle">
