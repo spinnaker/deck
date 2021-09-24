@@ -340,9 +340,8 @@ describe('ProviderSelectionService: API', () => {
     });
 
     // If an application is configured to have kubernetes as a cloud provider, and there are multiple kubernetes accounts, then the create
-    // infrastructure buttons are not disabled even if kubernetesAdHocInfraWritesEnabled is false
-    // TODO: This behaviour is a bug and needs to be fixed
-    it('create infrastructure buttons are enabled even when all accounts have cloud providers with ad-hoc operations disabled', () => {
+    // infrastructure buttons are disabled if kubernetesAdHocInfraWritesEnabled is false
+    it('create infrastructure buttons are disabled when all accounts have cloud providers with ad-hoc operations disabled', () => {
       let isDisabled_result = false;
       hasValue = true;
       const k8s_account_1 = fakeAccount('kubernetes');
@@ -360,7 +359,7 @@ describe('ProviderSelectionService: API', () => {
         isDisabled_result = isDisable;
       });
       $scope.$digest();
-      expect(isDisabled_result).toBe(false);
+      expect(isDisabled_result).toBe(true);
     });
   });
 });
