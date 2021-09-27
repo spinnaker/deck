@@ -6,4 +6,5 @@ export * from './ScalingPolicyWriter';
 export * from './targetTracking/TargetTrackingAdditionalSettings';
 export * from './targetTracking/TargetMetricFields';
 export * from './targetTracking/TargetTrackingChart';
+export { UpsertTargetTrackingModal as AmazonUpsertTargetTrackingModal } from './targetTracking/UpsertTargetTrackingModal';
 export * from './upsert';
