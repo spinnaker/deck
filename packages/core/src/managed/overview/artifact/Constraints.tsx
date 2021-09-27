@@ -10,7 +10,8 @@ import { CollapsibleSection, useApplicationContextSafe } from '../../../presenta
 import { ArtifactVersionProps, QueryConstraint } from '../types';
 import { getConstraintsStatusSummary } from './utils';
 import { useLogEvent } from '../../utils/logging';
-import { NotifierService, Spinner } from '../../../widgets';
+import { useNotifyOnError } from '../../utils/useNotifyOnError.hook';
+import { Spinner } from '../../../widgets';
 
 import './Constraints.less';
 
@@ -31,16 +32,7 @@ const ConstraintContent = ({ constraint, versionProps }: IConstraintContentProps
     ],
   });
 
-  React.useEffect(() => {
-    if (error) {
-      NotifierService.publish({
-        action: 'create',
-        key: 'updateConstraintError',
-        content: `Failed to update constraint - ${error.message}`,
-        options: { type: 'error' },
-      });
-    }
-  }, [error]);
+  useNotifyOnError({ key: 'updateConstraintError', content: `Failed to update constraint`, error });
 
   return (
     <dl className="constraint-content">
@@ -88,7 +80,7 @@ const Constraint = ({ constraint, versionProps }: IConstraintProps) => {
   const title = constraintsManager.renderTitle(constraint);
   return (
     <div className="version-constraint single-constraint">
-      <VersionOperationIcon status={constraint.status} />
+      <VersionOperationIcon status={constraint.status} size="small" className="constraint-icon" />
       <CollapsibleSection
         outerDivClassName=""
         defaultExpanded
@@ -130,7 +122,7 @@ export const Constraints = ({
   return (
     <div className="Constraints">
       <div className="version-constraint">
-        <VersionOperationIcon status={summary.status} />
+        <VersionOperationIcon status={summary.status} className="constraints-icon" />
         <CollapsibleSection
           heading={({ chevron }) => (
             <div className="horizontal">

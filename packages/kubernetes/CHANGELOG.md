@@ -3,6 +3,78 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.101](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.100...@spinnaker/kubernetes@0.0.101) (2021-09-24)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.100](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.99...@spinnaker/kubernetes@0.0.100) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.99](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.98...@spinnaker/kubernetes@0.0.99) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.98](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.97...@spinnaker/kubernetes@0.0.98) (2021-09-21)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.97](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.96...@spinnaker/kubernetes@0.0.97) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.96](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.95...@spinnaker/kubernetes@0.0.96) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.95](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.94...@spinnaker/kubernetes@0.0.95) (2021-09-16)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.94](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.93...@spinnaker/kubernetes@0.0.94) (2021-09-15)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.93](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.92...@spinnaker/kubernetes@0.0.93) (2021-09-14)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
 ## [0.0.92](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.91...@spinnaker/kubernetes@0.0.92) (2021-09-06)
 
 **Note:** Version bump only for package @spinnaker/kubernetes

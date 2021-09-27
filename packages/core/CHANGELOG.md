@@ -3,6 +3,118 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.7](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.6...@spinnaker/core@0.11.7) (2021-09-24)
+
+
+### Bug Fixes
+
+* **core/cloudProvider:** remove unused ICloudProviderLogoState interface ([57d606c](https://github.com/spinnaker/deck/commit/57d606cb2442b5eb1e465b3cd5bc9f5235ae9d92))
+* **core:** previous commit updated the font to sans serif 3, but not the styleguide. ([#9700](https://github.com/spinnaker/deck/issues/9700)) ([b01afa9](https://github.com/spinnaker/deck/commit/b01afa95ca19455e7a316844101f080adef99ca9))
+* **md:** allow users to enable resource management ([#9690](https://github.com/spinnaker/deck/issues/9690)) ([455be38](https://github.com/spinnaker/deck/commit/455be38a5fee8fbcb2345b6026844e00923418fb))
+
+
+
+
+
+## [0.11.6](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.5...@spinnaker/core@0.11.6) (2021-09-23)
+
+
+### Bug Fixes
+
+* **md:** notify users on error in mutation ([#9691](https://github.com/spinnaker/deck/issues/9691)) ([ad99afb](https://github.com/spinnaker/deck/commit/ad99afbef6fa55bb570d8c2530667b24b2d02c79))
+
+
+
+
+
+## [0.11.5](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.4...@spinnaker/core@0.11.5) (2021-09-23)
+
+
+### Bug Fixes
+
+* **aws/lambda:** Fix functions icon on menu ([#9686](https://github.com/spinnaker/deck/issues/9686)) ([9e6aae3](https://github.com/spinnaker/deck/commit/9e6aae34af206ea6d280fac1b892d7aba7f38abc))
+* **pipelines:** Reduce pipelineConfig fetches ([#9677](https://github.com/spinnaker/deck/issues/9677)) ([106d00b](https://github.com/spinnaker/deck/commit/106d00b942ce19c5a316a130963c411171893108))
+
+
+
+
+
+## [0.11.4](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.3...@spinnaker/core@0.11.4) (2021-09-21)
+
+
+### Bug Fixes
+
+* **md:** render resource status as markdown ([#9674](https://github.com/spinnaker/deck/issues/9674)) ([9f3d12f](https://github.com/spinnaker/deck/commit/9f3d12f3df97f33723b5287ccac5202cd4e2f8c4))
+
+
+
+
+
+## [0.11.3](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.2...@spinnaker/core@0.11.3) (2021-09-18)
+
+
+### Bug Fixes
+
+* **md:** fix version message style ([#9671](https://github.com/spinnaker/deck/issues/9671)) ([c5ff99a](https://github.com/spinnaker/deck/commit/c5ff99ac472645fdb5f931e221bc4d475335c086))
+
+
+
+
+
+## [0.11.2](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.1...@spinnaker/core@0.11.2) (2021-09-18)
+
+
+### Bug Fixes
+
+* **md:** replaced status with statusSummary ([#9669](https://github.com/spinnaker/deck/issues/9669)) ([4defe7f](https://github.com/spinnaker/deck/commit/4defe7f3df71c201533bda4f103e63b116859a96))
+
+
+
+
+
+## [0.11.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.0...@spinnaker/core@0.11.1) (2021-09-16)
+
+
+### Bug Fixes
+
+* **core:** break words in notifications to prevent overflow ([#9665](https://github.com/spinnaker/deck/issues/9665)) ([9e15cc7](https://github.com/spinnaker/deck/commit/9e15cc7aaba7eb88bff64a1d618758de4e6476dd))
+* **md:** Added DELETING state to resource states.  ([#9659](https://github.com/spinnaker/deck/issues/9659)) ([dc36ccd](https://github.com/spinnaker/deck/commit/dc36ccdebdb1c2e20ac1f594f6b8418f470f3076))
+
+
+
+
+
+# [0.11.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.10.0...@spinnaker/core@0.11.0) (2021-09-15)
+
+
+### Features
+
+* **md:** display manifest path and make it configurable ([#9657](https://github.com/spinnaker/deck/issues/9657)) ([c7faaef](https://github.com/spinnaker/deck/commit/c7faaef01ae89b6103f37fa0087a94e33c658d8c))
+
+
+
+
+
+# [0.10.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.9.1...@spinnaker/core@0.10.0) (2021-09-14)
+
+
+### Bug Fixes
+
+* **core:** do not show "0" when no scaling activities detected ([da063fb](https://github.com/spinnaker/deck/commit/da063fbe1f15638b17c0903703ee9b608f92ea40))
+* **style:** keep submit button status indicator inline with label ([3d2b4cb](https://github.com/spinnaker/deck/commit/3d2b4cbaf3bf35ae170034d3843e75d994a642a3))
+
+
+### Features
+
+* **core:** Allow notification email SpEL ([#9633](https://github.com/spinnaker/deck/issues/9633)) ([05bd71f](https://github.com/spinnaker/deck/commit/05bd71f9870a5a234fe6a4302be0952b305fc2e4))
+* **core:** Expand Image Provider validation to find image stages ([#9647](https://github.com/spinnaker/deck/issues/9647)) ([c6cd62f](https://github.com/spinnaker/deck/commit/c6cd62f5dea233343037e29fdebb978728ff8341))
+* **md:** extended and simplified constraint title rendering ([#9640](https://github.com/spinnaker/deck/issues/9640)) ([b96078e](https://github.com/spinnaker/deck/commit/b96078e304aad10f147bfeb65b91299c9033a6d1))
+* **travis:** Remove Property File field from Travis stages and triggers ([#8990](https://github.com/spinnaker/deck/issues/8990)) ([6aa8e39](https://github.com/spinnaker/deck/commit/6aa8e39cae511bbdf3152be23e12f48a19a25abd))
+
+
+
+
+
 ## [0.9.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.9.0...@spinnaker/core@0.9.1) (2021-09-06)
 
 

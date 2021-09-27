@@ -3,6 +3,78 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.72](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.0.71...@spinnaker/google@0.0.72) (2021-09-24)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.0.71](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.0.70...@spinnaker/google@0.0.71) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.0.70](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.0.69...@spinnaker/google@0.0.70) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.0.69](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.0.68...@spinnaker/google@0.0.69) (2021-09-21)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.0.68](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.0.67...@spinnaker/google@0.0.68) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.0.67](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.0.66...@spinnaker/google@0.0.67) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.0.66](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.0.65...@spinnaker/google@0.0.66) (2021-09-16)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.0.65](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.0.64...@spinnaker/google@0.0.65) (2021-09-15)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.0.64](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.0.63...@spinnaker/google@0.0.64) (2021-09-14)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
 ## [0.0.63](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.0.62...@spinnaker/google@0.0.63) (2021-09-06)
 
 **Note:** Version bump only for package @spinnaker/google
