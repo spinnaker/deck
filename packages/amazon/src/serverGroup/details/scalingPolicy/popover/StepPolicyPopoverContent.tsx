@@ -9,7 +9,7 @@ import {
   IScalingPolicyView,
   IStepAdjustmentView,
 } from '../../../../domain';
-import { COMPARATORS } from '../upsert';
+import { comparatorMap } from '../popover/AlarmSummary';
 
 export interface IStepPolicyPopoverContentProps {
   policy: IScalingPolicyView;
@@ -48,10 +48,10 @@ export const StepPolicyPopoverContent = ({ policy, serverGroup }: IStepPolicyPop
 
   return (
     <div>
-      <LabeledValueList>
+      <LabeledValueList className="dl-horizontal dl-narrow">
         <LabeledValue
           label="Whenever"
-          value={`${alarm.statistic} of ${alarm.metricName} is ${COMPARATORS[alarm.comparisonOperator]} ${
+          value={`${alarm.statistic} of ${alarm.metricName} is ${comparatorMap[alarm.comparisonOperator]} ${
             alarm.threshold
           }`}
         />
@@ -62,8 +62,8 @@ export const StepPolicyPopoverContent = ({ policy, serverGroup }: IStepPolicyPop
         {Boolean(stepAdjustments?.length) && (
           <LabeledValue
             label="then"
-            value={stepAdjustments.map((sa) => (
-              <div>
+            value={stepAdjustments.map((sa, index) => (
+              <div key={`step-adjustment-boundary-${index}`}>
                 {stepAdjustments.length > 1 && <span>{getBoundaryStr(sa)}</span>}
                 <span>{getAdjustmentTypeString(sa)}</span>
               </div>
@@ -78,10 +78,10 @@ export const StepPolicyPopoverContent = ({ policy, serverGroup }: IStepPolicyPop
           />
         )}
         {Boolean(showWait) && (
-          <LabeledValue label="wait" value={`${cooldown} seconds before allowign another scaling activity.`} />
+          <LabeledValue label="wait" value={`${cooldown} seconds before allowing another scaling activity.`} />
         )}
-        {Boolean(showWait && estimatedInstanceWarmup) && (
-          <LabeledValue label="" value={`${estimatedInstanceWarmup} seconds to warm up after each step.`} />
+        {Boolean(estimatedInstanceWarmup) && (
+          <LabeledValue label="wait" value={`${estimatedInstanceWarmup} seconds to warm up after each step.`} />
         )}
       </LabeledValueList>
       <MetricAlarmChart alarm={alarm} serverGroup={serverGroup} />

@@ -15,6 +15,8 @@ import { IAmazonServerGroup, IScalingPolicyView } from '../../../domain';
 import { AlarmSummary } from './popover/AlarmSummary';
 import { StepPolicyPopoverContent } from './popover/StepPolicyPopoverContent';
 
+import './StepPolicySummary.less';
+
 export interface IStepPolicySummaryProps {
   application: Application;
   policy: IScalingPolicyView;
@@ -59,7 +61,7 @@ export const StepPolicySummary = ({ application, policy, serverGroup }: IStepPol
   }
 
   return (
-    <div>
+    <div className="StepPolicySummary">
       <span className="label label-default">{robotToHuman(policy.policyType).toUpperCase()}</span>
       <div>
         {policy.alarms.map((a) => (
@@ -68,6 +70,8 @@ export const StepPolicySummary = ({ application, policy, serverGroup }: IStepPol
               Component={() => (
                 <StepPolicyPopoverContent policy={policy} serverGroup={serverGroup as IAmazonServerGroup} />
               )}
+              placement="left"
+              title={policy.policyName}
             >
               <AlarmSummary alarm={a} />
             </HoverablePopover>
