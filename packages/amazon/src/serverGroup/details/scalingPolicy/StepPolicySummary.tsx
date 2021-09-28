@@ -8,9 +8,9 @@ import {
   IServerGroup,
   ReactModal,
   robotToHuman,
+  TaskExecutor,
 } from '@spinnaker/core';
 
-import { ScalingPolicyWriter } from './ScalingPolicyWriter';
 import { IAmazonServerGroup, IScalingPolicyView } from '../../../domain';
 import { AlarmSummary } from './popover/AlarmSummary';
 import { StepPolicyPopoverContent } from './popover/StepPolicyPopoverContent';
@@ -23,9 +23,20 @@ export interface IStepPolicySummaryProps {
   serverGroup: IServerGroup;
 }
 
+interface IDeletePolicyJob {
+  type: string;
+  cloudProvider: string;
+  credentials: string;
+  region: string;
+  policyName?: string;
+  scalingPolicyID?: string;
+  serverGroupName: string;
+}
+
 export const StepPolicySummary = ({ application, policy, serverGroup }: IStepPolicySummaryProps) => {
   const provider = serverGroup.type || serverGroup.cloudProvider || 'aws';
   const providerConfig = CloudProviderRegistry.getValue(provider, 'serverGroup');
+  const policyTitle = provider === 'aws' ? policy.policyName : policy.id;
 
   const UpsertModalComponent = providerConfig.UpsertStepPolicyModal;
 
@@ -42,17 +53,34 @@ export const StepPolicySummary = ({ application, policy, serverGroup }: IStepPol
   const deletePolicy = () => {
     const taskMonitor = {
       application,
-      title: `Deleting scaling policy ${policy.policyName}`,
+      title: `Deleting scaling policy ${policyTitle}`,
     };
 
-    const submitMethod = () => ScalingPolicyWriter.deleteScalingPolicy(application, serverGroup, policy);
+    const jobToSubmit: IDeletePolicyJob = {
+      type: 'deleteScalingPolicy',
+      cloudProvider: provider,
+      credentials: serverGroup.account,
+      region: serverGroup.region,
+      scalingPolicyID: policy.id,
+      serverGroupName: serverGroup.name,
+    };
+
+    if (provider === 'aws') {
+      delete jobToSubmit.scalingPolicyID;
+      jobToSubmit.policyName = policy.policyName;
+    }
 
     ConfirmationModalService.confirm({
-      header: `Really delete ${policy.policyName}?`,
+      header: `Really delete ${policyTitle}?`,
       buttonText: 'Delete scaling policy',
-      account: policy.alarms.length ? serverGroup.account : null,
+      account: serverGroup.account,
       taskMonitorConfig: taskMonitor,
-      submitMethod: submitMethod,
+      submitMethod: () =>
+        TaskExecutor.executeTask({
+          application,
+          description: `Delete scaling policy ${policyTitle}`,
+          job: [jobToSubmit],
+        }),
     });
   };
 
