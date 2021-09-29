@@ -1,9 +1,11 @@
 {
-  "extends": "../tsconfig.app.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "composite": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["**/*.spec.*", "**/*.stories.*"]
+  "exclude": ["**/*.spec.*", "**/*.stories.*"],
+  "extends": "../tsconfig.app.base.json",
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js"],
+  "references": [{ "path": "../presentation/tsconfig.json" }]
 }

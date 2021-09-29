@@ -3,8 +3,21 @@
   "compilerOptions": {
     "baseUrl": "./src",
     "outDir": "dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "composite": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["**/*.spec.*"]
+  "exclude": ["**/*.spec.*"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js"],
+  "references": [
+    { "path": "../amazon/tsconfig.json" },
+    { "path": "../appengine/tsconfig.json" },
+    { "path": "../cloudfoundry/tsconfig.json" },
+    { "path": "../core/tsconfig.json" },
+    { "path": "../docker/tsconfig.json" },
+    { "path": "../ecs/tsconfig.json" },
+    { "path": "../google/tsconfig.json" },
+    { "path": "../kubernetes/tsconfig.json" },
+    { "path": "../oracle/tsconfig.json" },
+    { "path": "../titus/tsconfig.json" }
+  ]
 }

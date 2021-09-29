@@ -21,13 +21,13 @@ Thumbs.db
 # Node Files #
 npm-debug.log
 node_modules/
-test/google/node_modules/
 
 # Build Files
 .awcache/
 .gradle/
 .happypack/
 **/.cache-loader
+**/tsconfig.tsbuildinfo
 .yalc
 yalc.lock
 build/
