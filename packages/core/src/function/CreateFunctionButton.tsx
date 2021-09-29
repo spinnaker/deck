@@ -30,7 +30,7 @@ export class CreateFunctionButton extends React.Component<ICreateFunctionButtonP
     super(props);
 
     const { app } = this.props;
-    this.state = { isDisabled: false };
+    this.state = { isDisabled: true };
     ProviderSelectionService.isDisabled(app).then((val) => {
       this.setState({
         isDisabled: val,
