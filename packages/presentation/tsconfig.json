@@ -5,7 +5,8 @@
     "strict": true,
     "composite": true
   },
-  "exclude": ["dist"],
+  "exclude": ["**/*.spec.*", "**/*.stories.*"],
   "extends": "../tsconfig.tools.base.json",
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js"],
   "references": []
 }
