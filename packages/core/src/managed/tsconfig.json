@@ -1,7 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-      "noEmit": true, 
-      "strictNullChecks": true
-  }
+    "noEmit": true,
+    "strictNullChecks": true
+  },
+  "references": [{ "path": "../../../presentation/tsconfig.json" }]
 }
