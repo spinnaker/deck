@@ -14,14 +14,15 @@ export interface IInstanceTypeSelectorProps {
 }
 
 export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
+  const { command, setFieldValue, instanceTypeDetails } = props;
   const isLaunchTemplatesEnabled = AWSProviderSettings.serverGroups?.enableLaunchTemplates;
 
-  const [useSimpleMode, setUseSimpleMode] = React.useState(props.command.viewState.useSimpleInstanceTypeSelector);
-  const [unlimitedCpuCredits, setUnlimitedCpuCredits] = useState(props.command.unlimitedCpuCredits);
+  const [useSimpleMode, setUseSimpleMode] = React.useState(command.viewState.useSimpleInstanceTypeSelector);
+  const [unlimitedCpuCredits, setUnlimitedCpuCredits] = useState(command.unlimitedCpuCredits);
 
   useEffect(() => {
-    if (props.command.unlimitedCpuCredits !== unlimitedCpuCredits) {
-      props.setFieldValue('unlimitedCpuCredits', unlimitedCpuCredits);
+    if (command.unlimitedCpuCredits !== unlimitedCpuCredits) {
+      setFieldValue('unlimitedCpuCredits', unlimitedCpuCredits);
     }
   }, [unlimitedCpuCredits]);
 
@@ -29,44 +30,43 @@ export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
     if (useSimpleMode !== useSimpleModeNew) {
       setUseSimpleMode(useSimpleModeNew);
 
-      // update viewState
-      props.setFieldValue('viewState', {
-        ...props.command.viewState,
+      setFieldValue('viewState', {
+        ...command.viewState,
         useSimpleInstanceTypeSelector: useSimpleModeNew,
       });
 
       // update selected instance type(s) if mode changed.
       // Simple mode uses command.instanceType to track selected type. Advanced mode uses command.launchTemplateOverridesForInstanceType to track selected types.
-      const multipleInstanceTypesInProps = props.command.launchTemplateOverridesForInstanceType;
-      const singleInstanceTypeInProps = props.command.instanceType;
+      const multipleInstanceTypesInProps = command.launchTemplateOverridesForInstanceType;
+      const singleInstanceTypeInProps = command.instanceType;
 
-      if (useSimpleModeNew && multipleInstanceTypesInProps && multipleInstanceTypesInProps.length > 0) {
-        // advanced mode -> simple mode, pick the instance type with highest priority from command.launchTemplateOverridesForInstanceType
+      const toSimple = useSimpleModeNew && multipleInstanceTypesInProps?.length;
+      const toAdvanced = !useSimpleModeNew && singleInstanceTypeInProps;
+      if (toSimple) {
         const highestPriorityNum = Math.min(...multipleInstanceTypesInProps.map((it) => it.priority));
         const instanceTypeWithHighestPriority = multipleInstanceTypesInProps.find(
           (it) => it.priority === highestPriorityNum,
         ).instanceType;
 
-        props.setFieldValue('instanceType', instanceTypeWithHighestPriority);
-        props.setFieldValue('launchTemplateOverridesForInstanceType', []);
-        props.command.instanceTypeChanged(props.command);
-      } else if (!useSimpleModeNew && singleInstanceTypeInProps) {
-        // simple mode -> advanced mode, port command.instanceType to command.launchTemplateOverridesForInstanceType
+        setFieldValue('instanceType', instanceTypeWithHighestPriority);
+        setFieldValue('launchTemplateOverridesForInstanceType', []);
+        command.instanceTypeChanged(command);
+      } else if (toAdvanced) {
         const instanceTypes: IAmazonInstanceTypeOverride[] = [
           {
             instanceType: singleInstanceTypeInProps,
             priority: 1,
           },
         ];
-        props.setFieldValue('launchTemplateOverridesForInstanceType', instanceTypes);
-        props.setFieldValue('instanceType', undefined);
-        props.command.instanceTypesChanged(props.command);
+        setFieldValue('instanceType', undefined);
+        setFieldValue('launchTemplateOverridesForInstanceType', instanceTypes);
+        command.launchTemplateOverridesChanged(command);
       }
     }
   };
 
-  // advanced mode is supported only when launch templates support is enabled, so, render the component iff launch templates support is enabled
-  if (isLaunchTemplatesEnabled && !useSimpleMode) {
+  const showAdvancedMode = isLaunchTemplatesEnabled && !useSimpleMode;
+  if (showAdvancedMode) {
     return (
       <div className="container-fluid form-horizontal" style={{ padding: '0 15px' }}>
         <div>
@@ -84,10 +84,10 @@ export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
           </i>
         </div>
         <AdvancedModeSelector
-          command={props.command}
-          instanceTypeDetails={props.instanceTypeDetails}
+          command={command}
+          instanceTypeDetails={instanceTypeDetails}
           setUnlimitedCpuCredits={setUnlimitedCpuCredits}
-          setFieldValue={props.setFieldValue}
+          setFieldValue={setFieldValue}
         />
       </div>
     );
@@ -133,9 +133,9 @@ export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
     <div className="container-fluid form-horizontal" style={{ padding: '0 15px' }}>
       {advancedModeMessage}
       <SimpleModeSelector
-        command={props.command}
+        command={command}
         setUnlimitedCpuCredits={setUnlimitedCpuCredits}
-        setFieldValue={props.setFieldValue}
+        setFieldValue={setFieldValue}
       />
     </div>
   );

@@ -224,13 +224,14 @@ angular
 
         let instanceTypes;
         if (serverGroup.mixedInstancesPolicy) {
-          instanceTypes = serverGroup.mixedInstancesPolicy.launchTemplateOverridesForInstanceType
-            ? serverGroup.mixedInstancesPolicy.launchTemplateOverridesForInstanceType.map((o) => o.instanceType)
-            : serverGroup.mixedInstancesPolicy.launchTemplates[0].launchTemplateData.instanceType; // note: single launch template case is currently the only supported case for mixed instances policy
+          const ltOverrides = _.get(serverGroup, 'mixedInstancesPolicy.launchTemplateOverridesForInstanceType');
+          instanceTypes = ltOverrides
+            ? ltOverrides.map((o) => o.instanceType)
+            : [_.get(serverGroup, 'mixedInstancesPolicy.launchTemplates[0].launchTemplateData.instanceType')]; // note: single launch template case is currently the only supported case for mixed instances policy
         } else if (serverGroup.launchTemplate) {
-          instanceTypes = [serverGroup.launchTemplate.launchTemplateData.instanceType];
+          instanceTypes = [_.get(serverGroup, 'launchTemplate.launchTemplateData.instanceType')];
         } else if (serverGroup.launchConfig) {
-          instanceTypes = [serverGroup.launchConfig.instanceType];
+          instanceTypes = [_.get(serverGroup, 'launchConfig.instanceType')];
         }
         const instanceTypeCategoryLoader = instanceTypeService.getCategoryForMultipleInstanceTypes(
           'aws',
@@ -355,35 +356,55 @@ angular
               if (serverGroup.launchConfig.userData) {
                 command.base64UserData = serverGroup.launchConfig.userData;
               }
-              if (serverGroup.launchConfig.securityGroups.length) {
-                command.securityGroups = serverGroup.launchConfig.securityGroups;
-              }
-
               command.viewState.imageId = serverGroup.launchConfig.imageId;
+              command.viewState.useSimpleInstanceTypeSelector = true;
             }
 
-            if (serverGroup.launchTemplate) {
-              const { launchTemplateData } = serverGroup.launchTemplate;
-              const spotMaxPrice =
-                launchTemplateData.instanceMarketOptions &&
-                launchTemplateData.instanceMarketOptions.spotOptions &&
-                launchTemplateData.instanceMarketOptions.spotOptions.maxPrice;
-              const { ipv6AddressCount } =
-                launchTemplateData.networkInterfaces &&
-                launchTemplateData.networkInterfaces.length &&
-                launchTemplateData.networkInterfaces[0];
+            if (serverGroup.launchTemplate || serverGroup.mixedInstancesPolicy) {
+              let launchTemplateData, spotMaxPrice;
+              if (serverGroup.launchTemplate) {
+                launchTemplateData = serverGroup.launchTemplate.launchTemplateData;
+                spotMaxPrice = _.get(launchTemplateData, 'instanceMarketOptions.spotOptions.maxPrice');
+
+                command.instanceType = launchTemplateData.instanceType;
+                command.viewState.useSimpleInstanceTypeSelector = true;
+              }
+
+              if (serverGroup.mixedInstancesPolicy) {
+                const mip = serverGroup.mixedInstancesPolicy;
+                launchTemplateData = _.get(mip, 'launchTemplates[0].launchTemplateData'); // note: single launch template case is currently the only supported case for mixed instances policy
+                spotMaxPrice = _.get(mip, 'instancesDistribution.spotMaxPrice');
+
+                command.securityGroups = launchTemplateData.networkInterfaces
+                  ? (launchTemplateData.networkInterfaces.find((ni) => ni.deviceIndex === 0) || {}).groups
+                  : _.get(launchTemplateData, 'securityGroups');
+                command.onDemandAllocationStrategy = mip.instancesDistribution.onDemandAllocationStrategy;
+                command.onDemandBaseCapacity = mip.instancesDistribution.onDemandBaseCapacity;
+                command.onDemandPercentageAboveBaseCapacity =
+                  mip.instancesDistribution.onDemandPercentageAboveBaseCapacity;
+                command.spotAllocationStrategy = mip.instancesDistribution.spotAllocationStrategy;
+                command.spotInstancePools = mip.instancesDistribution.spotInstancePools;
+
+                // 'launchTemplateOverridesForInstanceType' is used for multiple instance types case, 'instanceType' is used for all other cases.
+                if (mip.launchTemplateOverridesForInstanceType) {
+                  command.launchTemplateOverridesForInstanceType = getInstanceTypesWithPriority(
+                    mip.launchTemplateOverridesForInstanceType,
+                  );
+                } else {
+                  command.instanceType = launchTemplateData.instanceType;
+                }
+
+                command.viewState.useSimpleInstanceTypeSelector = isSimpleModeEnabled(command);
+              }
+
+              const ipv6AddressCount = _.get(launchTemplateData, 'networkInterfaces[0]');
 
               const asgSettings = AWSProviderSettings.serverGroups;
               const isTestEnv = serverGroup.accountDetails && serverGroup.accountDetails.environment === 'test';
               const shouldAutoEnableIPv6 =
                 asgSettings && asgSettings.enableIPv6 && asgSettings.setIPv6InTest && isTestEnv;
 
-              const secGroups = launchTemplateData.networkInterfaces
-                ? (launchTemplateData.networkInterfaces.find((ni) => ni.deviceIndex === 0) || {}).groups
-                : launchTemplateData.securityGroups.length && launchTemplateData.securityGroups;
-
               angular.extend(command, {
-                instanceType: launchTemplateData.instanceType,
                 iamRole: launchTemplateData.iamInstanceProfile.name,
                 keyPair: launchTemplateData.keyName,
                 associateIPv6Address: shouldAutoEnableIPv6 || Boolean(ipv6AddressCount),
@@ -397,60 +418,7 @@ angular
                 unlimitedCpuCredits: launchTemplateData.creditSpecification
                   ? launchTemplateData.creditSpecification.cpuCredits === 'unlimited'
                   : undefined,
-                securityGroups: secGroups,
               });
-
-              command.viewState.imageId = launchTemplateData.imageId;
-            }
-
-            if (serverGroup.mixedInstancesPolicy) {
-              const mip = serverGroup.mixedInstancesPolicy;
-              const { launchTemplateData } = mip.launchTemplates[0]; // note: single launch template case is currently the only supported case for mixed instances policy
-
-              const { ipv6AddressCount } =
-                launchTemplateData.networkInterfaces &&
-                launchTemplateData.networkInterfaces.length &&
-                launchTemplateData.networkInterfaces[0];
-
-              const asgSettings = AWSProviderSettings.serverGroups;
-              const isTestEnv = serverGroup.accountDetails && serverGroup.accountDetails.environment === 'test';
-              const shouldAutoEnableIPv6 =
-                asgSettings && asgSettings.enableIPv6 && asgSettings.setIPv6InTest && isTestEnv;
-
-              const secGroups = launchTemplateData.networkInterfaces
-                ? (launchTemplateData.networkInterfaces.find((ni) => ni.deviceIndex === 0) || {}).groups
-                : launchTemplateData.securityGroups.length && launchTemplateData.securityGroups;
-
-              angular.extend(command, {
-                iamRole: launchTemplateData.iamInstanceProfile.name,
-                keyPair: launchTemplateData.keyName,
-                associateIPv6Address: shouldAutoEnableIPv6 || Boolean(ipv6AddressCount),
-                ramdiskId: launchTemplateData.ramdiskId,
-                instanceMonitoring: launchTemplateData.monitoring && launchTemplateData.monitoring.enabled,
-                ebsOptimized: launchTemplateData.ebsOptimized,
-                spotPrice: mip.instancesDistribution.spotMaxPrice || undefined,
-                requireIMDSv2: Boolean(
-                  launchTemplateData.metadataOptions && launchTemplateData.metadataOptions.httpsTokens === 'required',
-                ),
-                unlimitedCpuCredits: launchTemplateData.creditSpecification
-                  ? launchTemplateData.creditSpecification.cpuCredits === 'unlimited'
-                  : undefined,
-                securityGroups: secGroups,
-                onDemandAllocationStrategy: mip.instancesDistribution.onDemandAllocationStrategy,
-                onDemandBaseCapacity: mip.instancesDistribution.onDemandBaseCapacity,
-                onDemandPercentageAboveBaseCapacity: mip.instancesDistribution.onDemandPercentageAboveBaseCapacity,
-                spotAllocationStrategy: mip.instancesDistribution.spotAllocationStrategy,
-                spotInstancePools: mip.instancesDistribution.spotInstancePools,
-              });
-
-              // 'launchTemplateOverridesForInstanceType' is used for multiple instance types case, 'instanceType' is used for all other cases.
-              if (mip.launchTemplateOverridesForInstanceType) {
-                command.launchTemplateOverridesForInstanceType = getInstanceTypesWithPriority(
-                  mip.launchTemplateOverridesForInstanceType,
-                );
-              } else {
-                command.instanceType = launchTemplateData.instanceType;
-              }
 
               command.viewState.imageId = launchTemplateData.imageId;
             }
@@ -459,7 +427,21 @@ angular
               command.amiName = serverGroup.image.name;
             }
 
-            command.viewState.useSimpleInstanceTypeSelector = isSimpleModeEnabled(command);
+            if (serverGroup.launchConfig && serverGroup.launchConfig.securityGroups.length) {
+              command.securityGroups = serverGroup.launchConfig.securityGroups;
+            }
+
+            if (serverGroup.launchTemplate && serverGroup.launchTemplate.launchTemplateData.securityGroups.length) {
+              command.securityGroups = serverGroup.launchTemplate.launchTemplateData.securityGroups;
+            }
+
+            if (serverGroup.launchTemplate && serverGroup.launchTemplate.launchTemplateData.networkInterfaces) {
+              const networkInterface =
+                serverGroup.launchTemplate.launchTemplateData.networkInterfaces.find((ni) => ni.deviceIndex === 0) ||
+                {};
+              command.securityGroups = networkInterface.groups;
+            }
+
             return command;
           });
       }
@@ -467,24 +449,17 @@ angular
       // Since Deck allows changing priority of instance types via drag handle, fill priority field explicitly if empty
       function getInstanceTypesWithPriority(instanceTypeOverrides) {
         let explicitPriority = 1;
-        const instanceTypesWithPriority = [];
-        instanceTypeOverrides.forEach((o) => {
-          if (o.priority) {
-            instanceTypesWithPriority.push({
-              instanceType: o.instanceType,
-              weightedCapacity: o.weightedCapacity,
-              priority: o.priority,
-            });
-            explicitPriority = o.priority + 1;
+        return _.sortBy(instanceTypeOverrides, ['priority']).map((override) => {
+          const { instanceType, weightedCapacity } = override;
+          let priority;
+          if (override.priority) {
+            priority = override.priority;
+            explicitPriority = override.priority + 1;
           } else {
-            instanceTypesWithPriority.push({
-              instanceType: o.instanceType,
-              weightedCapacity: o.weightedCapacity,
-              priority: explicitPriority++,
-            });
+            priority = explicitPriority++;
           }
+          return { instanceType, weightedCapacity, priority };
         });
-        return instanceTypesWithPriority;
       }
 
       function isSimpleModeEnabled(command) {

@@ -83,10 +83,10 @@ export class InstanceTypeService {
   }
 
   public getCategoryForMultipleInstanceTypes(cloudProvider: string, instanceTypes: string[]) {
-    const promises = instanceTypes.map((it) => this.getInstanceTypeCategory(cloudProvider, it));
+    const promises = instanceTypes.map((it) => this.getCategoryForInstanceType(cloudProvider, it));
 
-    return Promise.all(promises).then((categories: IInstanceTypeCategory[]) => {
-      const distinctCategories = _.uniq(categories.map((c) => c.type));
+    return Promise.all(promises).then((categories: string[]) => {
+      const distinctCategories = _.uniq(categories);
       return distinctCategories.length === 1 ? distinctCategories[0] : 'custom';
     });
   }

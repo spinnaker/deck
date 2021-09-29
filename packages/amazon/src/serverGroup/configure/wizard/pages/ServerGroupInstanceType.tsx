@@ -124,12 +124,26 @@ export class ServerGroupInstanceType
     const { setFieldValue, values } = this.props.formik;
     const showTypeSelector = !!(values.viewState.disableImageSelection || values.amiName);
 
+    // mark unavailable instance types for all profiles
+    const availableInstanceTypesForConfig: string[] =
+      (values.backingData && values.backingData.filtered && values.backingData.filtered.instanceTypes) || [];
+    const markedInstanceTypeDetails: IAmazonInstanceTypeCategory[] = Array.from(this.state.instanceTypeDetails);
+    if (!values.viewState.disableImageSelection && availableInstanceTypesForConfig.length) {
+      markedInstanceTypeDetails.forEach((profile) => {
+        profile.families.forEach((family) => {
+          family.instanceTypes.forEach((instanceType) => {
+            instanceType.unavailable = !availableInstanceTypesForConfig.includes(instanceType.name);
+          });
+        });
+      });
+    }
+
     if (showTypeSelector && values) {
       return (
         <InstanceTypeSelector
           command={values}
           setFieldValue={setFieldValue}
-          instanceTypeDetails={this.state.instanceTypeDetails}
+          instanceTypeDetails={markedInstanceTypeDetails}
         />
       );
     }
