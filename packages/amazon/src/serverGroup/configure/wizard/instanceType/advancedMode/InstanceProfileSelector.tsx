@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { IAmazonInstanceTypeCategory } from '../../../../../../instance/awsInstanceType.service';
+import { IAmazonInstanceTypeCategory } from '../../../../../instance/awsInstanceType.service';
 
-import '../advancedMode.less';
+import './advancedMode.less';
 
 export interface IInstanceProfileSelectorProps {
   currentProfile: string;
@@ -11,10 +11,6 @@ export interface IInstanceProfileSelectorProps {
 }
 
 export function InstanceProfileSelector(props: IInstanceProfileSelectorProps) {
-  const handleProfileChange = (newProfile: string) => {
-    props.handleProfileChange(newProfile);
-  };
-
   return (
     <div>
       <h4 style={{ marginTop: '10px' }}>This application is</h4>
@@ -22,7 +18,7 @@ export function InstanceProfileSelector(props: IInstanceProfileSelectorProps) {
         <div key={profile.type} className={`instance-profile-header profile-button`}>
           <button
             type="button"
-            onClick={() => handleProfileChange(profile.type)}
+            onClick={() => props.handleProfileChange(profile.type)}
             className={props.currentProfile === profile.type ? 'instance-profile active' : 'instance-profile'}
           >
             {props.currentProfile === profile.type && <span className="far fa-check-circle selected-indicator" />}

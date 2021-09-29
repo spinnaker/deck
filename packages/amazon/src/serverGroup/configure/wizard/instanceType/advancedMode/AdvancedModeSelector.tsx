@@ -3,7 +3,9 @@ import React, { useState } from 'react';
 
 import { usePrevious } from '@spinnaker/core';
 
-import { InstanceProfileSelector, InstancesDistribution, InstanceTypeTable } from './common/index';
+import { InstanceProfileSelector } from './InstanceProfileSelector';
+import { InstanceTypeTable } from './InstanceTypeTable';
+import { InstancesDistribution } from './InstancesDistribution';
 import { IAmazonInstanceTypeCategory } from '../../../../../instance/awsInstanceType.service';
 import { AwsReactInjector } from '../../../../../reactShims';
 import { IAmazonInstanceTypeOverride, IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
@@ -21,7 +23,6 @@ export interface IAdvancedModeSelectorProps {
 export function AdvancedModeSelector(props: IAdvancedModeSelectorProps) {
   const multipleInstanceTypesInProps = props.command.launchTemplateOverridesForInstanceType;
 
-  // build a map of selected instance types with related data for easy access
   const selectedInstanceTypesMap = new Map<string, IAmazonInstanceTypeOverride>(
     Object.entries(_.keyBy(multipleInstanceTypesInProps, 'instanceType')),
   );
@@ -62,29 +63,12 @@ export function AdvancedModeSelector(props: IAdvancedModeSelectorProps) {
     return null;
   }
 
-  // mark unavailable instance types for all profiles
-  const availableInstanceTypesForConfig: string[] =
-    (props.command.backingData &&
-      props.command.backingData.filtered &&
-      props.command.backingData.filtered.instanceTypes) ||
-    [];
-  const markedInstanceTypeDetails: IAmazonInstanceTypeCategory[] = Array.from(props.instanceTypeDetails);
-  if (!props.command.viewState.disableImageSelection) {
-    markedInstanceTypeDetails.forEach((profile) => {
-      profile.families.forEach((family) => {
-        family.instanceTypes.forEach((instanceType) => {
-          instanceType.unavailable = !availableInstanceTypesForConfig.includes(instanceType.name);
-        });
-      });
-    });
-  }
-
   return (
     <div className={'advanced-mode-selector'}>
       <InstanceProfileSelector
         currentProfile={instanceProfile}
         handleProfileChange={handleProfileChange}
-        instanceProfileList={markedInstanceTypeDetails}
+        instanceProfileList={props.instanceTypeDetails}
       />
       <InstancesDistribution
         onDemandAllocationStrategy={props.command.onDemandAllocationStrategy}
@@ -99,8 +83,13 @@ export function AdvancedModeSelector(props: IAdvancedModeSelectorProps) {
         currentProfile={instanceProfile}
         selectedInstanceTypesMap={selectedInstanceTypesMap}
         unlimitedCpuCreditsInCmd={props.command.unlimitedCpuCredits}
-        profileDetails={markedInstanceTypeDetails.find((p) => p.type === instanceProfile)}
-        availableInstanceTypesList={availableInstanceTypesForConfig}
+        profileDetails={props.instanceTypeDetails.find((p) => p.type === instanceProfile)}
+        availableInstanceTypesList={
+          (props.command.backingData &&
+            props.command.backingData.filtered &&
+            props.command.backingData.filtered.instanceTypes) ||
+          []
+        }
         handleInstanceTypesChange={handleInstanceTypesChange}
         setUnlimitedCpuCredits={props.setUnlimitedCpuCredits}
       />

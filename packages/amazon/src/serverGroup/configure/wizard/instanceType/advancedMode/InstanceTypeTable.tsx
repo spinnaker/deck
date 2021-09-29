@@ -2,14 +2,15 @@ import _ from 'lodash';
 import React from 'react';
 import { arrayMove, SortEnd } from 'react-sortable-hoc';
 
-import { CpuCreditsToggle } from '../../CpuCreditsToggle';
-import { AWSProviderSettings } from '../../../../../../aws.settings';
-import { CustomHeading, CustomTableBody, CustomTableFooter, CustomTableHeader } from '../custom/index';
-import { IAmazonInstanceTypeCategory } from '../../../../../../instance/awsInstanceType.service';
-import { NonCustomHeading, NonCustomTableBody, NonCustomTableHeader } from '../nonCustom/index';
-import { IAmazonInstanceTypeOverride } from '../../../../serverGroupConfiguration.service';
+import { CpuCreditsToggle } from '../CpuCreditsToggle';
+import { CustomHeading, CustomTableFooter, CustomTableHeader } from './Custom';
+import { InstanceTypeTableBody } from './InstanceTypeTableBody';
+import { NonCustomHeading, NonCustomTableHeader } from './NonCustom';
+import { AWSProviderSettings } from '../../../../../aws.settings';
+import { IAmazonInstanceTypeCategory } from '../../../../../instance/awsInstanceType.service';
+import { IAmazonInstanceTypeOverride } from '../../../serverGroupConfiguration.service';
 
-import '../advancedMode.less';
+import './advancedMode.less';
 
 export interface IInstanceTypeTableProps {
   currentProfile: string;
@@ -95,7 +96,8 @@ export function InstanceTypeTable(props: IInstanceTypeTableProps) {
         {isCpuCreditsEnabled && cpuCreditsToggle}
         <table className="table table-hover">
           <NonCustomTableHeader showCpuCredits={props.profileDetails.showCpuCredits} />
-          <NonCustomTableBody
+          <InstanceTypeTableBody
+            isCustom={false}
             profileFamiliesDetails={props.profileDetails.families}
             selectedInstanceTypesMap={props.selectedInstanceTypesMap}
             addOrUpdateInstanceType={addOrUpdateInstanceType}
@@ -112,7 +114,8 @@ export function InstanceTypeTable(props: IInstanceTypeTableProps) {
         {isCpuCreditsEnabled && cpuCreditsToggle}
         <table className="table table-hover">
           <CustomTableHeader />
-          <CustomTableBody
+          <InstanceTypeTableBody
+            isCustom={true}
             selectedInstanceTypesMap={props.selectedInstanceTypesMap}
             addOrUpdateInstanceType={addOrUpdateInstanceType}
             removeInstanceType={removeInstanceType}
