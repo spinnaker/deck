@@ -39,10 +39,6 @@ export function CpuCreditsToggle(props: ICpuCreditsToggleProps) {
     }
   }, [props.currentProfile, props.selectedInstanceTypes]);
 
-  const handleToggleChange = (state: boolean) => {
-    props.setUnlimitedCpuCredits(state);
-  };
-
   return (
     <div className={'row'} style={{ fontSize: '110%' }}>
       {showToggle && (
@@ -55,7 +51,7 @@ export function CpuCreditsToggle(props: ICpuCreditsToggleProps) {
             displayTextPropOffBtn={'Off'}
             tooltipPropOnBtn={'Toggle to turn ON unlimited CPU credits'}
             displayTextPropOnBtn={'On'}
-            onClick={handleToggleChange}
+            onClick={(b) => props.setUnlimitedCpuCredits(b)}
             isPropertyActive={props.unlimitedCpuCredits}
           />
         </div>
