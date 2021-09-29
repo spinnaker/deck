@@ -15,14 +15,16 @@ export const PreviewEnvironments = ({ orderedEnvironments, isConfigured }: IPrev
   const { environments: previewEnvironments, ...previewEnvironmentsProps } = orderedEnvironments;
   const logClick = useLogEvent('PreviewEnvironments');
   const docsLink = getDocsUrl('previewEnvironments');
+  const hasActivePreviewEnvironments = previewEnvironments.length > 0;
+
   return (
     <>
-      {(Boolean(previewEnvironments.length) || isConfigured) && (
+      {(isConfigured || hasActivePreviewEnvironments) && (
         <h4 className="sp-margin-2xl-top sp-margin-m-bottom self-left">
           <b>Preview Environments</b>
         </h4>
       )}
-      {!Boolean(previewEnvironments.length) && isConfigured && (
+      {isConfigured && !hasActivePreviewEnvironments && (
         <div className="self-left">
           No PRs matching your branch filter were found.
           <br />
