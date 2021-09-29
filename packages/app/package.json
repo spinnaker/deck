@@ -16,6 +16,7 @@
   "dependencies": {
     "@spinnaker/amazon": "^0.8.13",
     "@spinnaker/appengine": "^0.0.67",
+    "@spinnaker/azure": "^0.3.8",
     "@spinnaker/cloudfoundry": "^0.0.154",
     "@spinnaker/core": "^0.11.6",
     "@spinnaker/docker": "^0.0.113",

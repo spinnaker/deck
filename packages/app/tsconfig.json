@@ -18,6 +18,7 @@
     { "path": "../google/tsconfig.json" },
     { "path": "../kubernetes/tsconfig.json" },
     { "path": "../oracle/tsconfig.json" },
-    { "path": "../titus/tsconfig.json" }
+    { "path": "../titus/tsconfig.json" },
+    { "path": "../azure/tsconfig.json" }
   ]
 }
