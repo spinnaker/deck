@@ -10,6 +10,7 @@ import {
   InstanceReader,
   ManifestReader,
   RecentHistoryService,
+  SETTINGS,
 } from '@spinnaker/core';
 
 import { IKubernetesInstance } from '../../interfaces';
@@ -63,6 +64,7 @@ class KubernetesInstanceDetailsController implements IController {
       .then(() => {
         this.extractInstance(instance);
         this.app.onRefresh(this.$scope, () => this.extractInstance(instance));
+        this.$scope.isDisabled = !SETTINGS.kubernetesAdHocInfraWritesEnabled;
       })
       .catch(() => this.autoClose());
   }
