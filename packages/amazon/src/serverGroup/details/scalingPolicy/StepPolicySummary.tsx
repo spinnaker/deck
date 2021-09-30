@@ -1,17 +1,16 @@
 import * as React from 'react';
 
 import {
-  Application,
   CloudProviderRegistry,
   ConfirmationModalService,
   HoverablePopover,
-  IServerGroup,
   ReactModal,
   robotToHuman,
   TaskExecutor,
 } from '@spinnaker/core';
+import type { Application, IServerGroup } from '@spinnaker/core';
 
-import { IAmazonServerGroup, IScalingPolicyView } from '../../../domain';
+import type { IAmazonServerGroup, IScalingPolicyView } from '../../../domain';
 import { AlarmSummary } from './popover/AlarmSummary';
 import { StepPolicyPopoverContent } from './popover/StepPolicyPopoverContent';
 

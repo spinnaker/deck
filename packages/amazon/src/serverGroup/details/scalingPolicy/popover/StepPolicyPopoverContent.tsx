@@ -3,7 +3,7 @@ import * as React from 'react';
 import { LabeledValue, LabeledValueList } from '@spinnaker/core';
 
 import { MetricAlarmChart } from '../chart/MetricAlarmChart';
-import {
+import type {
   IAmazonServerGroup,
   IScalingPolicyAlarmView,
   IScalingPolicyView,
