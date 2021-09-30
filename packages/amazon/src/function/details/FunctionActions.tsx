@@ -1,18 +1,18 @@
 import React from 'react';
 import { Dropdown } from 'react-bootstrap';
 
+import type { Application } from '@spinnaker/core';
 import {
   AddEntityTagLinks,
-  Application,
   ApplicationReader,
   ConfirmationModalService,
   FunctionWriter,
   SETTINGS,
 } from '@spinnaker/core';
 
-import { IFunctionFromStateParams } from './AmazonFunctionDetails';
+import type { IFunctionFromStateParams } from './AmazonFunctionDetails';
 import { CreateLambdaFunction } from '../CreateLambdaFunction';
-import { IAmazonFunction, IAmazonFunctionDeleteCommand } from '../../domain';
+import type { IAmazonFunction, IAmazonFunctionDeleteCommand } from '../../domain';
 
 export interface IFunctionActionsProps {
   app: Application;
@@ -96,33 +96,35 @@ export class FunctionActions extends React.Component<IFunctionActionsProps, IFun
 
     return (
       <div style={{ display: 'inline-block' }}>
-        <Dropdown className="dropdown" id="function-actions-dropdown">
-          <Dropdown.Toggle className="btn btn-sm btn-primary dropdown-toggle">
-            <span>Function Actions</span>
-          </Dropdown.Toggle>
-          <Dropdown.Menu className="dropdown-menu">
-            <li className={!application ? 'disabled' : ''}>
-              <a className="clickable" onClick={this.editFunction}>
-                Edit Function
-              </a>
-            </li>
-            {functionDef.functionName && (
-              <li>
-                <a className="clickable" onClick={this.deleteFunction}>
-                  Delete Function
+        {SETTINGS.awsAdHocInfraWritesEnabled && (
+          <Dropdown className="dropdown" id="function-actions-dropdown">
+            <Dropdown.Toggle className="btn btn-sm btn-primary dropdown-toggle">
+              <span>Function Actions</span>
+            </Dropdown.Toggle>
+            <Dropdown.Menu className="dropdown-menu">
+              <li className={!application ? 'disabled' : ''}>
+                <a className="clickable" onClick={this.editFunction}>
+                  Edit Function
                 </a>
               </li>
-            )}
-            {SETTINGS && SETTINGS.feature.entityTags && (
-              <AddEntityTagLinks
-                component={functionDef}
-                application={app}
-                entityType="function"
-                onUpdate={this.entityTagUpdate}
-              />
-            )}
-          </Dropdown.Menu>
-        </Dropdown>
+              {functionDef.functionName && (
+                <li>
+                  <a className="clickable" onClick={this.deleteFunction}>
+                    Delete Function
+                  </a>
+                </li>
+              )}
+              {SETTINGS && SETTINGS.feature.entityTags && (
+                <AddEntityTagLinks
+                  component={functionDef}
+                  application={app}
+                  entityType="function"
+                  onUpdate={this.entityTagUpdate}
+                />
+              )}
+            </Dropdown.Menu>
+          </Dropdown>
+        )}
       </div>
     );
   }

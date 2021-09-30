@@ -1,9 +1,9 @@
-import { IAccountDetails, IAsg, IServerGroup } from '@spinnaker/core';
+import type { IAccountDetails, IAsg, IServerGroup } from '@spinnaker/core';
 
-import { IAmazonLaunchTemplate } from './IAmazonLaunchTemplate';
-import { IScalingPolicyView } from './IAmazonScalingPolicy';
-import { IScalingPolicy } from './IScalingPolicy';
-import { ISuspendedProcess } from './IScalingProcess';
+import type { IAmazonLaunchTemplate } from './IAmazonLaunchTemplate';
+import type { IScalingPolicyView } from './IAmazonScalingPolicy';
+import type { IScalingPolicy } from './IScalingPolicy';
+import type { ISuspendedProcess } from './IScalingProcess';
 
 export interface IAmazonAsg extends IAsg {
   availabilityZones: string[];
@@ -22,6 +22,7 @@ export interface IAmazonServerGroup extends IServerGroup {
   scalingPolicies?: IScalingPolicy[];
   targetGroups?: string[];
   asg: IAmazonAsg;
+  awsAccount?: string;
   launchTemplate?: IAmazonLaunchTemplate;
   mixedInstancesPolicy?: IAmazonMixedInstancesPolicy;
 }
@@ -35,12 +36,12 @@ export interface IScheduledAction {
 
 export interface IAmazonMixedInstancesPolicy {
   allowedInstanceTypes: string[];
-  instancesDiversification: IAmazonInstancesDiversification;
+  instancesDistribution: IAmazonInstancesDistribution;
   launchTemplates: IAmazonLaunchTemplate[];
   launchTemplateOverridesForInstanceType: IAmazonLaunchTemplateOverrides[];
 }
 
-export interface IAmazonInstancesDiversification {
+export interface IAmazonInstancesDistribution {
   onDemandAllocationStrategy: string;
   onDemandBaseCapacity: number;
   onDemandPercentageAboveBaseCapacity: number;
@@ -51,7 +52,8 @@ export interface IAmazonInstancesDiversification {
 
 export interface IAmazonLaunchTemplateOverrides {
   instanceType: string;
-  weightedCapacity: string;
+  weightedCapacity?: string;
+  priority?: number;
 }
 
 export interface IAmazonServerGroupView extends IAmazonServerGroup {

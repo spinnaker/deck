@@ -3,6 +3,105 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.10](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.9...@spinnaker/titus@0.5.10) (2021-09-29)
+
+
+### Bug Fixes
+
+* **titus:** Deal with absence of non-required fields ([#9711](https://github.com/spinnaker/deck/issues/9711)) ([4602446](https://github.com/spinnaker/deck/commit/460244626f2e2892dcbe5163d788bedf93c01a64))
+
+
+
+
+
+## [0.5.9](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.8...@spinnaker/titus@0.5.9) (2021-09-24)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.8](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.7...@spinnaker/titus@0.5.8) (2021-09-24)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.7](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.6...@spinnaker/titus@0.5.7) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.6](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.5...@spinnaker/titus@0.5.6) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.5](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.4...@spinnaker/titus@0.5.5) (2021-09-21)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.4](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.3...@spinnaker/titus@0.5.4) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.3](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.2...@spinnaker/titus@0.5.3) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.2](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.1...@spinnaker/titus@0.5.2) (2021-09-16)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.1](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.0...@spinnaker/titus@0.5.1) (2021-09-15)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+# [0.5.0](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.4.8...@spinnaker/titus@0.5.0) (2021-09-14)
+
+
+### Bug Fixes
+
+* **amazon:** Set default metric for new scaling policy ([#9655](https://github.com/spinnaker/deck/issues/9655)) ([63e55a9](https://github.com/spinnaker/deck/commit/63e55a988f5c8638d95ab324449d04c1cf40aeac))
+
+
+### Features
+
+* **titus:** Titus policy command builder ([#9629](https://github.com/spinnaker/deck/issues/9629)) ([9901867](https://github.com/spinnaker/deck/commit/9901867af636e8ee7408b8ffee7e67d99ea6c969))
+
+
+
+
+
 ## [0.4.8](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.4.7...@spinnaker/titus@0.4.8) (2021-09-07)
 
 **Note:** Version bump only for package @spinnaker/titus

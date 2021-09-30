@@ -1,9 +1,11 @@
-import { Application, IJob, IMetricAlarmDimension, IServerGroup, ITask, TaskExecutor } from '@spinnaker/core';
-import {
+import type { Application, IJob, IMetricAlarmDimension, IServerGroup, ITask } from '@spinnaker/core';
+import { TaskExecutor } from '@spinnaker/core';
+import type {
   AlarmComparisonOperator,
   AlarmStatisticType,
   IScalingPolicy,
   IStepAdjustment,
+  ITargetTrackingConfiguration,
   MetricAggregationType,
   ScalingPolicyAdjustmentType,
   StandardUnitType,
@@ -23,15 +25,20 @@ export interface IUpsertScalingPolicyCommand extends IJob {
   step?: IStepPolicyDescription;
 }
 
+export interface ITargetTrackingPolicyCommand extends IUpsertScalingPolicyCommand {
+  estimatedInstanceWarmup: number;
+  targetTrackingConfiguration: ITargetTrackingConfiguration;
+}
+
 export interface ISimplePolicyDescription {
   cooldown: number;
   scalingAdjustment: number;
 }
 
 export interface IStepPolicyDescription {
+  cooldown?: number;
   stepAdjustments: IStepAdjustment[];
   estimatedInstanceWarmup: number;
-  cooldown?: number;
   metricAggregationType: MetricAggregationType;
 }
 

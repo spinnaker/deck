@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { CollapsibleSection, LabeledValue, LabeledValueList, ShowUserData } from '@spinnaker/core';
-import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
+import type { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
 import { MultipleInstanceTypesSubSection } from './MultipleInstanceTypesSubSection';
 import { getBaseImageName } from '../utils';
 
@@ -18,7 +18,7 @@ export const LaunchTemplateDetailsSection = ({ serverGroup }: IAmazonServerGroup
 
   const { launchTemplateData } = launchTemplate;
   const maxSpotPrice = isMip
-    ? serverGroup.mixedInstancesPolicy.instancesDiversification.spotMaxPrice
+    ? serverGroup.mixedInstancesPolicy.instancesDistribution.spotMaxPrice
     : launchTemplateData?.instanceMarketOptions?.spotOptions?.maxPrice;
   const creditSpecification = launchTemplateData?.creditSpecification?.cpuCredits;
   const launchTemplateOverrides = isMip

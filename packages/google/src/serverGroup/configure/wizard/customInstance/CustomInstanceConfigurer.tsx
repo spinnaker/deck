@@ -1,5 +1,6 @@
 import React from 'react';
-import Select, { Option } from 'react-select';
+import type { Option } from 'react-select';
+import Select from 'react-select';
 
 import { CheckboxInput, HelpField } from '@spinnaker/core';
 import './customInstanceConfigurer.component.less';

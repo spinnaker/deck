@@ -3,18 +3,11 @@ import React from 'react';
 import { from as observableFrom, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import {
-  AccountTag,
-  Application,
-  CollapsibleSection,
-  Details,
-  IFunction,
-  IOverridableProps,
-  Overrides,
-} from '@spinnaker/core';
+import type { Application, IFunction, IOverridableProps } from '@spinnaker/core';
+import { AccountTag, CollapsibleSection, Details, Overrides } from '@spinnaker/core';
 
 import { FunctionActions } from './FunctionActions';
-import { IAmazonFunction, IAmazonFunctionSourceData } from '../../domain';
+import type { IAmazonFunction, IAmazonFunctionSourceData } from '../../domain';
 import { AwsReactInjector } from '../../reactShims';
 
 export interface IFunctionFromStateParams {
@@ -115,17 +108,35 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
         <dd>{functionDef.revisionId}</dd>
         <dt>Version</dt>
         <dd>{functionDef.version}</dd>
-        <dt>Event Source</dt>
-        <dd>
-          {functionDef.eventSourceMappings && functionDef.eventSourceMappings.length !== 0
-            ? functionDef.eventSourceMappings
-            : 'None'}
-        </dd>
+      </dl>
+    );
+
+    const eventSourceDetails = (
+      <dl className="horizontal-when-filters-collapsed dl-horizontal dl-narrow">
+        {functionDef.eventSourceMappings && functionDef.eventSourceMappings.length !== 0
+          ? functionDef.eventSourceMappings.map((value: any) => (
+              <>
+                <h5>
+                  <strong>Event Source</strong>
+                </h5>
+                <dl>
+                  <dt>ARN</dt>
+                  <dd>{value.eventSourceArn}</dd>
+                  <dt>State</dt>
+                  <dd>{value.state}</dd>
+                </dl>
+              </>
+            ))
+          : 'None'}
       </dl>
     );
 
     const functionDetailsSection = (
       <CollapsibleSection heading="Function Details">{functionDetails}</CollapsibleSection>
+    );
+
+    const eventSourceDetailsSection = (
+      <CollapsibleSection heading="Event Source Details">{eventSourceDetails}</CollapsibleSection>
     );
 
     return (
@@ -151,6 +162,9 @@ export class AmazonFunctionDetails extends React.Component<IAmazonFunctionDetail
           </Details.Header>
         )}
         {!isEmpty(this.state.functionDef) ? functionDetailsSection : ''}
+        {!isEmpty(this.state.functionDef) && !isEmpty(this.state.functionDef.eventSourceMappings)
+          ? eventSourceDetailsSection
+          : ''}
       </Details>
     );
   }

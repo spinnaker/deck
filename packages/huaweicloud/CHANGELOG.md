@@ -3,6 +3,86 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.46](https://github.com/spinnaker/deck/compare/@spinnaker/huaweicloud@0.0.45...@spinnaker/huaweicloud@0.0.46) (2021-09-29)
+
+**Note:** Version bump only for package @spinnaker/huaweicloud
+
+
+
+
+
+## [0.0.45](https://github.com/spinnaker/deck/compare/@spinnaker/huaweicloud@0.0.44...@spinnaker/huaweicloud@0.0.45) (2021-09-24)
+
+**Note:** Version bump only for package @spinnaker/huaweicloud
+
+
+
+
+
+## [0.0.44](https://github.com/spinnaker/deck/compare/@spinnaker/huaweicloud@0.0.43...@spinnaker/huaweicloud@0.0.44) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/huaweicloud
+
+
+
+
+
+## [0.0.43](https://github.com/spinnaker/deck/compare/@spinnaker/huaweicloud@0.0.42...@spinnaker/huaweicloud@0.0.43) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/huaweicloud
+
+
+
+
+
+## [0.0.42](https://github.com/spinnaker/deck/compare/@spinnaker/huaweicloud@0.0.41...@spinnaker/huaweicloud@0.0.42) (2021-09-21)
+
+**Note:** Version bump only for package @spinnaker/huaweicloud
+
+
+
+
+
+## [0.0.41](https://github.com/spinnaker/deck/compare/@spinnaker/huaweicloud@0.0.40...@spinnaker/huaweicloud@0.0.41) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/huaweicloud
+
+
+
+
+
+## [0.0.40](https://github.com/spinnaker/deck/compare/@spinnaker/huaweicloud@0.0.39...@spinnaker/huaweicloud@0.0.40) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/huaweicloud
+
+
+
+
+
+## [0.0.39](https://github.com/spinnaker/deck/compare/@spinnaker/huaweicloud@0.0.38...@spinnaker/huaweicloud@0.0.39) (2021-09-16)
+
+**Note:** Version bump only for package @spinnaker/huaweicloud
+
+
+
+
+
+## [0.0.38](https://github.com/spinnaker/deck/compare/@spinnaker/huaweicloud@0.0.37...@spinnaker/huaweicloud@0.0.38) (2021-09-15)
+
+**Note:** Version bump only for package @spinnaker/huaweicloud
+
+
+
+
+
+## [0.0.37](https://github.com/spinnaker/deck/compare/@spinnaker/huaweicloud@0.0.36...@spinnaker/huaweicloud@0.0.37) (2021-09-14)
+
+**Note:** Version bump only for package @spinnaker/huaweicloud
+
+
+
+
+
 ## [0.0.36](https://github.com/spinnaker/deck/compare/@spinnaker/huaweicloud@0.0.35...@spinnaker/huaweicloud@0.0.36) (2021-09-06)
 
 **Note:** Version bump only for package @spinnaker/huaweicloud
