@@ -30,7 +30,8 @@ module(CORE_APPLICATION_MODAL_CREATEAPPLICATION_MODAL_CONTROLLER, [
   '$state',
   '$uibModalInstance',
   '$timeout',
-  function ($scope, $q, $log, $state, $uibModalInstance, $timeout) {
+  'name',
+  function ($scope, $q, $log, $state, $uibModalInstance, $timeout, name) {
     const applicationLoader = ApplicationReader.listApplications();
     applicationLoader.then((applications) => (this.data.appNameList = _.map(applications, 'name')));
 
@@ -58,6 +59,10 @@ module(CORE_APPLICATION_MODAL_CREATEAPPLICATION_MODAL_CONTROLLER, [
       cloudProviders: [],
       instancePort: SETTINGS.defaultInstancePort || null,
     };
+
+    if (name) {
+      this.application.name = name;
+    }
 
     const submitting = () => {
       this.state.errorMessages = [];

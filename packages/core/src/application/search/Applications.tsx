@@ -10,6 +10,7 @@ import { PaginationControls } from './PaginationControls';
 import { IAccount } from '../../account';
 import { ICache, ViewStateCache } from '../../cache';
 import { InsightMenu } from '../../insight/InsightMenu';
+import { ModalInjector, ReactInjector } from '../../reactShims';
 import { ApplicationReader, IApplicationSummary } from '../service/ApplicationReader';
 import { Spinner } from '../../widgets';
 
@@ -18,6 +19,10 @@ import '../applications.less';
 interface IViewState {
   filter: string;
   sort: string;
+}
+
+interface IApplicationsStateParams {
+  create?: string;
 }
 
 export interface IApplicationPagination {
@@ -111,6 +116,36 @@ export class Applications extends React.Component<{}, IApplicationsState> {
           throw error;
         },
       );
+
+    const { create } = ReactInjector.$stateParams as IApplicationsStateParams;
+    applicationSummaries$.subscribe((applications: IApplicationSummary[]) => {
+      if (create) {
+        const found = applications.find((app) => app.name === create);
+        if (found) {
+          if (found.email) {
+            // Application already exists - redirect to app
+            ReactInjector.$state.go('home.applications.application', { application: create, create: null });
+          } else {
+            // Inferred application - redirect to config
+            ReactInjector.$state.go('home.applications.application.config', { application: create, create: null });
+          }
+        } else {
+          // Nonexistant application - open create modal
+          ModalInjector.modalService.open({
+            scope: ReactInjector.$rootScope.$new(),
+            templateUrl: ReactInjector.overrideRegistry.getTemplate(
+              'createApplicationModal',
+              require('../modal/newapplication.html'),
+            ),
+            resolve: {
+              name: () => create,
+            },
+            controller: ReactInjector.overrideRegistry.getController('CreateApplicationModalCtrl'),
+            controllerAs: 'newAppModal',
+          });
+        }
+      }
+    });
   }
 
   private toggleSort(column: string): void {
