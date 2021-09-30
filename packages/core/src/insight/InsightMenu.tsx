@@ -55,6 +55,9 @@ export class InsightMenu extends React.Component<IInsightMenuProps, IInsightMenu
           'createApplicationModal',
           require('../application/modal/newapplication.html'),
         ),
+        resolve: {
+          name: () => '',
+        },
         controller: this.overrideRegistry.getController('CreateApplicationModalCtrl'),
         controllerAs: 'newAppModal',
       })

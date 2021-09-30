@@ -76,11 +76,12 @@ module(CORE_APPLICATION_MODAL_CREATEAPPLICATION_MODAL_CONTROLLER, [
     let navigateTimeout = null;
 
     const routeToApplication = () => {
-      navigateTimeout = $timeout(() => {
-        $state.go('home.applications.application', {
-          application: this.application.name,
-        });
-      }, 1000);
+      $uibModalInstance.close(this.application);
+      // navigateTimeout = $timeout(() => {
+      //   $state.go('home.applications.application', {
+      //     application: this.application.name,
+      //   });
+      // }, 1000);
     };
 
     $scope.$on('$destroy', () => $timeout.cancel(navigateTimeout));

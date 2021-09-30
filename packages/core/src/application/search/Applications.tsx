@@ -8,6 +8,7 @@ import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 import { ApplicationTable } from './ApplicationsTable';
 import { PaginationControls } from './PaginationControls';
 import { IAccount } from '../../account';
+import { Application } from '../../application';
 import { ICache, ViewStateCache } from '../../cache';
 import { InsightMenu } from '../../insight/InsightMenu';
 import { ModalInjector, ReactInjector } from '../../reactShims';
@@ -117,32 +118,44 @@ export class Applications extends React.Component<{}, IApplicationsState> {
         },
       );
 
-    const { create } = ReactInjector.$stateParams as IApplicationsStateParams;
+    const { $stateParams, $state, $rootScope, overrideRegistry } = ReactInjector;
+    const { create } = $stateParams as IApplicationsStateParams;
     applicationSummaries$.subscribe((applications: IApplicationSummary[]) => {
       if (create) {
         const found = applications.find((app) => app.name === create);
         if (found) {
           if (found.email) {
             // Application already exists - redirect to app
-            ReactInjector.$state.go('home.applications.application', { application: create, create: null });
+            $state.go('home.applications.application', { application: create, create: null });
           } else {
             // Inferred application - redirect to config
-            ReactInjector.$state.go('home.applications.application.config', { application: create, create: null });
+            $state.go('home.applications.application.config', { application: create, create: null });
           }
         } else {
           // Nonexistant application - open create modal
-          ModalInjector.modalService.open({
-            scope: ReactInjector.$rootScope.$new(),
-            templateUrl: ReactInjector.overrideRegistry.getTemplate(
-              'createApplicationModal',
-              require('../modal/newapplication.html'),
-            ),
-            resolve: {
-              name: () => create,
-            },
-            controller: ReactInjector.overrideRegistry.getController('CreateApplicationModalCtrl'),
-            controllerAs: 'newAppModal',
-          });
+          ModalInjector.modalService
+            .open({
+              scope: $rootScope.$new(),
+              templateUrl: overrideRegistry.getTemplate(
+                'createApplicationModal',
+                require('../modal/newapplication.html'),
+              ),
+              resolve: {
+                name: () => create,
+              },
+              controller: overrideRegistry.getController('CreateApplicationModalCtrl'),
+              controllerAs: 'newAppModal',
+            })
+            .result.then(
+              (app: Application) => {
+                $state.go('home.applications.application', { application: app.name, create: null });
+              },
+              () => {
+                // Clear out the query parameter if the dialog is dismissed
+                $state.go('home.applications', { create: null });
+              },
+            )
+            .catch(() => {});
         }
       }
     });
