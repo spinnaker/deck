@@ -77,11 +77,6 @@ module(CORE_APPLICATION_MODAL_CREATEAPPLICATION_MODAL_CONTROLLER, [
 
     const routeToApplication = () => {
       $uibModalInstance.close(this.application);
-      // navigateTimeout = $timeout(() => {
-      //   $state.go('home.applications.application', {
-      //     application: this.application.name,
-      //   });
-      // }, 1000);
     };
 
     $scope.$on('$destroy', () => $timeout.cancel(navigateTimeout));
