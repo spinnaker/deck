@@ -1,17 +1,16 @@
 import * as React from 'react';
 
+import type { Application, IServerGroup } from '@spinnaker/core';
 import {
-  Application,
   CloudProviderRegistry,
   ConfirmationModalService,
   HoverablePopover,
-  IServerGroup,
   ReactModal,
   robotToHuman,
   TaskExecutor,
 } from '@spinnaker/core';
 
-import { ITargetTrackingPolicy } from '../../../../domain';
+import type { ITargetTrackingPolicy } from '../../../../domain';
 import './TargetTrackingSummary.less';
 
 export interface ITargetTrackingPolicySummaryProps {
