@@ -1,4 +1,5 @@
-import { IComponentOptions, module } from 'angular';
+import type { IComponentOptions } from 'angular';
+import { module } from 'angular';
 
 export const submitButtonComponent: IComponentOptions = {
   bindings: {
@@ -10,9 +11,11 @@ export const submitButtonComponent: IComponentOptions = {
   },
   template: `
     <button class="btn btn-primary" ng-disabled="$ctrl.isDisabled" ng-click="$ctrl.onClick()">
-      <i ng-if="!$ctrl.submitting" class="far fa-check-circle"></i>
-      <loading-spinner ng-if="$ctrl.submitting" mode="'circular'"></loading-spinner>
-      {{$ctrl.label || ($ctrl.isNew ? 'Create' : 'Update')}}
+      <div class="flex-container-h horizontal middle">
+        <i ng-if="!$ctrl.submitting" class="far fa-check-circle"></i>
+        <loading-spinner ng-if="$ctrl.submitting" mode="'circular'"></loading-spinner>
+        <span class="sp-margin-xs-left">{{$ctrl.label || ($ctrl.isNew ? 'Create' : 'Update')}}</span>
+      </div>
     </button>`,
 };
 

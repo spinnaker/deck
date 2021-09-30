@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import React from 'react';
 import { react2angular } from 'react2angular';
 
-import { Application } from '../../application';
+import type { Application } from '../../application';
 import { createApolloClient } from '../graphql/client';
 import {
   FetchApplicationManagementDataDocument,
@@ -14,6 +14,7 @@ import {
 import { withErrorBoundary } from '../../presentation/SpinErrorBoundary';
 import { ValidationMessage } from '../../presentation/forms/validation';
 import { logger } from '../../utils';
+import { getDocsUrl } from '../utils/defaults';
 import { Spinner } from '../../widgets/spinners/Spinner';
 
 import './ManagedResourceConfig.less';
@@ -95,11 +96,7 @@ const ManagedResourceConfigInternal = ({ application }: IManagedResourceConfigPr
       )}
       <div className="color-text-caption sp-margin-l-top">
         Not sure what this means?{' '}
-        <a
-          target="_blank"
-          onClick={() => logClick('Documentation', application.name)}
-          href="https://www.spinnaker.io/guides/user/managed-delivery"
-        >
+        <a target="_blank" onClick={() => logClick('Documentation', application.name)} href={getDocsUrl('root')}>
           Check out our documentation
         </a>
       </div>

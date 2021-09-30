@@ -8,6 +8,14 @@
   font-size: 13px;
   flex-wrap: wrap;
 
+  i {
+    color: var(--color-concrete);
+  }
+
+  .HoverablePopover {
+    text-decoration: none;
+  }
+
   .metadata-icon {
     margin-right: 6px;
     display: flex;
@@ -64,15 +72,38 @@
     color: var(--color-mineshaft);
     border-radius: 4px;
     padding: var(--s-spacing);
-    padding-right: var(--xl-spacing);
-    display: flex;
-    flex-direction: row;
+    padding-right: var(--l-spacing);
+    display: grid;
+    grid-gap: var(--xs-spacing);
+    grid-template-columns: auto auto;
     align-items: flex-start;
   }
 
   .created-at {
     a {
       color: inherit;
+    }
+  }
+}
+
+.LifecycleEventDetails {
+  .title {
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .details {
+    display: grid;
+    grid-template-columns: minmax(80px, auto) auto;
+    column-gap: 10px;
+    align-items: baseline;
+
+    dt {
+      font-weight: normal;
+      text-transform: uppercase;
+      font-size: 13px;
+      color: var(--color-concrete);
+      font-weight: 600;
     }
   }
 }

@@ -3,6 +3,86 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.10](https://github.com/spinnaker/deck/compare/@spinnaker/azure@0.3.9...@spinnaker/azure@0.3.10) (2021-09-29)
+
+**Note:** Version bump only for package @spinnaker/azure
+
+
+
+
+
+## [0.3.9](https://github.com/spinnaker/deck/compare/@spinnaker/azure@0.3.8...@spinnaker/azure@0.3.9) (2021-09-24)
+
+**Note:** Version bump only for package @spinnaker/azure
+
+
+
+
+
+## [0.3.8](https://github.com/spinnaker/deck/compare/@spinnaker/azure@0.3.7...@spinnaker/azure@0.3.8) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/azure
+
+
+
+
+
+## [0.3.7](https://github.com/spinnaker/deck/compare/@spinnaker/azure@0.3.6...@spinnaker/azure@0.3.7) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/azure
+
+
+
+
+
+## [0.3.6](https://github.com/spinnaker/deck/compare/@spinnaker/azure@0.3.5...@spinnaker/azure@0.3.6) (2021-09-21)
+
+**Note:** Version bump only for package @spinnaker/azure
+
+
+
+
+
+## [0.3.5](https://github.com/spinnaker/deck/compare/@spinnaker/azure@0.3.4...@spinnaker/azure@0.3.5) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/azure
+
+
+
+
+
+## [0.3.4](https://github.com/spinnaker/deck/compare/@spinnaker/azure@0.3.3...@spinnaker/azure@0.3.4) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/azure
+
+
+
+
+
+## [0.3.3](https://github.com/spinnaker/deck/compare/@spinnaker/azure@0.3.2...@spinnaker/azure@0.3.3) (2021-09-16)
+
+**Note:** Version bump only for package @spinnaker/azure
+
+
+
+
+
+## [0.3.2](https://github.com/spinnaker/deck/compare/@spinnaker/azure@0.3.1...@spinnaker/azure@0.3.2) (2021-09-15)
+
+**Note:** Version bump only for package @spinnaker/azure
+
+
+
+
+
+## [0.3.1](https://github.com/spinnaker/deck/compare/@spinnaker/azure@0.3.0...@spinnaker/azure@0.3.1) (2021-09-14)
+
+**Note:** Version bump only for package @spinnaker/azure
+
+
+
+
+
 # [0.3.0](https://github.com/spinnaker/deck/compare/@spinnaker/azure@0.2.0...@spinnaker/azure@0.3.0) (2021-09-06)
 
 

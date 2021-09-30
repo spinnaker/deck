@@ -1,16 +1,17 @@
 import { useSref } from '@uirouter/react';
 import classnames from 'classnames';
 import { sortBy } from 'lodash';
-import { DateTime } from 'luxon';
+import type { DateTime } from 'luxon';
 import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 
-import { Icon, IconNames } from '@spinnaker/presentation';
+import type { IconNames } from '@spinnaker/presentation';
+import { Icon } from '@spinnaker/presentation';
 
 import { RelativeTimestamp } from '../RelativeTimestamp';
-import { LifecycleEventSummary } from '../overview/artifact/utils';
+import type { LifecycleEventSummary } from '../overview/artifact/utils';
 import { Tooltip } from '../../presentation';
-import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
+import { ABSOLUTE_TIME_FORMAT, TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 import { useLogEvent } from '../utils/logging';
 
 import './VersionMetadata.less';
@@ -53,16 +54,15 @@ export const toVetoedMetadata = (data: {
 });
 
 export interface IVersionMetadataProps {
-  build?: IVersionBuildProps['build'];
+  build?: IVersionBuildProps['build'] & Partial<LifecycleEventSummary>;
   version: string;
   sha?: string;
   author?: string;
   deployedAt?: string;
   createdAt?: IVersionCreatedAtProps['createdAt'];
-  buildDuration?: string;
   buildsBehind?: number;
   isDeploying?: boolean;
-  baking?: LifecycleEventSummary;
+  bake?: LifecycleEventSummary;
   pinned?: VersionMessageData;
   vetoed?: VersionMessageData;
   actions?: VersionAction[];
@@ -180,7 +180,7 @@ export const VersionMessage = ({ data, type, newRow = true }: IVersionMessage) =
     <>
       {newRow && <div className="flex-break sp-margin-s-top" />}
       <div className={classnames('version-message', typeProps.className)}>
-        <Icon name={typeProps.icon} size="18px" color="black" className="sp-margin-s-right sp-margin-2xs-top" />
+        <Icon name={typeProps.icon} size="14px" color="black" className="sp-margin-2xs-top" />
         <div>
           <div>
             {typeProps.text} {data.by},{' '}
@@ -270,4 +270,34 @@ export const VersionBuilds = ({ builds }: IVersionBuildsProps) => {
 
 export const BaseVersionMetadata: React.FC = ({ children }) => {
   return <div className="VersionMetadata">{children}</div>;
+};
+
+interface ILifecycleEventDetailsProps extends Partial<LifecycleEventSummary> {
+  title: string;
+}
+
+export const LifecycleEventDetails = ({ duration, link, startedAt, title }: ILifecycleEventDetailsProps) => {
+  return (
+    <div className="LifecycleEventDetails">
+      <div>
+        <div className="title sp-margin-xs-bottom">{title}</div>
+        <dl className="details sp-margin-s-bottom">
+          <dt>Started at</dt>
+          <dd>{startedAt?.toFormat(ABSOLUTE_TIME_FORMAT) || 'N/A'}</dd>
+
+          <dt>Duration</dt>
+          <dd>{duration || 'N/A'}</dd>
+
+          {link && (
+            <>
+              <dt>Link</dt>
+              <dd>
+                <a href={link}>Open</a>
+              </dd>
+            </>
+          )}
+        </dl>
+      </div>
+    </div>
+  );
 };
