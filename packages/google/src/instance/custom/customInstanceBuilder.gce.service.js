@@ -105,7 +105,7 @@ module(GOOGLE_INSTANCE_CUSTOM_CUSTOMINSTANCEBUILDER_GCE_SERVICE, []).factory(
       if (instanceFamily === 'n1') {
         return `custom-${vCpuCount}-${memoryInMbs}${extendedFlag}`;
       }
-      return `${instanceFamily}-custom-${vCpuCount}-${memoryInMbs}`;
+      return `${instanceFamily}-custom-${vCpuCount}-${memoryInMbs}${extendedFlag}`;
     }
 
     function parseInstanceTypeString(instanceTypeString) {

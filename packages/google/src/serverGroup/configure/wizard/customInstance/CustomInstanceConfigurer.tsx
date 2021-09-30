@@ -90,24 +90,26 @@ export class CustomInstanceConfigurer extends React.Component<ICustomInstanceCon
             )}
           </div>
         </div>
-        <div className="row gce-instance-build-custom-select">
-          <div className="col-md-5 sm-label-right"></div>
-          <div className="col-md-3">
-            <span className="gce-instance-build-custom-extended-memory-checkbox">
-              <CheckboxInput
-                name="extendedMemory"
-                text="Extended Memory"
-                checked={this.props.selectedExtendedMemory}
-                onChange={(event: { target: { checked: boolean } }) => {
-                  this.handleExtendedMemory(event.target.checked);
-                }}
-              />
-              <div className="gce-instance-build-custom-extended-memory-checkbox-helptext">
-                <HelpField id="gce.instance.customInstance.extendedmemory" />
-              </div>
-            </span>
+        {this.props.selectedInstanceFamily !== 'E2' ? (
+          <div className="row gce-instance-build-custom-select">
+            <div className="col-md-5 sm-label-right"></div>
+            <div className="col-md-3">
+              <span className="gce-instance-build-custom-extended-memory-checkbox">
+                <CheckboxInput
+                  name="extendedMemory"
+                  text="Extended Memory"
+                  checked={this.props.selectedExtendedMemory}
+                  onChange={(event: { target: { checked: boolean } }) => {
+                    this.handleExtendedMemory(event.target.checked);
+                  }}
+                />
+                <div className="gce-instance-build-custom-extended-memory-checkbox-helptext">
+                  <HelpField id="gce.instance.customInstance.extendedmemory" />
+                </div>
+              </span>
+            </div>
           </div>
-        </div>
+        ) : null}
       </div>
     );
   }
@@ -138,7 +140,7 @@ export class CustomInstanceConfigurer extends React.Component<ICustomInstanceCon
       instanceFamily: value,
       vCpuCount: this.props.selectedVCpuCount,
       memory: this.props.selectedMemory,
-      extendedMemory: this.props.selectedExtendedMemory,
+      extendedMemory: value === 'E2' ? false : this.props.selectedExtendedMemory,
     });
   };
 
