@@ -37,9 +37,6 @@ export const TargetTrackingSummary = ({ application, policy, serverGroup }: ITar
   const UpsertModalComponent = providerConfig.UpsertTargetTrackingModal;
   const PopoverContent = providerConfig.TargetTrackingChart;
 
-  // eslint-disable-next-line
-  console.log('here', CloudProviderRegistry.getProvider(provider));
-
   const editPolicy = () => {
     const upsertProps = {
       app: application,
