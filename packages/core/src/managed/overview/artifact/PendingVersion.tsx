@@ -2,9 +2,9 @@ import { isEmpty } from 'lodash';
 import React from 'react';
 
 import { Constraints } from './Constraints';
-import { GitLink } from './GitLink';
+import { VersionTitle } from './VersionTitle';
 import type { QueryArtifact, QueryArtifactVersion } from '../types';
-import { useCreateVersionActions } from './utils';
+import { useCreateVersionRollbackActions } from './utils';
 import { useLogEvent } from '../../utils/logging';
 import type { VersionMessageData } from '../../versionMetadata/MetadataComponents';
 import { toPinnedMetadata } from '../../versionMetadata/MetadataComponents';
@@ -15,7 +15,7 @@ export interface IPendingVersionsProps {
   pendingVersions?: QueryArtifactVersion[];
 }
 
-const NUM_VERSIONS_WHEN_COLLAPSED = 2;
+const NUM_VERSIONS_WHEN_COLLAPSED = 1;
 
 export const PendingVersions = ({ artifact, pendingVersions }: IPendingVersionsProps) => {
   const numVersions = pendingVersions?.length || 0;
@@ -71,8 +71,8 @@ interface IPendingVersionProps {
 }
 
 const PendingVersion = ({ data, reference, environment, pinned, index }: IPendingVersionProps) => {
-  const { buildNumber, version, gitMetadata, constraints, status } = data;
-  const actions = useCreateVersionActions({
+  const { buildNumber, version, gitMetadata, constraints, status, isCurrent } = data;
+  const actions = useCreateVersionRollbackActions({
     environment,
     reference,
     buildNumber,
@@ -80,17 +80,20 @@ const PendingVersion = ({ data, reference, environment, pinned, index }: IPendin
     status,
     commitMessage: gitMetadata?.commitInfo?.message,
     isPinned: Boolean(pinned),
-    compareLinks: {
-      current: gitMetadata?.comparisonLinks?.toCurrentVersion,
-    },
+    isCurrent,
   });
 
   return (
     <div className="artifact-pending-version">
       <div className="artifact-pending-version-commit">
-        {gitMetadata ? <GitLink gitMetadata={gitMetadata} /> : `Build ${buildNumber}`}
+        <VersionTitle
+          gitMetadata={gitMetadata}
+          buildNumber={data?.buildNumber}
+          version={data.version}
+          actions={actions}
+        />
       </div>
-      <VersionMetadata {...getBaseMetadata(data)} pinned={pinned} createdAt={data.createdAt} actions={actions} />
+      <VersionMetadata {...getBaseMetadata(data)} pinned={pinned} createdAt={data.createdAt} />
       {constraints && !isEmpty(constraints) && (
         <Constraints
           key={index} // This is needed on refresh if a new version was added

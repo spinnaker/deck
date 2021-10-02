@@ -9,6 +9,8 @@ export interface ICopyToClipboardProps {
   displayText?: boolean;
   text: string;
   toolTip?: string;
+  delayHide?: number;
+  delayShow?: number;
   className?: string;
   stopPropagation?: boolean;
 }
@@ -88,7 +90,7 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps, ICop
   };
 
   private renderTooltip(children: React.ReactNode): React.ReactNode {
-    const { toolTip, text = '' } = this.props;
+    const { toolTip, delayShow, delayHide, text = '' } = this.props;
     const { tooltipCopy, shouldUpdatePosition } = this.state;
 
     const persistOverlay = Boolean(tooltipCopy);
@@ -110,7 +112,8 @@ export class CopyToClipboard extends React.Component<ICopyToClipboardProps, ICop
         defaultOverlayShown={persistOverlay}
         placement="top"
         overlay={tooltipComponent}
-        delayHide={250}
+        delayHide={delayHide !== undefined ? delayHide : 250}
+        delayShow={delayShow}
         {...otherProps}
       >
         {children}

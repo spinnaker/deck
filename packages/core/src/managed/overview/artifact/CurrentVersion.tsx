@@ -3,9 +3,9 @@ import React from 'react';
 import type { ITaskArtifactVersionProps } from './ArtifactVersionTasks';
 import { ArtifactVersionTasks } from './ArtifactVersionTasks';
 import { Constraints } from './Constraints';
-import { GitLink } from './GitLink';
+import { VersionTitle } from './VersionTitle';
 import type { QueryArtifactVersion } from '../types';
-import { useCreateVersionActions } from './utils';
+import { useCreateVersionRollbackActions } from './utils';
 import type { VersionMessageData } from '../../versionMetadata/MetadataComponents';
 import { getBaseMetadata, VersionMetadata } from '../../versionMetadata/VersionMetadata';
 
@@ -19,7 +19,7 @@ interface ICurrentVersionProps {
 
 export const CurrentVersion = ({ data, environment, reference, numNewerVersions, pinned }: ICurrentVersionProps) => {
   const { gitMetadata, constraints, verifications, postDeploy } = data;
-  const actions = useCreateVersionActions({
+  const actions = useCreateVersionRollbackActions({
     environment,
     reference,
     version: data.version,
@@ -27,9 +27,7 @@ export const CurrentVersion = ({ data, environment, reference, numNewerVersions,
     status: data.status,
     commitMessage: gitMetadata?.commitInfo?.message,
     isPinned: Boolean(pinned),
-    compareLinks: {
-      previous: gitMetadata?.comparisonLinks?.toPreviousVersion,
-    },
+    isCurrent: data.isCurrent,
   });
 
   const versionProps: ITaskArtifactVersionProps = {
@@ -41,12 +39,16 @@ export const CurrentVersion = ({ data, environment, reference, numNewerVersions,
 
   return (
     <div className="artifact-current-version">
-      {gitMetadata ? <GitLink gitMetadata={gitMetadata} /> : <div>Build {data?.version}</div>}
+      <VersionTitle
+        gitMetadata={gitMetadata}
+        buildNumber={data?.buildNumber}
+        version={data.version}
+        actions={actions}
+      />
       <VersionMetadata
         {...getBaseMetadata(data)}
         createdAt={data.createdAt}
         buildsBehind={numNewerVersions}
-        actions={actions}
         pinned={pinned}
       />
       {constraints && (

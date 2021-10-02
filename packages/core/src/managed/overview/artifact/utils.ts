@@ -2,14 +2,12 @@ import { groupBy } from 'lodash';
 import { DateTime } from 'luxon';
 
 import { ACTION_DISPLAY_NAMES, getActionStatusData } from './VersionOperation';
+import type { VersionAction } from '../../artifactActionsMenu/ArtifactActionsMenu';
 import type { MdArtifactStatusInEnvironment } from '../../graphql/graphql-sdk';
 import { useMarkVersionAsBad, useMarkVersionAsGood, usePinVersion, useUnpinVersion } from './hooks';
 import { useApplicationContextSafe } from '../../../presentation';
 import type { QueryArtifactVersion, QueryConstraint, QueryLifecycleStep } from '../types';
 import { timeDiffToString } from '../../../utils';
-import { copyTextToClipboard } from '../../../utils/clipboard/copyTextToClipboard';
-import { getIsDebugMode } from '../../utils/debugMode';
-import type { VersionAction } from '../../versionMetadata/MetadataComponents';
 
 export const getConstraintsStatusSummary = (constraints: QueryConstraint[]) => {
   let finalStatus: QueryConstraint['status'] = 'PASS';
@@ -92,13 +90,10 @@ interface ICreateVersionActionsProps {
   commitMessage?: string;
   isPinned: boolean;
   status?: MdArtifactStatusInEnvironment;
-  compareLinks?: {
-    previous?: string;
-    current?: string;
-  };
+  isCurrent?: boolean;
 }
 
-export const useCreateVersionActions = ({
+export const useCreateVersionRollbackActions = ({
   environment,
   reference,
   version,
@@ -106,60 +101,52 @@ export const useCreateVersionActions = ({
   buildNumber,
   commitMessage,
   isPinned,
-  compareLinks,
+  isCurrent,
 }: ICreateVersionActionsProps): VersionAction[] | undefined => {
   const application = useApplicationContextSafe();
 
   const basePayload = { application: application.name, environment, reference, version };
 
   const onUnpin = useUnpinVersion(basePayload, [`Unpin #${buildNumber}`, commitMessage].filter(Boolean).join(' - '));
-  const onPin = usePinVersion(basePayload, [`Pin #${buildNumber}`, commitMessage].filter(Boolean).join(' - '));
+
+  const onPin = usePinVersion(
+    basePayload,
+    [isCurrent ? `Pin #${buildNumber} as deployed` : `Roll back to #${buildNumber} and pin`, commitMessage]
+      .filter(Boolean)
+      .join(' - '),
+  );
 
   const onMarkAsBad = useMarkVersionAsBad(
     basePayload,
-    [`Mark #${buildNumber} as Bad`, commitMessage].filter(Boolean).join(' - '),
+    [isCurrent ? `Roll back to previous and never deploy` : 'Never deploy', ` #${buildNumber}`, commitMessage]
+      .filter(Boolean)
+      .join(' - '),
   );
 
   const onMarkAsGood = useMarkVersionAsGood(
     basePayload,
-    [`Mark #${buildNumber} as Good`, commitMessage].filter(Boolean).join(' - '),
+    [`Allow deploying #${buildNumber}`, commitMessage].filter(Boolean).join(' - '),
   );
 
   const actions: VersionAction[] = [
     isPinned
       ? {
-          content: 'Unpin version',
+          content: 'Unpin version...',
           onClick: onUnpin,
         }
       : {
-          content: 'Pin version',
+          content: isCurrent ? 'Pin this version as deployed...' : 'Rollback to this version...',
           onClick: onPin,
         },
     status === 'VETOED'
       ? {
-          content: 'Mark as good',
+          content: 'Allow deploying this version...',
           onClick: onMarkAsGood,
         }
       : {
-          content: 'Mark as bad',
+          content: isCurrent ? 'Rollback to previous version...' : 'Never deploy this version...',
           onClick: onMarkAsBad,
         },
   ];
-  if (compareLinks?.current) {
-    actions.push({ content: 'Compare to current version', href: compareLinks.current });
-  }
-  if (compareLinks?.previous) {
-    actions.push({ content: 'Compare to previous version', href: compareLinks.previous });
-  }
-
-  if (getIsDebugMode()) {
-    actions.push({
-      content: 'Copy artifact version [Debug]',
-      onClick: () => {
-        copyTextToClipboard(version);
-      },
-    });
-  }
-
   return actions.length ? actions : undefined;
 };

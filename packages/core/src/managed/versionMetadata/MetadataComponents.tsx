@@ -3,14 +3,17 @@ import classnames from 'classnames';
 import { sortBy } from 'lodash';
 import type { DateTime } from 'luxon';
 import React from 'react';
-import { Dropdown, MenuItem } from 'react-bootstrap';
 
 import type { IconNames } from '@spinnaker/presentation';
 import { Icon } from '@spinnaker/presentation';
 
 import { RelativeTimestamp } from '../RelativeTimestamp';
+import type { VersionAction } from '../artifactActionsMenu/ArtifactActionsMenu';
+import { ArtifactActionsMenu } from '../artifactActionsMenu/ArtifactActionsMenu';
 import type { LifecycleEventSummary } from '../overview/artifact/utils';
 import { Tooltip } from '../../presentation';
+import { CopyToClipboard } from '../../utils/clipboard/CopyToClipboard';
+import { getIsDebugMode } from '../utils/debugMode';
 import { ABSOLUTE_TIME_FORMAT, TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 import { useLogEvent } from '../utils/logging';
 
@@ -20,17 +23,15 @@ export const MetadataElement: React.FC<{ className?: string }> = ({ className, c
   return <span className={classnames('delimited-element horizontal middle', className)}>{children}</span>;
 };
 
-export interface VersionAction {
-  onClick?: () => void;
-  href?: string;
-  content: string;
-  disabled?: boolean;
-}
-
 export interface VersionMessageData {
   by?: string;
   at?: string;
   comment?: string;
+}
+
+export interface ICompareLinks {
+  previous?: string;
+  current?: string;
 }
 
 export const toPinnedMetadata = (data: {
@@ -65,40 +66,8 @@ export interface IVersionMetadataProps {
   bake?: LifecycleEventSummary;
   pinned?: VersionMessageData;
   vetoed?: VersionMessageData;
-  actions?: VersionAction[];
+  compareLinks?: ICompareLinks;
 }
-
-export interface IVersionMetadataActionsProps {
-  id: string;
-  actions: VersionAction[];
-}
-
-export const VersionMetadataActions = ({ id, actions }: IVersionMetadataActionsProps) => {
-  const logEvent = useLogEvent('ArtifactActions');
-  return (
-    <MetadataElement>
-      <Dropdown id={id}>
-        <Dropdown.Toggle className="element-actions-menu-toggle">Actions</Dropdown.Toggle>
-        <Dropdown.Menu>
-          {actions.map((action, index) => (
-            <MenuItem
-              key={index}
-              disabled={action.disabled}
-              onClick={() => {
-                action.onClick?.();
-                logEvent({ action: `OpenModal - ${action.content}` });
-              }}
-              href={action.href}
-              target="_blank"
-            >
-              {action.content}
-            </MenuItem>
-          ))}
-        </Dropdown.Menu>
-      </Dropdown>
-    </MetadataElement>
-  );
-};
 
 interface IVersionCreatedAtProps {
   createdAt?: string | DateTime;
@@ -300,4 +269,35 @@ export const LifecycleEventDetails = ({ duration, link, startedAt, title }: ILif
       </div>
     </div>
   );
+};
+
+export const CopyVersion = ({ version }: { version: string }) => {
+  if (!getIsDebugMode()) {
+    return null;
+  }
+  return (
+    <MetadataElement>
+      <CopyToClipboard
+        className="as-link"
+        buttonInnerNode={<span>{version}</span>}
+        text={version}
+        toolTip="Debug mode. Click to copy"
+        delayShow={200}
+        delayHide={0}
+      />
+    </MetadataElement>
+  );
+};
+
+interface ICompareLinksMenuProps {
+  id: string;
+  links: ICompareLinks;
+}
+
+export const CompareLinksMenu = ({ id, links }: ICompareLinksMenuProps) => {
+  const actions: VersionAction[] = [
+    { content: 'Current version', href: links.current, disabled: !links.current },
+    { content: 'Previous version', href: links.previous, disabled: !links.previous },
+  ];
+  return <ArtifactActionsMenu id={id} title="Compare to" actions={actions} />;
 };

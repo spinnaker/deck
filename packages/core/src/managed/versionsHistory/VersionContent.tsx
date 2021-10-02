@@ -1,6 +1,7 @@
 import { flatten, omit, uniq } from 'lodash';
 import React from 'react';
 
+import { ArtifactActionsMenu } from '../artifactActionsMenu/ArtifactActionsMenu';
 import { BaseEnvironment } from '../environmentBaseElements/BaseEnvironment';
 import { EnvironmentItem } from '../environmentBaseElements/EnvironmentItem';
 import { EnvironmentsRender, useOrderedEnvironment } from '../environmentBaseElements/EnvironmentsRender';
@@ -9,7 +10,7 @@ import { useFetchVersionQuery } from '../graphql/graphql-sdk';
 import type { ITaskArtifactVersionProps } from '../overview/artifact/ArtifactVersionTasks';
 import { ArtifactVersionTasks } from '../overview/artifact/ArtifactVersionTasks';
 import { Constraints } from '../overview/artifact/Constraints';
-import { useCreateVersionActions } from '../overview/artifact/utils';
+import { useCreateVersionRollbackActions } from '../overview/artifact/utils';
 import { useApplicationContextSafe } from '../../presentation';
 import { LoadingAnimation } from '../../presentation/LoadingAnimation';
 import type {
@@ -45,7 +46,7 @@ const VersionInEnvironment = ({
     pinnedData = toPinnedMetadata(currentPinnedVersion);
   }
 
-  const actions = useCreateVersionActions({
+  const actions = useCreateVersionRollbackActions({
     environment,
     reference: version.reference,
     version: version.version,
@@ -53,10 +54,7 @@ const VersionInEnvironment = ({
     status: version.status,
     commitMessage: version.gitMetadata?.commitInfo?.message,
     isPinned: Boolean(pinnedData),
-    compareLinks: {
-      previous: detailedVersionData?.gitMetadata?.comparisonLinks?.toPreviousVersion,
-      current: detailedVersionData?.gitMetadata?.comparisonLinks?.toCurrentVersion,
-    },
+    isCurrent: version.isCurrent,
   });
 
   const versionProps: ITaskArtifactVersionProps = {
@@ -77,9 +75,18 @@ const VersionInEnvironment = ({
         key={version.id}
         version={version.version}
         {...(detailedVersionData ? omit(getBaseMetadata(detailedVersionData), 'author', 'buildDuration') : undefined)}
-        actions={actions}
         pinned={pinnedData}
-      />
+      >
+        {actions && (
+          <ArtifactActionsMenu
+            id={`${version.version}-${version.buildNumber}-rollback-actions`}
+            title="Rollback"
+            actions={actions}
+            className="rollback-actions"
+            pullRight
+          />
+        )}
+      </VersionMetadata>
 
       {loading && <LoadingAnimation />}
       <Constraints

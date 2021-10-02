@@ -3,6 +3,8 @@ import React from 'react';
 import type { IVersionMetadataProps } from './MetadataComponents';
 import {
   BaseVersionMetadata,
+  CompareLinksMenu,
+  CopyVersion,
   LifecycleEventDetails,
   MetadataBadge,
   MetadataElement,
@@ -11,7 +13,6 @@ import {
   VersionBuilds,
   VersionCreatedAt,
   VersionMessage,
-  VersionMetadataActions,
 } from './MetadataComponents';
 import { formatToRelativeTimestamp, RelativeTimestamp } from '../RelativeTimestamp';
 import { getLifecycleEventSummary } from '../overview/artifact/utils';
@@ -36,10 +37,14 @@ export const getBaseMetadata = (
     isDeploying: version.status === 'DEPLOYING',
     bake: getLifecycleEventSummary(version, 'BAKE'),
     vetoed: version.veto ? toVetoedMetadata(version.veto) : undefined,
+    compareLinks: {
+      current: version.gitMetadata?.comparisonLinks?.toCurrentVersion,
+      previous: version.gitMetadata?.comparisonLinks?.toPreviousVersion,
+    },
   };
 };
 
-export const VersionMetadata = ({
+export const VersionMetadata: React.FC<IVersionMetadataProps> = ({
   version,
   sha,
   build,
@@ -51,8 +56,9 @@ export const VersionMetadata = ({
   isDeploying,
   pinned,
   vetoed,
-  actions,
-}: IVersionMetadataProps) => {
+  compareLinks,
+  children,
+}) => {
   return (
     <BaseVersionMetadata>
       {isDeploying && <MetadataBadge type="deploying" />}
@@ -99,7 +105,13 @@ export const VersionMetadata = ({
           {buildsBehind} build{buildsBehind > 1 ? 's' : ''} behind
         </MetadataElement>
       ) : null}
-      {actions && <VersionMetadataActions id={`${build?.buildNumber}-actions`} actions={actions} />}
+      <CopyVersion version={version} />
+      {compareLinks && (
+        <MetadataElement>
+          <CompareLinksMenu id={`${version}-${build?.buildNumber}-compare-menu`} links={compareLinks} />
+        </MetadataElement>
+      )}
+      {children}
       {pinned && <VersionMessage type="pinned" data={pinned} />}
       {vetoed && <VersionMessage type="vetoed" data={vetoed} />}
     </BaseVersionMetadata>
