@@ -68,23 +68,6 @@ export interface IVersionMetadataProps {
   isCurrent?: boolean;
 }
 
-interface IVersionLinkProps {
-  linkProps: Record<string, string>;
-}
-
-export const VersionLink = ({ linkProps }: IVersionLinkProps) => {
-  const { href } = useCreateVersionLink(linkProps);
-  return (
-    <MetadataElement>
-      <CopyToClipboard
-        buttonInnerNode={<i className="fas fa-link" />}
-        text={href || ''}
-        toolTip={`Click to copy version link`}
-      />
-    </MetadataElement>
-  );
-};
-
 const useCreateVersionLink = (linkProps: IVersionCreatedAtProps['linkProps']) => {
   return useSref('home.applications.application.environments.history', linkProps);
 };
