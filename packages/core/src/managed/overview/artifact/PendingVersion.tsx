@@ -93,7 +93,7 @@ const PendingVersion = ({ data, reference, environment, pinned, index }: IPendin
           actions={actions}
         />
       </div>
-      <VersionMetadata {...getBaseMetadata(data)} pinned={pinned} createdAt={data.createdAt} />
+      <VersionMetadata {...getBaseMetadata(data)} pinned={pinned} />
       {constraints && !isEmpty(constraints) && (
         <Constraints
           key={index} // This is needed on refresh if a new version was added

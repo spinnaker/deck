@@ -4,29 +4,27 @@ import type { IVersionMetadataProps } from './MetadataComponents';
 import {
   BaseVersionMetadata,
   CompareLinksMenu,
-  CopyVersion,
   LifecycleEventDetails,
   MetadataBadge,
   MetadataElement,
   toVetoedMetadata,
   VersionAuthor,
   VersionBuilds,
-  VersionCreatedAt,
   VersionMessage,
 } from './MetadataComponents';
 import { formatToRelativeTimestamp, RelativeTimestamp } from '../RelativeTimestamp';
 import { getLifecycleEventSummary } from '../overview/artifact/utils';
 import type { QueryArtifactVersion } from '../overview/types';
-import { HoverablePopover, IconTooltip } from '../../presentation';
+import { HoverablePopover, Icon, IconTooltip } from '../../presentation';
 import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 import type { SingleVersionArtifactVersion } from '../versionsHistory/types';
 
 export const getBaseMetadata = (
   version: QueryArtifactVersion | SingleVersionArtifactVersion,
 ): Omit<Partial<IVersionMetadataProps>, 'version'> & Pick<IVersionMetadataProps, 'version'> => {
+  // The return type above makes everything optional except for the version
   return {
     version: version.version,
-    sha: version.gitMetadata?.commit,
     build: {
       buildNumber: version.buildNumber,
       version: version.version,
@@ -45,13 +43,11 @@ export const getBaseMetadata = (
   };
 };
 
-export const VersionMetadata: React.FC<IVersionMetadataProps> = ({
+export const VersionMetadata = ({
   version,
-  sha,
   build,
   author,
   deployedAt,
-  createdAt,
   isCurrent,
   isDeploying,
   buildsBehind,
@@ -59,8 +55,7 @@ export const VersionMetadata: React.FC<IVersionMetadataProps> = ({
   pinned,
   vetoed,
   compareLinks,
-  children,
-}) => {
+}: IVersionMetadataProps) => {
   return (
     <BaseVersionMetadata>
       {isCurrent && <MetadataBadge type="deployed" />}
@@ -74,7 +69,6 @@ export const VersionMetadata: React.FC<IVersionMetadataProps> = ({
       )}
       {build?.buildNumber && <VersionBuilds builds={[build]} />}
       <VersionAuthor author={author} />
-      <VersionCreatedAt createdAt={createdAt} linkProps={sha ? { sha } : { version }} />
       {deployedAt && (
         <MetadataElement>
           <IconTooltip
@@ -87,7 +81,7 @@ export const VersionMetadata: React.FC<IVersionMetadataProps> = ({
           <RelativeTimestamp timestamp={deployedAt} delayShow={TOOLTIP_DELAY_SHOW} removeStyles withSuffix />
         </MetadataElement>
       )}
-      {(build?.duration || bake?.duration) && (
+      {bake?.duration && (
         <MetadataElement>
           <HoverablePopover
             delayShow={200}
@@ -95,11 +89,10 @@ export const VersionMetadata: React.FC<IVersionMetadataProps> = ({
             Component={() => (
               <>
                 <LifecycleEventDetails title="Bake" {...bake} />
-                <LifecycleEventDetails title="Build" {...build} />
               </>
             )}
           >
-            <i className="fas fa-info-circle " />
+            <Icon name="bake" size="13px" />
           </HoverablePopover>
         </MetadataElement>
       )}
@@ -108,13 +101,11 @@ export const VersionMetadata: React.FC<IVersionMetadataProps> = ({
           {buildsBehind} build{buildsBehind > 1 ? 's' : ''} behind
         </MetadataElement>
       ) : null}
-      <CopyVersion version={version} />
       {compareLinks && (
         <MetadataElement>
           <CompareLinksMenu id={`${version}-${build?.buildNumber}-compare-menu`} links={compareLinks} />
         </MetadataElement>
       )}
-      {children}
       {pinned && <VersionMessage type="pinned" data={pinned} />}
       {vetoed && <VersionMessage type="vetoed" data={vetoed} />}
     </BaseVersionMetadata>

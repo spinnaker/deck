@@ -7,13 +7,13 @@ import React from 'react';
 import type { IconNames } from '@spinnaker/presentation';
 import { Icon } from '@spinnaker/presentation';
 
-import { RelativeTimestamp } from '../RelativeTimestamp';
+import { formatToRelativeTimestamp, RelativeTimestamp } from '../RelativeTimestamp';
 import type { VersionAction } from '../artifactActionsMenu/ArtifactActionsMenu';
 import { ArtifactActionsMenu } from '../artifactActionsMenu/ArtifactActionsMenu';
 import type { LifecycleEventSummary } from '../overview/artifact/utils';
-import { Tooltip } from '../../presentation';
+import { HoverablePopover, Tooltip } from '../../presentation';
 import { CopyToClipboard } from '../../utils/clipboard/CopyToClipboard';
-import { getIsDebugMode } from '../utils/debugMode';
+import { copyTextToClipboard } from '../../utils/clipboard/copyTextToClipboard';
 import { ABSOLUTE_TIME_FORMAT, TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 import { useLogEvent } from '../utils/logging';
 
@@ -55,12 +55,10 @@ export const toVetoedMetadata = (data: {
 });
 
 export interface IVersionMetadataProps {
-  build?: IVersionBuildProps['build'] & Partial<LifecycleEventSummary>;
+  build?: IVersionBuildProps['build'];
   version: string;
-  sha?: string;
   author?: string;
   deployedAt?: string;
-  createdAt?: IVersionCreatedAtProps['createdAt'];
   buildsBehind?: number;
   isDeploying?: boolean;
   bake?: LifecycleEventSummary;
@@ -70,13 +68,33 @@ export interface IVersionMetadataProps {
   isCurrent?: boolean;
 }
 
+interface IVersionLinkProps {
+  linkProps: Record<string, string>;
+}
+
+export const VersionLink = ({ linkProps }: IVersionLinkProps) => {
+  const { href } = useCreateVersionLink(linkProps);
+  return (
+    <MetadataElement>
+      <CopyToClipboard
+        buttonInnerNode={<i className="fas fa-link" />}
+        text={href || ''}
+        toolTip={`Click to copy version link`}
+      />
+    </MetadataElement>
+  );
+};
+
+const useCreateVersionLink = (linkProps: IVersionCreatedAtProps['linkProps']) => {
+  return useSref('home.applications.application.environments.history', linkProps);
+};
 interface IVersionCreatedAtProps {
   createdAt?: string | DateTime;
   linkProps: Record<string, string>;
 }
 
 export const VersionCreatedAt = ({ createdAt, linkProps }: IVersionCreatedAtProps) => {
-  const { href, onClick } = useSref('home.applications.application.environments.history', linkProps);
+  const { href } = useCreateVersionLink(linkProps);
   if (!createdAt) return null;
 
   return (
@@ -84,7 +102,13 @@ export const VersionCreatedAt = ({ createdAt, linkProps }: IVersionCreatedAtProp
       <Tooltip delayShow={TOOLTIP_DELAY_SHOW} value="Created at">
         <i className="far fa-calendar-alt metadata-icon" />
       </Tooltip>
-      <a href={href} onClick={onClick}>
+      <a
+        href={href}
+        onClick={(e) => {
+          href && copyTextToClipboard([window.location.origin, href].join('/'));
+          e.stopPropagation();
+        }}
+      >
         <RelativeTimestamp timestamp={createdAt} delayShow={TOOLTIP_DELAY_SHOW} removeStyles withSuffix />
       </a>
     </MetadataElement>
@@ -189,15 +213,15 @@ export const VersionBranch = ({ branch }: IVersionBranchProps) => {
 };
 
 interface IVersionBuildProps {
-  build: { buildNumber?: string; buildLink?: string; version?: string };
+  build: { buildNumber?: string; version?: string } & Partial<LifecycleEventSummary>;
   withPrefix?: boolean;
 }
 
 export const VersionBuild = ({ build, withPrefix }: IVersionBuildProps) => {
   const logEvent = useLogEvent('ArtifactBuild', 'OpenBuild');
   const text = `${withPrefix ? `Build ` : ''}#${build.buildNumber}`;
-  const content = build.buildLink ? (
-    <a href={build.buildLink} onClick={() => logEvent({ data: { build: build.buildNumber } })}>
+  const content = build.link ? (
+    <a href={build.link} onClick={() => logEvent({ data: { build: build.buildNumber } })}>
       {text}
     </a>
   ) : (
@@ -205,9 +229,12 @@ export const VersionBuild = ({ build, withPrefix }: IVersionBuildProps) => {
   );
 
   return build.version ? (
-    <Tooltip value={build.version} delayShow={TOOLTIP_DELAY_SHOW}>
+    <HoverablePopover
+      Component={() => <LifecycleEventDetails {...build} title="Build" showLink={false} />}
+      delayShow={TOOLTIP_DELAY_SHOW}
+    >
       <span>{content}</span>
-    </Tooltip>
+    </HoverablePopover>
   ) : (
     <>{content}</>
   );
@@ -245,21 +272,40 @@ export const BaseVersionMetadata: React.FC = ({ children }) => {
 
 interface ILifecycleEventDetailsProps extends Partial<LifecycleEventSummary> {
   title: string;
+  showLink?: boolean;
+  version?: string;
 }
 
-export const LifecycleEventDetails = ({ duration, link, startedAt, title }: ILifecycleEventDetailsProps) => {
+export const LifecycleEventDetails = ({
+  version,
+  duration,
+  link,
+  startedAt,
+  title,
+  showLink = true,
+}: ILifecycleEventDetailsProps) => {
   return (
     <div className="LifecycleEventDetails">
       <div>
         <div className="title sp-margin-xs-bottom">{title}</div>
         <dl className="details sp-margin-s-bottom">
+          {version && (
+            <>
+              <dt>version</dt>
+              <dd>{version}</dd>
+            </>
+          )}
+
           <dt>Started at</dt>
-          <dd>{startedAt?.toFormat(ABSOLUTE_TIME_FORMAT) || 'N/A'}</dd>
+          <dd>
+            {startedAt?.toFormat(ABSOLUTE_TIME_FORMAT) || 'N/A'}{' '}
+            {startedAt ? ` (${formatToRelativeTimestamp(startedAt, true)})` : ''}
+          </dd>
 
           <dt>Duration</dt>
           <dd>{duration || 'N/A'}</dd>
 
-          {link && (
+          {showLink && link && (
             <>
               <dt>Link</dt>
               <dd>
@@ -270,24 +316,6 @@ export const LifecycleEventDetails = ({ duration, link, startedAt, title }: ILif
         </dl>
       </div>
     </div>
-  );
-};
-
-export const CopyVersion = ({ version }: { version: string }) => {
-  if (!getIsDebugMode()) {
-    return null;
-  }
-  return (
-    <MetadataElement>
-      <CopyToClipboard
-        className="as-link"
-        buttonInnerNode={<span>{version}</span>}
-        text={version}
-        toolTip="Debug mode. Click to copy"
-        delayShow={200}
-        delayHide={0}
-      />
-    </MetadataElement>
   );
 };
 

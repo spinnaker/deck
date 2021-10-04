@@ -45,12 +45,7 @@ export const CurrentVersion = ({ data, environment, reference, numNewerVersions,
         version={data.version}
         actions={actions}
       />
-      <VersionMetadata
-        {...getBaseMetadata(data)}
-        createdAt={data.createdAt}
-        buildsBehind={numNewerVersions}
-        pinned={pinned}
-      />
+      <VersionMetadata {...getBaseMetadata(data)} buildsBehind={numNewerVersions} pinned={pinned} />
       {constraints && (
         <Constraints constraints={constraints} versionProps={{ environment, reference, version: data.version }} />
       )}
