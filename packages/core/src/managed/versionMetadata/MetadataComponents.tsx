@@ -12,7 +12,6 @@ import type { VersionAction } from '../artifactActionsMenu/ArtifactActionsMenu';
 import { ArtifactActionsMenu } from '../artifactActionsMenu/ArtifactActionsMenu';
 import type { LifecycleEventSummary } from '../overview/artifact/utils';
 import { HoverablePopover, Tooltip } from '../../presentation';
-import { CopyToClipboard } from '../../utils/clipboard/CopyToClipboard';
 import { copyTextToClipboard } from '../../utils/clipboard/copyTextToClipboard';
 import { ABSOLUTE_TIME_FORMAT, TOOLTIP_DELAY_SHOW } from '../utils/defaults';
 import { useLogEvent } from '../utils/logging';
