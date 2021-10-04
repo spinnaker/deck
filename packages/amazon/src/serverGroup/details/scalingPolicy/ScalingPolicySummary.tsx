@@ -6,8 +6,6 @@ import { StepPolicySummary } from './StepPolicySummary';
 import type { IScalingPolicyView, ITargetTrackingPolicy } from '../../../domain';
 import { TargetTrackingSummary } from './targetTracking/TargetTrackingSummary';
 
-import './scalingPolicySummary.component.less';
-
 export interface IScalingPolicySummaryProps {
   application: Application;
   policy: IScalingPolicyView;
@@ -15,7 +13,13 @@ export interface IScalingPolicySummaryProps {
 }
 
 export const ScalingPolicySummary = ({ application, policy, serverGroup }: IScalingPolicySummaryProps) => {
-  if (policy.policyType === 'TargetTrackingScaling') {
+  const scalingPolicyType = policy.policyType
+    ? policy.policyType
+    : policy.targetTrackingConfiguration
+    ? 'TargetTrackingScaling'
+    : 'StepScaling';
+
+  if (scalingPolicyType === 'TargetTrackingScaling') {
     return (
       <TargetTrackingSummary
         application={application}
