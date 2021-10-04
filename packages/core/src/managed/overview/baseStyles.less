@@ -2,6 +2,7 @@
   display: grid;
   grid-template-columns: [icon] var(--row-element-icon-width) [details] 1fr;
   padding: var(--l-spacing) var(--base-horizontal-padding) var(--s-spacing) var(--base-horizontal-padding);
+  position: relative;
 
   @media (max-width: 768px) {
     grid-template-columns: [icon] 30px [details] 1fr;
@@ -34,6 +35,8 @@
     font-weight: 600;
     line-height: 1.3;
     color: var(--color-charcoal);
+    display: grid;
+    grid-template-columns: 1fr auto;
 
     &.small {
       font-size: 14px;

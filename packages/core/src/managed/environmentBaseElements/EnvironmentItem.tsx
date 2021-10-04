@@ -12,6 +12,7 @@ interface IEnvironmentItemProps {
   iconTooltip: string;
   iconName: IIconProps['name'];
   size?: 'regular' | 'small';
+  rightElement?: React.ReactElement;
 }
 
 export const EnvironmentItem: React.FC<IEnvironmentItemProps> = ({
@@ -20,6 +21,7 @@ export const EnvironmentItem: React.FC<IEnvironmentItemProps> = ({
   iconName,
   iconTooltip,
   className,
+  rightElement,
   children,
 }) => {
   return (
@@ -34,7 +36,10 @@ export const EnvironmentItem: React.FC<IEnvironmentItemProps> = ({
         />
       </div>
       <div className="row-details">
-        <div className={classnames('row-title', size)}>{title}</div>
+        <div className={classnames('row-title', size)}>
+          {title}
+          {rightElement && <div>{rightElement}</div>}
+        </div>
         {children}
       </div>
     </div>

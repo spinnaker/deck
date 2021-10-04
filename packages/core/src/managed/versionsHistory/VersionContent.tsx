@@ -70,14 +70,8 @@ const VersionInEnvironment = ({
       iconName="artifact"
       iconTooltip={`Artifact - ${version.type}`}
       size="small"
-    >
-      <VersionMetadata
-        key={version.id}
-        version={version.version}
-        {...(detailedVersionData ? omit(getBaseMetadata(detailedVersionData), 'author', 'buildDuration') : undefined)}
-        pinned={pinnedData}
-      >
-        {actions && (
+      rightElement={
+        actions && (
           <ArtifactActionsMenu
             id={`${version.version}-${version.buildNumber}-rollback-actions`}
             title="Rollback"
@@ -85,9 +79,15 @@ const VersionInEnvironment = ({
             className="rollback-actions"
             pullRight
           />
-        )}
-      </VersionMetadata>
-
+        )
+      }
+    >
+      <VersionMetadata
+        key={version.id}
+        version={version.version}
+        {...(detailedVersionData ? omit(getBaseMetadata(detailedVersionData), 'author', 'buildDuration') : undefined)}
+        pinned={pinnedData}
+      />
       {loading && <LoadingAnimation />}
       <Constraints
         constraints={detailedVersionData?.constraints}
