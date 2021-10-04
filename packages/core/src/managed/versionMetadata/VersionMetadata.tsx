@@ -34,6 +34,7 @@ export const getBaseMetadata = (
     },
     author: version.gitMetadata?.author,
     deployedAt: version.deployedAt,
+    isCurrent: version.isCurrent,
     isDeploying: version.status === 'DEPLOYING',
     bake: getLifecycleEventSummary(version, 'BAKE'),
     vetoed: version.veto ? toVetoedMetadata(version.veto) : undefined,
@@ -51,9 +52,10 @@ export const VersionMetadata: React.FC<IVersionMetadataProps> = ({
   author,
   deployedAt,
   createdAt,
+  isCurrent,
+  isDeploying,
   buildsBehind,
   bake,
-  isDeploying,
   pinned,
   vetoed,
   compareLinks,
@@ -61,6 +63,7 @@ export const VersionMetadata: React.FC<IVersionMetadataProps> = ({
 }) => {
   return (
     <BaseVersionMetadata>
+      {isCurrent && <MetadataBadge type="deployed" />}
       {isDeploying && <MetadataBadge type="deploying" />}
       {bake?.isRunning && (
         <MetadataBadge

@@ -111,7 +111,7 @@ export const useCreateVersionRollbackActions = ({
 
   const onPin = usePinVersion(
     basePayload,
-    [isCurrent ? `Pin #${buildNumber} as deployed` : `Roll back to #${buildNumber} and pin`, commitMessage]
+    [isCurrent ? `Pin #${buildNumber} as live` : `Roll back to #${buildNumber} and pin`, commitMessage]
       .filter(Boolean)
       .join(' - '),
   );

@@ -74,18 +74,19 @@ export const Artifact = ({ artifact }: IArtifactProps) => {
       className="Artifact"
       title={artifact.reference}
     >
-      <div className="artifact-versions-title sp-margin-m-top">Current version</div>
-      {currentVersion ? (
-        <CurrentVersion
-          data={currentVersion}
-          environment={artifact.environment}
-          reference={artifact.reference}
-          numNewerVersions={newerVersions?.length}
-          pinned={pinnedVersion?.version === currentVersion.version ? toPinnedMetadata(pinnedVersion) : undefined}
-        />
-      ) : (
-        <div>No version is deployed</div>
-      )}
+      <div className="sp-margin-m-top">
+        {currentVersion ? (
+          <CurrentVersion
+            data={currentVersion}
+            environment={artifact.environment}
+            reference={artifact.reference}
+            numNewerVersions={newerVersions?.length}
+            pinned={pinnedVersion?.version === currentVersion.version ? toPinnedMetadata(pinnedVersion) : undefined}
+          />
+        ) : (
+          <div>No version is deployed</div>
+        )}
+      </div>
       {pinnedVersion && pinnedVersion.buildNumber !== currentVersion?.buildNumber && (
         <PinnedVersion version={pinnedVersion} />
       )}

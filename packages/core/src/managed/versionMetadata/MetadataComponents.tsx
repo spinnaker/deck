@@ -67,6 +67,7 @@ export interface IVersionMetadataProps {
   pinned?: VersionMessageData;
   vetoed?: VersionMessageData;
   compareLinks?: ICompareLinks;
+  isCurrent?: boolean;
 }
 
 interface IVersionCreatedAtProps {
@@ -93,6 +94,7 @@ export const VersionCreatedAt = ({ createdAt, linkProps }: IVersionCreatedAtProp
 const badgeTypeToDetails = {
   deploying: { className: 'version-deploying', text: 'Deploying' },
   baking: { className: 'version-baking', text: 'Baking' },
+  deployed: { className: 'version-deployed', text: 'Live' },
 };
 
 interface IMetadataBadgeProps {
