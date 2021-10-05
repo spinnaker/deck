@@ -91,7 +91,7 @@ export const useMarkVersionAsBad = (payload: IVersionActionsProps) => {
       MarkAsBadActionModal,
       {
         title:
-          (isCurrent ? `Roll back ${environment.toUpperCase()} to previous version and never deploy` : 'Never deploy') +
+          (isCurrent ? `Roll back ${environment.toUpperCase()} to previous version and reject ` : 'Reject') +
           ` #${buildNumber}`,
         actionName: 'Rollback',
         onAction: async (comment) => {

@@ -148,8 +148,8 @@ export const MarkAsBadActionModal = ({ actionProps, ...props }: InternalModalPro
         <span>
           <p>
             {isCurrent
-              ? `Spinnaker will immediately deploy the latest version approved for deployment to ${environment}. Version #${buildNumber} will be rejected and will not be deployed again, unless if you revert this rejection`
-              : `This action will reject version ${buildNumber} and Spinnaker will never deploy it to ${environment}, unless if you revert this action. This will not affect the live version.`}
+              ? `Spinnaker will immediately deploy the latest version approved for deployment to ${environment}. Version #${buildNumber} will be rejected and will not be deployed again`
+              : `This action will reject version ${buildNumber} and Spinnaker will not be deploy it to ${environment}. This will not affect the live version`}
             . For more information,{' '}
             <a
               target="_blank"
