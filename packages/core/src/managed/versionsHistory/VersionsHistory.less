@@ -117,15 +117,28 @@
     }
 
     &.skipped {
+      @stripesColor: var(--color-seashell);
+      @baseColor: var(--color-white);
       border: 1px solid var(--color-silver);
+      background-image: linear-gradient(
+        135deg,
+        @stripesColor 1.61%,
+        @baseColor 1.61%,
+        @baseColor 50%,
+        @stripesColor 50%,
+        @stripesColor 51.61%,
+        @baseColor 51.61%,
+        @baseColor 100%
+      );
+      background-size: 15px 15px;
     }
 
     &.approved {
-      background-color: var(--color-status-progress);
+      background-color: var(--color-status-progress-light);
     }
 
     &.pending {
-      background-color: var(--color-status-progress);
+      background-color: var(--color-status-progress-light);
     }
 
     &.vetoed {
@@ -137,7 +150,20 @@
     }
 
     &.previous {
-      background-color: var(--color-status-neutral);
+      // background-color: rgba(87%, 100%, 87%, 0.835);
+      @stripesColor: var(--color-silver);
+      @baseColor: rgba(87%, 100%, 87%, 0.835);
+      background-image: linear-gradient(
+        135deg,
+        @stripesColor 1.61%,
+        @baseColor 1.61%,
+        @baseColor 50%,
+        @stripesColor 50%,
+        @stripesColor 51.61%,
+        @baseColor 51.61%,
+        @baseColor 100%
+      );
+      background-size: 15px 15px;
     }
 
     &.deploying {
