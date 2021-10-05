@@ -119,7 +119,7 @@ export const useCreateVersionRollbackActions = (
   } else {
     if (!isCurrent) {
       actions.push({
-        content: isCurrent ? 'Rollback...' : 'Never deploy...',
+        content: isCurrent ? 'Rollback...' : 'Reject...',
         onClick: onMarkAsBad,
       });
     }
