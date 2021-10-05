@@ -1,4 +1,3 @@
-import classnames from 'classnames';
 import { orderBy } from 'lodash';
 import React from 'react';
 
@@ -60,14 +59,14 @@ export const PinnedVersion = ({ version }: { version: NonNullable<QueryArtifact[
     </div>
   );
 };
-interface IRollbackActionsProps {
+interface IRollbackActionProps {
   currentVersion: QueryArtifactVersion;
   environment: string;
   reference: string;
   isPinned: boolean;
 }
 
-const RollbackActions = ({ currentVersion, environment, reference, isPinned }: IRollbackActionsProps) => {
+const RollbackAction = ({ currentVersion, environment, reference, isPinned }: IRollbackActionProps) => {
   const appName = useApplicationContextSafe().name;
   const onMarkAsBad = useMarkVersionAsBad({
     application: appName,
@@ -84,7 +83,7 @@ const RollbackActions = ({ currentVersion, environment, reference, isPinned }: I
     },
   });
   return (
-    <button className={classnames(ACTION_BUTTON_CLASS_NAME, 'md-btn-danger')} onClick={onMarkAsBad}>
+    <button className={ACTION_BUTTON_CLASS_NAME} onClick={onMarkAsBad}>
       Rollback...
     </button>
   );
@@ -107,7 +106,7 @@ export const Artifact = ({ artifact, isPreview }: IArtifactProps) => {
       title={reference}
       rightElement={
         currentVersion && !isPreview ? (
-          <RollbackActions {...{ environment, currentVersion, reference }} isPinned={Boolean(pinnedVersion)} />
+          <RollbackAction {...{ environment, currentVersion, reference }} isPinned={Boolean(pinnedVersion)} />
         ) : undefined
       }
     >
