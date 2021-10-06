@@ -95,6 +95,10 @@ query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironm
     id
     name
     account
+    config {
+      id
+      previewEnvironmentsConfigured
+    }
     environments {
       ...baseEnvironmentFields
       isDeleting
@@ -338,4 +342,8 @@ mutation DismissNotification($payload: MdDismissNotificationPayload!) {
 
 mutation ImportDeliveryConfig($application: String!) {
   importDeliveryConfig(application: $application)
+}
+
+mutation ToggleResourceManagement($payload: MdToggleResourceManagementPayload) {
+  toggleResourceManagement(payload: $payload)
 }

@@ -1,7 +1,7 @@
 import { module } from 'angular';
 import _ from 'lodash';
-
-import { PROVIDER_SERVICE_DELEGATE, ProviderServiceDelegate } from '../cloudProvider/providerService.delegate';
+import type { ProviderServiceDelegate } from '../cloudProvider/providerService.delegate';
+import { PROVIDER_SERVICE_DELEGATE } from '../cloudProvider/providerService.delegate';
 
 export interface IInstanceType {
   account: string;

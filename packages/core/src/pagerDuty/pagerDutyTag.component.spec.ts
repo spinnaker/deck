@@ -1,7 +1,11 @@
+import type { IComponentControllerService } from 'angular';
+import { mock } from 'angular';
 import { of as observableOf } from 'rxjs';
-import { IComponentControllerService, mock } from 'angular';
-import { IPagerDutyService, PagerDutyReader } from './pagerDuty.read.service';
-import { PAGER_DUTY_TAG_COMPONENT, PagerDutyTagComponentController } from './pagerDutyTag.component';
+
+import type { IPagerDutyService } from './pagerDuty.read.service';
+import { PagerDutyReader } from './pagerDuty.read.service';
+import type { PagerDutyTagComponentController } from './pagerDutyTag.component';
+import { PAGER_DUTY_TAG_COMPONENT } from './pagerDutyTag.component';
 
 describe('PagerDutyTagComponent', () => {
   let $componentController: IComponentControllerService, $ctrl: PagerDutyTagComponentController;

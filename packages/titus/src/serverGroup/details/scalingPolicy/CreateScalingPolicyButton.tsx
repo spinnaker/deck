@@ -1,10 +1,14 @@
 import React from 'react';
 
 import { PolicyTypeSelectionModal } from '@spinnaker/amazon';
-import { AccountService, Application, IServerGroup, ModalInjector } from '@spinnaker/core';
+import type { Application, IServerGroup } from '@spinnaker/core';
+import { AccountService, ReactModal } from '@spinnaker/core';
 
 import { TitusReactInjector } from '../../../reactShims';
-import { UpsertTargetTrackingController } from './targetTracking/upsertTargetTracking.controller';
+import type { IUpsertTargetTrackingModalProps } from './targetTracking/UpsertTargetTrackingModal';
+import { UpsertTargetTrackingModal } from './targetTracking/UpsertTargetTrackingModal';
+import type { IUpsertScalingPolicyModalProps } from './upsert/UpsertScalingPolicyModal';
+import { UpsertScalingPolicyModal } from './upsert/UpsertScalingPolicyModal';
 
 export interface ICreateScalingPolicyButtonProps {
   application: Application;
@@ -42,51 +46,24 @@ export class CreateScalingPolicyButton extends React.Component<
   public createStepPolicy(): void {
     const { serverGroup, application } = this.props;
 
-    ModalInjector.modalService
-      .open({
-        templateUrl: require('./upsert/upsertScalingPolicy.modal.html'),
-        controller: 'titusUpsertScalingPolicyCtrl',
-        controllerAs: 'ctrl',
-        size: 'lg',
-        resolve: {
-          policy: () =>
-            TitusReactInjector.titusServerGroupTransformer.constructNewStepScalingPolicyTemplate(serverGroup),
-          serverGroup: () => serverGroup,
-          alarmServerGroup: () => ({
-            type: 'aws',
-            account: this.state.awsAccount,
-            region: serverGroup.region,
-            name: serverGroup.name,
-          }),
-          application: () => application,
-        },
-      })
-      .result.catch(() => {});
+    const upsertProps = {
+      app: application,
+      policy: TitusReactInjector.titusServerGroupTransformer.constructNewStepScalingPolicyTemplate(serverGroup),
+      serverGroup,
+    } as IUpsertScalingPolicyModalProps;
+    const modalProps = { dialogClassName: 'wizard-modal modal-lg' };
+    ReactModal.show(UpsertScalingPolicyModal, upsertProps, modalProps);
   }
 
   public createTargetTrackingPolicy(): void {
     const { serverGroup, application } = this.props;
-
-    ModalInjector.modalService
-      .open({
-        templateUrl: require('./targetTracking/upsertTargetTracking.modal.html'),
-        controller: UpsertTargetTrackingController,
-        controllerAs: '$ctrl',
-        size: 'lg',
-        resolve: {
-          policy: () =>
-            TitusReactInjector.titusServerGroupTransformer.constructNewTargetTrackingPolicyTemplate(serverGroup),
-          serverGroup: () => serverGroup,
-          alarmServerGroup: () => ({
-            type: 'aws',
-            account: this.state.awsAccount,
-            region: serverGroup.region,
-            name: serverGroup.name,
-          }),
-          application: () => application,
-        },
-      })
-      .result.catch(() => {});
+    const upsertProps = {
+      app: application,
+      policy: TitusReactInjector.titusServerGroupTransformer.constructNewTargetTrackingPolicyTemplate(serverGroup),
+      serverGroup,
+    } as IUpsertTargetTrackingModalProps;
+    const modalProps = { dialogClassName: 'wizard-modal modal-lg' };
+    ReactModal.show(UpsertTargetTrackingModal, upsertProps, modalProps);
   }
 
   public typeSelected = (typeSelection: string): void => {

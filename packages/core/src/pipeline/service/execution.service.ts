@@ -1,23 +1,26 @@
 import UIROUTER_ANGULARJS from '@uirouter/angularjs';
-import { StateService } from '@uirouter/core';
-import { IQService, ITimeoutService, module } from 'angular';
+import type { StateService } from '@uirouter/core';
+import type { IQService, ITimeoutService } from 'angular';
+import { module } from 'angular';
 import { get, identity, pickBy, uniq } from 'lodash';
 
 import { ExecutionsTransformer } from './ExecutionsTransformer';
 import { REST } from '../../api/ApiService';
-import { Application } from '../../application/application.model';
-import { ApplicationDataSource } from '../../application/service/applicationDataSource';
+import type { Application } from '../../application/application.model';
+import type { ApplicationDataSource } from '../../application/service/applicationDataSource';
 import { PipelineConfigService } from '../config/services/PipelineConfigService';
 import { SETTINGS } from '../../config/settings';
-import { IExecution, IExecutionStage, IExecutionStageSummary } from '../../domain';
-import { IPipeline } from '../../domain/IPipeline';
+import type { IExecution, IExecutionStage, IExecutionStageSummary } from '../../domain';
+import type { IPipeline } from '../../domain/IPipeline';
 import { ExecutionFilterService } from '../filter/executionFilter.service';
-import { FilterModelService, ISortFilter } from '../../filterModel';
+import type { ISortFilter } from '../../filterModel';
+import { FilterModelService } from '../../filterModel';
 import { ReactInjector } from '../../reactShims';
 import { ExecutionState } from '../../state';
 import { JsonUtils } from '../../utils';
 import { DebugWindow } from '../../utils/consoleDebug';
-import { IRetryablePromise, retryablePromise } from '../../utils/retryablePromise';
+import type { IRetryablePromise } from '../../utils/retryablePromise';
+import { retryablePromise } from '../../utils/retryablePromise';
 
 export class ExecutionService {
   public get activeStatuses(): string[] {
@@ -97,7 +100,7 @@ export class ExecutionService {
     return this.getFilteredExecutions(applicationName, statuses, limit, null, expand);
   }
 
-  public getExecution(executionId: string): PromiseLike<IExecution> {
+  public getExecution(executionId: string, pipelineConfigs: IPipeline[] = []): PromiseLike<IExecution> {
     return REST('/pipelines')
       .path(executionId)
       .get()
@@ -106,6 +109,11 @@ export class ExecutionService {
         execution.hydrated = true;
         this.cleanExecutionForDiffing(execution);
         if (application && name) {
+          const cached = pipelineConfigs.find((config) => config.id === execution.pipelineConfigId);
+          if (cached) {
+            execution.pipelineConfig = cached;
+            return Promise.resolve(execution);
+          }
           return REST('/applications')
             .path(application, 'pipelineConfigs', name)
             .get()
@@ -402,7 +410,7 @@ export class ExecutionService {
     });
     application.executions.data.forEach((execution: IExecution) => {
       if (execution.isActive && application.runningExecutions.data.every((e: IExecution) => e.id !== execution.id)) {
-        this.getExecution(execution.id).then((updatedExecution) => {
+        this.getExecution(execution.id, application.pipelineConfigs?.data).then((updatedExecution) => {
           this.updateExecution(application, updatedExecution);
         });
       }

@@ -1,14 +1,14 @@
-import { FormikErrors, FormikProps, isNaN } from 'formik';
+import type { FormikErrors, FormikProps } from 'formik';
 import _ from 'lodash';
 import React from 'react';
 import { Subject } from 'rxjs';
 
-import { IWizardPageComponent } from '@spinnaker/core';
+import type { IWizardPageComponent } from '@spinnaker/core';
 
-import { IAmazonInstanceTypeCategory } from '../../../../instance/awsInstanceType.service';
+import type { IAmazonInstanceTypeCategory } from '../../../../instance/awsInstanceType.service';
 import { InstanceTypeSelector } from '../instanceType/InstanceTypeSelector';
 import { AwsReactInjector } from '../../../../reactShims';
-import { IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
+import type { IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
 
 export interface IServerGroupInstanceTypeProps {
   formik: FormikProps<IAmazonServerGroupCommand>;

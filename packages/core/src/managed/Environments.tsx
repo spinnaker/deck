@@ -2,7 +2,7 @@ import { UIView, useCurrentStateAndParams } from '@uirouter/react';
 import React from 'react';
 
 import { EnvironmentsDirectionController } from './environmentBaseElements/EnvironmentsRender';
-import { Routes } from './managed.states';
+import type { Routes } from './managed.states';
 import { HorizontalTabs } from '../presentation/horizontalTabs/HorizontalTabs';
 import { setDebugMode } from './utils/debugMode';
 import { useLogEvent } from './utils/logging';
@@ -31,7 +31,7 @@ export const Environments = () => {
   }, [params]);
 
   return (
-    <div className="vertical Environments2">
+    <div className="vertical Environments">
       <HorizontalTabs
         tabs={tabs}
         rightElement={!state.name?.endsWith('.config') ? <EnvironmentsDirectionController /> : undefined}

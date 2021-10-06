@@ -4,10 +4,11 @@ import { DurationRender, RelativeTimestamp } from '../../RelativeTimestamp';
 import { VersionOperationIcon } from './VersionOperation';
 import { useRetryVersionActionMutation } from '../../graphql/graphql-sdk';
 import { Tooltip, useApplicationContextSafe } from '../../../presentation';
-import { QueryArtifactVersionTask, QueryArtifactVersionTaskStatus } from '../types';
+import type { QueryArtifactVersionTask, QueryArtifactVersionTaskStatus } from '../types';
 import { TOOLTIP_DELAY_SHOW } from '../../utils/defaults';
 import { useLogEvent } from '../../utils/logging';
-import { NotifierService, Spinner } from '../../../widgets';
+import { useNotifyOnError } from '../../utils/useNotifyOnError.hook';
+import { Spinner } from '../../../widgets';
 
 import './ArtifactVersionTasks.less';
 
@@ -37,6 +38,7 @@ interface IArtifactVersionTaskProps extends IBaseTaskProps {
   task: QueryArtifactVersionTask;
 }
 
+// Example of a task: postDeploy and verification
 const ArtifactVersionTask = ({ type, artifact, task }: IArtifactVersionTaskProps) => {
   const status = task.status || 'PENDING';
   const { link, startedAt, completedAt } = task;
@@ -55,15 +57,7 @@ const ArtifactVersionTask = ({ type, artifact, task }: IArtifactVersionTaskProps
     },
   });
 
-  React.useEffect(() => {
-    if (error) {
-      NotifierService.publish({
-        key: task.id,
-        content: `Failed to re-run ${type} - ${error.message}`,
-        options: { type: 'error' },
-      });
-    }
-  }, [error]);
+  useNotifyOnError({ key: task.id, content: `Failed to re-run ${type}`, error });
 
   return (
     <div className="version-task">
@@ -118,6 +112,7 @@ interface IArtifactVersionTasksProps extends IBaseTaskProps {
   tasks?: QueryArtifactVersionTask[];
 }
 
+// Example of tasks: postDeploys and verifications
 export const ArtifactVersionTasks = ({ tasks, ...restProps }: IArtifactVersionTasksProps) => {
   if (!tasks || !tasks.length) return null;
   return (

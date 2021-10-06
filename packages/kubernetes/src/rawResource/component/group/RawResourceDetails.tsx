@@ -5,15 +5,16 @@ import React from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Subject } from 'rxjs';
 
+import type { IManifest } from '@spinnaker/core';
 import {
   AccountTag,
   CloudProviderLogo,
   CollapsibleSection,
   ConfirmationModalService,
-  IManifest,
   logger,
   ManifestWriter,
   Overridable,
+  SETTINGS,
   Spinner,
   timestamp,
 } from '@spinnaker/core';
@@ -22,7 +23,8 @@ import { RawResourceUtils } from '../RawResourceUtils';
 import { ManifestLabels } from '../../../manifest/ManifestLabels';
 import { KubernetesManifestService } from '../../../manifest/manifest.service';
 import { KubernetesManifestCommandBuilder } from '../../../manifest/manifestCommandBuilder.service';
-import { IKubernetesManifestCondition, ManifestCondition } from '../../../manifest/status/ManifestCondition';
+import type { IKubernetesManifestCondition } from '../../../manifest/status/ManifestCondition';
+import { ManifestCondition } from '../../../manifest/status/ManifestCondition';
 import { ManifestWizard } from '../../../manifest/wizard/ManifestWizard';
 import { ManifestEvents } from '../../../pipelines/stages/deployManifest/manifestStatus/ManifestEvents';
 
@@ -175,7 +177,7 @@ export class RawResourceDetails extends React.Component<IRawResourceDetailsProps
               </h3>
             </div>
           )}
-          {!this.state.loading && (
+          {!this.state.loading && SETTINGS.kubernetesAdHocInfraWritesEnabled && (
             <div className="actions">
               <Dropdown className="dropdown" id="resource-actions-dropdown">
                 <Dropdown.Toggle className="btn btn-sm btn-primary dropdown-toggle">

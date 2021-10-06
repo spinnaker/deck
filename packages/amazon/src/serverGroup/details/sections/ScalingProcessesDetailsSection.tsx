@@ -2,8 +2,9 @@ import React from 'react';
 
 import { CollapsibleSection, confirmNotManaged, HelpField, ModalInjector, timestamp, Tooltip } from '@spinnaker/core';
 
-import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
-import { IScalingProcess } from '../../../domain';
+import type { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
+import { AWSProviderSettings } from '../../../aws.settings';
+import type { IScalingProcess } from '../../../domain';
 import { AutoScalingProcessService } from '../scalingProcesses/AutoScalingProcessService';
 
 export interface IScalingProcessesDetailsSectionState {
@@ -101,9 +102,11 @@ export class ScalingProcessesDetailsSection extends React.Component<
             </li>
           ))}
         </ul>
-        <a className="clickable" onClick={this.toggleScalingProcesses}>
-          Edit Scaling Processes
-        </a>
+        {AWSProviderSettings.adHocInfraWritesEnabled && (
+          <a className="clickable" onClick={this.toggleScalingProcesses}>
+            Edit Scaling Processes
+          </a>
+        )}
       </CollapsibleSection>
     );
   }

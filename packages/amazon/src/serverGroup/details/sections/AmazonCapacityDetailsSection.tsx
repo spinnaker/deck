@@ -1,14 +1,10 @@
 import React from 'react';
 
-import {
-  CapacityDetailsSection,
-  CollapsibleSection,
-  ICapacity,
-  Overridable,
-  ViewScalingActivitiesLink,
-} from '@spinnaker/core';
+import type { ICapacity } from '@spinnaker/core';
+import { CapacityDetailsSection, CollapsibleSection, Overridable, ViewScalingActivitiesLink } from '@spinnaker/core';
 
-import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
+import type { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
+import { AWSProviderSettings } from '../../../aws.settings';
 import { AmazonResizeServerGroupModal } from '../resize/AmazonResizeServerGroupModal';
 
 @Overridable('amazon.serverGroup.CapacityDetailsSection')
@@ -27,9 +23,11 @@ export class AmazonCapacityDetailsSection extends React.Component<IAmazonServerG
         <CapacityDetailsSection current={serverGroup.instances.length} capacity={capacity} />
 
         <div>
-          <a className="clickable" onClick={() => AmazonResizeServerGroupModal.show({ application, serverGroup })}>
-            Resize Server Group
-          </a>
+          {AWSProviderSettings.adHocInfraWritesEnabled && (
+            <a className="clickable" onClick={() => AmazonResizeServerGroupModal.show({ application, serverGroup })}>
+              Resize Server Group
+            </a>
+          )}
         </div>
 
         <div>

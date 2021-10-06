@@ -1,15 +1,14 @@
-import { mockHttpClient } from 'core/api/mock/jasmine';
-import { IControllerService, IRootScopeService, IScope, mock, noop } from 'angular';
-import { StateService } from '@uirouter/core';
+import type { StateService } from '@uirouter/core';
+import type { IControllerService, IRootScopeService, IScope } from 'angular';
+import { mock, noop } from 'angular';
 
 import { ApplicationModelBuilder } from '@spinnaker/core';
 
+// eslint-disable-next-line @spinnaker/import-from-npm-not-relative
+import { mockHttpClient } from '../../../../core/src/api/mock/jasmine';
 import { ORACLE_LOAD_BALANCER_CREATE_CONTROLLER, OracleLoadBalancerController } from './createLoadBalancer.controller';
-import {
-  IOracleLoadBalancer,
-  IOracleLoadBalancerUpsertCommand,
-  LoadBalancingPolicy,
-} from '../../domain/IOracleLoadBalancer';
+import type { IOracleLoadBalancer, IOracleLoadBalancerUpsertCommand } from '../../domain/IOracleLoadBalancer';
+import { LoadBalancingPolicy } from '../../domain/IOracleLoadBalancer';
 import { OracleProviderSettings } from '../../oracle.settings';
 
 describe('Controller: oracleCreateLoadBalancerCtrl', function () {

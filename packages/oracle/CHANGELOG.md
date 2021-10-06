@@ -3,6 +3,102 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.62](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.61...@spinnaker/oracle@0.0.62) (2021-10-05)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.61](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.60...@spinnaker/oracle@0.0.61) (2021-10-01)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.60](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.58...@spinnaker/oracle@0.0.60) (2021-09-30)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.59](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.58...@spinnaker/oracle@0.0.59) (2021-09-30)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.58](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.57...@spinnaker/oracle@0.0.58) (2021-09-29)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.57](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.56...@spinnaker/oracle@0.0.57) (2021-09-24)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.56](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.55...@spinnaker/oracle@0.0.56) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.55](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.54...@spinnaker/oracle@0.0.55) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.54](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.53...@spinnaker/oracle@0.0.54) (2021-09-21)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.53](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.52...@spinnaker/oracle@0.0.53) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.52](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.51...@spinnaker/oracle@0.0.52) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
+## [0.0.51](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.50...@spinnaker/oracle@0.0.51) (2021-09-16)
+
+**Note:** Version bump only for package @spinnaker/oracle
+
+
+
+
+
 ## [0.0.50](https://github.com/spinnaker/deck/compare/@spinnaker/oracle@0.0.49...@spinnaker/oracle@0.0.50) (2021-09-15)
 
 **Note:** Version bump only for package @spinnaker/oracle

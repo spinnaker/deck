@@ -1,14 +1,16 @@
-import { mock, IQService, IScope } from 'angular';
-import React from 'react';
+import type { IQService, IScope } from 'angular';
+import { mock } from 'angular';
 import { shallow } from 'enzyme';
+import React from 'react';
 
-import { CreatePipelineModal, ICreatePipelineModalProps } from './CreatePipelineModal';
-import { PipelineTemplateReader } from '../config/templates/PipelineTemplateReader';
-import { Application } from '../../application/application.model';
+import type { ICreatePipelineModalProps } from './CreatePipelineModal';
+import { CreatePipelineModal } from './CreatePipelineModal';
+import type { Application } from '../../application/application.model';
 import { ApplicationModelBuilder } from '../../application/applicationModel.builder';
-import { IPipeline } from '../../domain';
-import { SETTINGS } from '../../config/settings';
 import { PipelineConfigService } from '../config/services/PipelineConfigService';
+import { SETTINGS } from '../../config/settings';
+import { PipelineTemplateReader } from '../config/templates/PipelineTemplateReader';
+import type { IPipeline } from '../../domain';
 
 // Disable CreatePipelineModal tests until enzyme supports React 16 https://github.com/airbnb/enzyme/issues/1553
 // CreatePipelineModal uses Overridable() which uses React.forwardRef

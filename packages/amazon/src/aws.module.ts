@@ -2,6 +2,7 @@ import { module } from 'angular';
 
 import { CloudProviderRegistry, DeploymentStrategyRegistry } from '@spinnaker/core';
 
+import { AWSProviderSettings } from './aws.settings';
 import { COMMON_MODULE } from './common/common.module';
 import './deploymentStrategy/rollingPush.strategy';
 import { AmazonFunctionDetails } from './function';
@@ -47,6 +48,11 @@ import { AWS_SECURITY_GROUP_MODULE } from './securityGroup/securityGroup.module'
 import { AmazonCloneServerGroupModal } from './serverGroup/configure/wizard/AmazonCloneServerGroupModal';
 import { AmazonServerGroupActions } from './serverGroup/details/AmazonServerGroupActions';
 import { amazonServerGroupDetailsGetter } from './serverGroup/details/amazonServerGroupDetailsGetter';
+import {
+  AmazonUpsertScalingPolicyModal,
+  AmazonUpsertTargetTrackingModal,
+  TargetTrackingChart,
+} from './serverGroup/details/scalingPolicy';
 import {
   AdvancedSettingsDetailsSection,
   AmazonCapacityDetailsSection,
@@ -111,6 +117,7 @@ module(AMAZON_MODULE, [
 ]).config(() => {
   CloudProviderRegistry.registerProvider('aws', {
     name: 'Amazon',
+    adHocInfrastructureWritesEnabled: AWSProviderSettings.adHocInfraWritesEnabled,
     logo: {
       path: amazonLogo,
     },
@@ -141,6 +148,9 @@ module(AMAZON_MODULE, [
       commandBuilder: 'awsServerGroupCommandBuilder',
       configurationService: 'awsServerGroupConfigurationService',
       scalingActivitiesEnabled: true,
+      TargetTrackingChart,
+      UpsertStepPolicyModal: AmazonUpsertScalingPolicyModal,
+      UpsertTargetTrackingModal: AmazonUpsertTargetTrackingModal,
     },
     instance: {
       instanceTypeService: 'awsInstanceTypeService',
