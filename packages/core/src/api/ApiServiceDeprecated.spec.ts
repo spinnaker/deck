@@ -1,8 +1,11 @@
+/* eslint-disable @spinnaker/api-deprecation, @spinnaker/api-no-slashes, @spinnaker/migrate-to-mock-http-client */
+
 import Spy = jasmine.Spy;
 import { mock, noop } from 'angular';
-import { AuthenticationInitializer } from '../authentication/AuthenticationInitializer';
-import { ICache } from '../cache';
+
 import { API, InvalidAPIResponse, invalidContentMessage } from './ApiService';
+import { AuthenticationInitializer } from '../authentication/AuthenticationInitializer';
+import type { ICache } from '../cache';
 import { SETTINGS } from '../config/settings';
 
 describe('API Service', function () {

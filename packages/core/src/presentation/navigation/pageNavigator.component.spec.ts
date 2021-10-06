@@ -1,10 +1,10 @@
-import $ from 'jquery';
-import { mock } from 'angular';
-
-import { PAGE_NAVIGATOR_COMPONENT } from './pageNavigator.component';
-import { INavigationPage } from './PageNavigationState';
-import { ScrollToService } from '../../utils/scrollTo/scrollTo.service';
 import UI_ROUTER from '@uirouter/angularjs';
+import { mock } from 'angular';
+import $ from 'jquery';
+
+import type { INavigationPage } from './PageNavigationState';
+import { PAGE_NAVIGATOR_COMPONENT } from './pageNavigator.component';
+import { ScrollToService } from '../../utils/scrollTo/scrollTo.service';
 
 describe('Component: Page Navigator', () => {
   let $compile: ng.ICompileService, $scope: ng.IScope, $timeout: ng.ITimeoutService, elem: JQuery;
@@ -46,8 +46,8 @@ describe('Component: Page Navigator', () => {
       ];
       initialize(pages);
       expect(elem.find('h4').length).toBe(2);
-      expect(elem.find('h4:eq(0)')).textMatch('Page 1');
-      expect(elem.find('h4:eq(1)')).textMatch('Page 2');
+      expect(elem.find('h4:eq(0)').text()).toContain('Page 1');
+      expect(elem.find('h4:eq(1)').text()).toContain('Page 2');
     });
 
     it('renders pages conditionally based on visible flag', () => {
@@ -57,7 +57,7 @@ describe('Component: Page Navigator', () => {
       ];
       initialize(pages);
       expect(elem.find('h4').length).toBe(1);
-      expect(elem.find('h4:eq(0)')).textMatch('Page 1');
+      expect(elem.find('h4:eq(0)').text()).toContain('Page 1');
 
       pages[1].visible = true;
       $scope.$digest();

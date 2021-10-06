@@ -1,6 +1,7 @@
+/* eslint-disable @spinnaker/import-sort */
 import '../utils/import-aliases.mock';
-import ruleTester from '../utils/ruleTester';
 import rule from './import-from-npm-not-alias';
+import ruleTester from '../utils/ruleTester';
 
 ruleTester.run('import-from-npm-not-alias', rule, {
   valid: [

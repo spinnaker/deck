@@ -1,9 +1,9 @@
-import React from 'react';
 import { shallow } from 'enzyme';
+import React from 'react';
 
+import type { ICustomBannerConfig } from './CustomBannerConfig';
+import { CustomBannerConfig } from './CustomBannerConfig';
 import { noop } from '../../../utils';
-
-import { CustomBannerConfig, ICustomBannerConfig } from './CustomBannerConfig';
 
 describe('<CustomBannerConfig />', () => {
   let bannerConfigs: ICustomBannerConfig[];

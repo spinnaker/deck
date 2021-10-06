@@ -3,6 +3,47 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.1.1](https://github.com/spinnaker/deck/compare/deck-app@2.1.0...deck-app@2.1.1) (2021-10-05)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+# [2.1.0](https://github.com/spinnaker/deck/compare/deck-app@2.0.20...deck-app@2.1.0) (2021-10-01)
+
+
+### Features
+
+* **scripts:** make yarn clean delegate to all lerna packages ([3793778](https://github.com/spinnaker/deck/commit/3793778dfefdefd496cf3a9f6032d5c7ff210da9))
+
+
+
+
+
+## [2.0.20](https://github.com/spinnaker/deck/compare/deck-app@2.0.18...deck-app@2.0.20) (2021-09-30)
+
+
+### Bug Fixes
+
+* bump @types/react to 16.14.10 ([bb62b99](https://github.com/spinnaker/deck/commit/bb62b991514c2a81fbdf467c01f3ce7467f71718))
+
+
+
+
+
+## [2.0.19](https://github.com/spinnaker/deck/compare/deck-app@2.0.18...deck-app@2.0.19) (2021-09-30)
+
+
+### Bug Fixes
+
+* bump @types/react to 16.14.10 ([bb62b99](https://github.com/spinnaker/deck/commit/bb62b991514c2a81fbdf467c01f3ce7467f71718))
+
+
+
+
+
 ## [2.0.18](https://github.com/spinnaker/deck/compare/deck-app@2.0.17...deck-app@2.0.18) (2021-09-29)
 
 **Note:** Version bump only for package deck-app
