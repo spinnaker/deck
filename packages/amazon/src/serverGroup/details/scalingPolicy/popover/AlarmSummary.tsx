@@ -1,17 +1,26 @@
 import * as React from 'react';
-import { IScalingPolicyAlarmView } from '../../../../domain';
+import type { IScalingPolicyAlarmView } from '../../../../domain';
 
 export interface IAlarmSummaryProps {
   alarm: IScalingPolicyAlarmView;
 }
 
+export const comparatorMap = {
+  GreaterThanOrEqualToThreshold: '>=',
+  GreaterThanThreshold: '>',
+  LessThanOrEqualToThreshold: '<=',
+  LessThanThreshold: '<',
+};
+
 export const AlarmSummary = ({ alarm }: IAlarmSummaryProps) => (
   <div>
-    <b>Whenever</b>
-    {` ${alarm.statistic} of `}
-    <span className="alarm-name">{alarm.metricName}</span>
-    {` is ${alarm.comparator} ${alarm.threshold} `}
-    <b>for at least</b>
-    {` ${alarm.evaluationPeriods} consecutive periods of ${alarm.period} seconds`}
+    <div>
+      <b>Whenever</b>
+      {` ${alarm.statistic} of ${alarm.metricName}`}
+    </div>
+    <div>
+      <b>for at least</b>
+      {` ${alarm.evaluationPeriods} consecutive periods of ${alarm.period} seconds`}
+    </div>
   </div>
 );

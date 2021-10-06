@@ -1,13 +1,11 @@
 import React from 'react';
 
 import { SETTINGS } from '../../config';
-import {
-  FetchApplicationManagementDataDocument,
-  FetchApplicationManagementDataQuery,
-  useUpdateGitIntegrationMutation,
-} from '../graphql/graphql-sdk';
+import type { FetchApplicationManagementDataQuery } from '../graphql/graphql-sdk';
+import { FetchApplicationManagementDataDocument, useUpdateGitIntegrationMutation } from '../graphql/graphql-sdk';
 import { CheckboxInput, useApplicationContextSafe } from '../../presentation';
 import { useLogEvent } from '../utils/logging';
+import { useNotifyOnError } from '../utils/useNotifyOnError.hook';
 import { Spinner } from '../../widgets/spinners/Spinner';
 
 import './GitIntegration.less';
@@ -79,10 +77,16 @@ const ManifestPath = ({ manifestPath }: Pick<IGitIntegrationProps, 'manifestPath
 
 export const GitIntegration = ({ isEnabled, branch, link, repository, manifestPath }: IGitIntegrationProps) => {
   const appName = useApplicationContextSafe().name;
-  const [updateIntegration, { loading }] = useUpdateGitIntegrationMutation({
+  const [updateIntegration, { loading, error }] = useUpdateGitIntegrationMutation({
     refetchQueries: [{ query: FetchApplicationManagementDataDocument, variables: { appName } }],
   });
   const logEvent = useLogEvent('GitIntegration');
+
+  useNotifyOnError({
+    key: 'toggleGitIntegration',
+    content: `Failed to ${isEnabled ? 'disable' : 'enable'} auto-import`,
+    error,
+  });
 
   const repoAndBranch = [repository, branch].join(':');
 

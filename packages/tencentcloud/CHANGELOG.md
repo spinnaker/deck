@@ -3,6 +3,108 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.56](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.55...@spinnaker/tencentcloud@0.0.56) (2021-10-05)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.55](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.54...@spinnaker/tencentcloud@0.0.55) (2021-10-01)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.54](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.52...@spinnaker/tencentcloud@0.0.54) (2021-09-30)
+
+
+### Bug Fixes
+
+* bump @types/react to 16.14.10 ([bb62b99](https://github.com/spinnaker/deck/commit/bb62b991514c2a81fbdf467c01f3ce7467f71718))
+
+
+
+
+
+## [0.0.53](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.52...@spinnaker/tencentcloud@0.0.53) (2021-09-30)
+
+
+### Bug Fixes
+
+* bump @types/react to 16.14.10 ([bb62b99](https://github.com/spinnaker/deck/commit/bb62b991514c2a81fbdf467c01f3ce7467f71718))
+
+
+
+
+
+## [0.0.52](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.51...@spinnaker/tencentcloud@0.0.52) (2021-09-29)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.51](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.50...@spinnaker/tencentcloud@0.0.51) (2021-09-24)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.50](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.49...@spinnaker/tencentcloud@0.0.50) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.49](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.48...@spinnaker/tencentcloud@0.0.49) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.48](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.47...@spinnaker/tencentcloud@0.0.48) (2021-09-21)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.47](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.46...@spinnaker/tencentcloud@0.0.47) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.46](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.45...@spinnaker/tencentcloud@0.0.46) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.45](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.44...@spinnaker/tencentcloud@0.0.45) (2021-09-16)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
 ## [0.0.44](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.43...@spinnaker/tencentcloud@0.0.44) (2021-09-15)
 
 **Note:** Version bump only for package @spinnaker/tencentcloud

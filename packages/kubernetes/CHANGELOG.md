@@ -3,6 +3,121 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.2](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.2.1...@spinnaker/kubernetes@0.2.2) (2021-10-05)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.2.1](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.2.0...@spinnaker/kubernetes@0.2.1) (2021-10-01)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+# [0.2.0](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.102...@spinnaker/kubernetes@0.2.0) (2021-09-30)
+
+
+### Bug Fixes
+
+* bump @types/react to 16.14.10 ([bb62b99](https://github.com/spinnaker/deck/commit/bb62b991514c2a81fbdf467c01f3ce7467f71718))
+
+
+### Features
+
+* **aws/infrastructure:** Hide aws ad hoc infrastructure action buttons ([#9712](https://github.com/spinnaker/deck/issues/9712)) ([7202efd](https://github.com/spinnaker/deck/commit/7202efd54ad0b048d5c1f45c24162619b25be844))
+
+
+
+
+
+# [0.1.0](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.102...@spinnaker/kubernetes@0.1.0) (2021-09-30)
+
+
+### Bug Fixes
+
+* bump @types/react to 16.14.10 ([bb62b99](https://github.com/spinnaker/deck/commit/bb62b991514c2a81fbdf467c01f3ce7467f71718))
+
+
+### Features
+
+* **aws/infrastructure:** Hide aws ad hoc infrastructure action buttons ([#9712](https://github.com/spinnaker/deck/issues/9712)) ([7202efd](https://github.com/spinnaker/deck/commit/7202efd54ad0b048d5c1f45c24162619b25be844))
+
+
+
+
+
+## [0.0.102](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.101...@spinnaker/kubernetes@0.0.102) (2021-09-29)
+
+
+### Bug Fixes
+
+* **kubernetes:** hide ad-hoc infrastructure action buttons when spinnaker has multiple accounts ([#9707](https://github.com/spinnaker/deck/issues/9707)) ([337ec29](https://github.com/spinnaker/deck/commit/337ec291494bc8d7ff863cd2a44ce38ab98229c1))
+
+
+
+
+
+## [0.0.101](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.100...@spinnaker/kubernetes@0.0.101) (2021-09-24)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.100](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.99...@spinnaker/kubernetes@0.0.100) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.99](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.98...@spinnaker/kubernetes@0.0.99) (2021-09-23)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.98](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.97...@spinnaker/kubernetes@0.0.98) (2021-09-21)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.97](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.96...@spinnaker/kubernetes@0.0.97) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.96](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.95...@spinnaker/kubernetes@0.0.96) (2021-09-18)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
+## [0.0.95](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.94...@spinnaker/kubernetes@0.0.95) (2021-09-16)
+
+**Note:** Version bump only for package @spinnaker/kubernetes
+
+
+
+
+
 ## [0.0.94](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.0.93...@spinnaker/kubernetes@0.0.94) (2021-09-15)
 
 **Note:** Version bump only for package @spinnaker/kubernetes

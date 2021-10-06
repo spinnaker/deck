@@ -1,4 +1,4 @@
-import { IFunctionSourceData } from '@spinnaker/core';
+import type { IFunctionSourceData } from '@spinnaker/core';
 
 export interface IAmazonFunctionSourceData extends IFunctionSourceData {
   account: string;
@@ -10,6 +10,7 @@ export interface IAmazonFunctionSourceData extends IFunctionSourceData {
   publish: boolean;
   description: string;
   eventSourceMappings: string[];
+  aliasConfigurations: string[];
   functionArn: string;
   handler: string;
   layers: string;

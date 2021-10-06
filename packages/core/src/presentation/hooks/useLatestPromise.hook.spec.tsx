@@ -1,6 +1,8 @@
-import React from 'react';
 import { mount } from 'enzyme';
-import { IUseLatestPromiseResult, useLatestPromise } from './useLatestPromise.hook';
+import React from 'react';
+
+import type { IUseLatestPromiseResult } from './useLatestPromise.hook';
+import { useLatestPromise } from './useLatestPromise.hook';
 
 describe('useLatestPromise hook', () => {
   // Remove the the refresh function for .isEqual assertions
@@ -68,9 +70,13 @@ describe('useLatestPromise hook', () => {
     expect(spy).toHaveBeenCalledTimes(2);
 
     deferred.reject('error');
+    let caught = false;
     try {
       await deferred.promise;
-    } catch (error) {}
+    } catch (error) {
+      caught = true;
+    }
+    expect(caught).toBe(true);
     component.setProps({});
 
     expect(spy).toHaveBeenCalledTimes(3);

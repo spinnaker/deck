@@ -1,9 +1,11 @@
 import React from 'react';
 
-import { IconNames } from '@spinnaker/presentation';
-import { Application } from '../../application';
-import { IManagedResourceSummary, ManagedResourceStatus } from '../../domain';
+import type { IconNames } from '@spinnaker/presentation';
+
+import type { Application } from '../../application';
+import type { IManagedResourceSummary, ManagedResourceStatus } from '../../domain';
 import { logger } from '../../utils';
+import { getDocsUrl } from '../utils/defaults';
 
 interface IViewConfiguration {
   appearance: 'info' | 'warning' | 'error';
@@ -22,15 +24,22 @@ const LearnMoreLink = ({ resourceSummary }: { resourceSummary: IManagedResourceS
   <a
     target="_blank"
     onClick={() => logClick('Status docs link', resourceSummary.id, resourceSummary.status)}
-    href={`https://www.spinnaker.io/guides/user/managed-delivery/resource-status/#${resourceSummary.status
-      .toLowerCase()
-      .replace('_', '-')}`}
+    href={`${getDocsUrl('resourceStatus')}#${resourceSummary.status.toLowerCase().replace('_', '-')}`}
   >
     Learn more
   </a>
 );
 
 export const viewConfigurationByStatus: { [status in ManagedResourceStatus]: IViewConfiguration } = {
+  DELETING: {
+    appearance: 'warning',
+    iconName: 'mdActuating',
+    popoverContents: () => (
+      <p>
+        <b>Spinnaker is deleting this temporary managed resource</b>
+      </p>
+    ),
+  },
   ACTUATING: {
     appearance: 'info',
     iconName: 'mdActuating',

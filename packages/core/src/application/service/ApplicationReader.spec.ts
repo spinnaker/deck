@@ -1,16 +1,21 @@
 import { mock } from 'angular';
+
+import { ApplicationDataSourceRegistry } from './ApplicationDataSourceRegistry';
+import type { IApplicationDataSourceAttribute } from './ApplicationReader';
+import { ApplicationReader } from './ApplicationReader';
 import { mockHttpClient } from '../../api/mock/jasmine';
+import type { Application } from '../application.model';
+import type { ClusterService } from '../../cluster/cluster.service';
+import { CLUSTER_SERVICE } from '../../cluster/cluster.service';
+import { LOAD_BALANCER_DATA_SOURCE } from '../../loadBalancer/loadBalancer.dataSource';
+import type { LoadBalancerReader } from '../../loadBalancer/loadBalancer.read.service';
+import { LOAD_BALANCER_READ_SERVICE } from '../../loadBalancer/loadBalancer.read.service';
+import { SECURITY_GROUP_DATA_SOURCE } from '../../securityGroup/securityGroup.dataSource';
+import type { SecurityGroupReader } from '../../securityGroup/securityGroupReader.service';
+import { SECURITY_GROUP_READER } from '../../securityGroup/securityGroupReader.service';
+import { SERVER_GROUP_DATA_SOURCE } from '../../serverGroup/serverGroup.dataSource';
 
 import Spy = jasmine.Spy;
-import { IApplicationDataSourceAttribute, ApplicationReader } from './ApplicationReader';
-import { ApplicationDataSourceRegistry } from './ApplicationDataSourceRegistry';
-import { Application } from '../application.model';
-import { LOAD_BALANCER_DATA_SOURCE } from '../../loadBalancer/loadBalancer.dataSource';
-import { LOAD_BALANCER_READ_SERVICE, LoadBalancerReader } from '../../loadBalancer/loadBalancer.read.service';
-import { SECURITY_GROUP_READER, SecurityGroupReader } from '../../securityGroup/securityGroupReader.service';
-import { CLUSTER_SERVICE, ClusterService } from '../../cluster/cluster.service';
-import { SERVER_GROUP_DATA_SOURCE } from '../../serverGroup/serverGroup.dataSource';
-import { SECURITY_GROUP_DATA_SOURCE } from '../../securityGroup/securityGroup.dataSource';
 
 describe('ApplicationReader', function () {
   let securityGroupReader: SecurityGroupReader;

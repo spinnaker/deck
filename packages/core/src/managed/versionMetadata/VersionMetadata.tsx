@@ -1,71 +1,72 @@
 import React from 'react';
 
+import type { IVersionMetadataProps } from './MetadataComponents';
 import {
   BaseVersionMetadata,
-  IVersionMetadataProps,
+  LifecycleEventDetails,
   MetadataBadge,
   MetadataElement,
   toVetoedMetadata,
   VersionAuthor,
   VersionBuilds,
-  VersionCreatedAt,
   VersionMessage,
-  VersionMetadataActions,
 } from './MetadataComponents';
 import { formatToRelativeTimestamp, RelativeTimestamp } from '../RelativeTimestamp';
-import { getLifecycleEventDuration, getLifecycleEventLink, getLifecycleEventSummary } from '../overview/artifact/utils';
-import { QueryArtifactVersion } from '../overview/types';
-import { IconTooltip } from '../../presentation';
+import { getLifecycleEventSummary } from '../overview/artifact/utils';
+import type { QueryArtifactVersion } from '../overview/types';
+import { HoverablePopover, Icon, IconTooltip } from '../../presentation';
 import { TOOLTIP_DELAY_SHOW } from '../utils/defaults';
-import { SingleVersionArtifactVersion } from '../versionsHistory/types';
+import type { SingleVersionArtifactVersion } from '../versionsHistory/types';
+
+export const getVersionCompareLinks = (version: QueryArtifactVersion | SingleVersionArtifactVersion) => {
+  return {
+    current: version.gitMetadata?.comparisonLinks?.toCurrentVersion,
+    previous: version.gitMetadata?.comparisonLinks?.toPreviousVersion,
+  };
+};
 
 export const getBaseMetadata = (
   version: QueryArtifactVersion | SingleVersionArtifactVersion,
-): Omit<Partial<IVersionMetadataProps>, 'version'> & Pick<IVersionMetadataProps, 'version'> => {
+): Partial<IVersionMetadataProps> => {
+  // The return type above makes everything optional except for the version
   return {
-    version: version.version,
-    sha: version.gitMetadata?.commit,
     build: {
       buildNumber: version.buildNumber,
-      buildLink: getLifecycleEventLink(version, 'BUILD'),
       version: version.version,
+      ...getLifecycleEventSummary(version, 'BUILD'),
     },
     author: version.gitMetadata?.author,
     deployedAt: version.deployedAt,
-    buildDuration: getLifecycleEventDuration(version, 'BUILD'),
+    isCurrent: version.isCurrent,
     isDeploying: version.status === 'DEPLOYING',
-    baking: getLifecycleEventSummary(version, 'BAKE'),
+    bake: getLifecycleEventSummary(version, 'BAKE'),
     vetoed: version.veto ? toVetoedMetadata(version.veto) : undefined,
   };
 };
 
 export const VersionMetadata = ({
-  version,
-  sha,
   build,
   author,
   deployedAt,
-  createdAt,
-  buildDuration,
-  buildsBehind,
-  baking,
+  isCurrent,
   isDeploying,
+  buildsBehind,
+  bake,
   pinned,
   vetoed,
-  actions,
 }: IVersionMetadataProps) => {
   return (
     <BaseVersionMetadata>
+      {isCurrent && <MetadataBadge type="deployed" />}
       {isDeploying && <MetadataBadge type="deploying" />}
-      {baking?.isRunning && (
+      {bake?.isRunning && (
         <MetadataBadge
           type="baking"
-          link={baking.link}
-          tooltip={`${baking.startedAt ? formatToRelativeTimestamp(baking.startedAt, true) : ''} (Click to view task)`}
+          link={bake.link}
+          tooltip={`${bake.startedAt ? formatToRelativeTimestamp(bake.startedAt, true) : ''} (Click to view task)`}
         />
       )}
       {build?.buildNumber && <VersionBuilds builds={[build]} />}
-      <VersionCreatedAt createdAt={createdAt} linkProps={sha ? { sha } : { version }} />
       <VersionAuthor author={author} />
       {deployedAt && (
         <MetadataElement>
@@ -79,16 +80,19 @@ export const VersionMetadata = ({
           <RelativeTimestamp timestamp={deployedAt} delayShow={TOOLTIP_DELAY_SHOW} removeStyles withSuffix />
         </MetadataElement>
       )}
-      {buildDuration && (
+      {bake?.duration && (
         <MetadataElement>
-          <IconTooltip
-            tooltip="Build duration"
-            name="build"
-            size="12px"
-            wrapperClassName="metadata-icon"
-            delayShow={TOOLTIP_DELAY_SHOW}
-          />
-          {buildDuration}
+          <HoverablePopover
+            delayShow={200}
+            wrapperClassName="vertical"
+            Component={() => (
+              <>
+                <LifecycleEventDetails title="Bake" {...bake} />
+              </>
+            )}
+          >
+            <Icon name="bake" size="13px" />
+          </HoverablePopover>
         </MetadataElement>
       )}
       {buildsBehind ? (
@@ -96,7 +100,6 @@ export const VersionMetadata = ({
           {buildsBehind} build{buildsBehind > 1 ? 's' : ''} behind
         </MetadataElement>
       ) : null}
-      {actions && <VersionMetadataActions id={`${build?.buildNumber}-actions`} actions={actions} />}
       {pinned && <VersionMessage type="pinned" data={pinned} />}
       {vetoed && <VersionMessage type="vetoed" data={vetoed} />}
     </BaseVersionMetadata>

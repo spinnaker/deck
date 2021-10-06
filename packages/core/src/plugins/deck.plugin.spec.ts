@@ -1,7 +1,9 @@
-import { SearchResultType, searchResultTypeRegistry } from '../search/searchResult';
-import { IDeckPlugin, registerPluginExtensions } from './deck.plugin';
+import type { IDeckPlugin } from './deck.plugin';
+import { registerPluginExtensions } from './deck.plugin';
 import { HelpContentsRegistry } from '../help';
 import { Registry } from '../registry';
+import type { SearchResultType } from '../search/searchResult';
+import { searchResultTypeRegistry } from '../search/searchResult';
 
 describe('deck plugin registerPluginExtensions', () => {
   it('returns a promise', async () => {

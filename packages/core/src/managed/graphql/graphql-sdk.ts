@@ -120,6 +120,7 @@ export interface MdConfig {
   updatedAt?: Maybe<Scalars['InstantTime']>;
   rawConfig?: Maybe<Scalars['String']>;
   processedConfig?: Maybe<Scalars['String']>;
+  previewEnvironmentsConfigured?: Maybe<Scalars['Boolean']>;
 }
 
 export interface MdConstraint {
@@ -545,6 +546,7 @@ export type FetchApplicationQueryVariables = Exact<{
 export type FetchApplicationQuery = { __typename?: 'Query' } & {
   application?: Maybe<
     { __typename?: 'MdApplication' } & Pick<MdApplication, 'id' | 'name' | 'account'> & {
+        config?: Maybe<{ __typename?: 'MdConfig' } & Pick<MdConfig, 'id' | 'previewEnvironmentsConfigured'>>;
         environments: Array<
           { __typename?: 'MdEnvironment' } & Pick<MdEnvironment, 'isDeleting'> & {
               state: { __typename?: 'MdEnvironmentState' } & Pick<MdEnvironmentState, 'id'> & {
@@ -828,6 +830,12 @@ export type ImportDeliveryConfigMutationVariables = Exact<{
 
 export type ImportDeliveryConfigMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'importDeliveryConfig'>;
 
+export type ToggleResourceManagementMutationVariables = Exact<{
+  payload?: Maybe<MdToggleResourceManagementPayload>;
+}>;
+
+export type ToggleResourceManagementMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'toggleResourceManagement'>;
+
 export const ActionDetailsFragmentDoc = gql`
   fragment actionDetails on MdAction {
     id
@@ -931,6 +939,10 @@ export const FetchApplicationDocument = gql`
       id
       name
       account
+      config {
+        id
+        previewEnvironmentsConfigured
+      }
       environments {
         ...baseEnvironmentFields
         isDeleting
@@ -1887,4 +1899,46 @@ export type ImportDeliveryConfigMutationResult = Apollo.MutationResult<ImportDel
 export type ImportDeliveryConfigMutationOptions = Apollo.BaseMutationOptions<
   ImportDeliveryConfigMutation,
   ImportDeliveryConfigMutationVariables
+>;
+export const ToggleResourceManagementDocument = gql`
+  mutation ToggleResourceManagement($payload: MdToggleResourceManagementPayload) {
+    toggleResourceManagement(payload: $payload)
+  }
+`;
+export type ToggleResourceManagementMutationFn = Apollo.MutationFunction<
+  ToggleResourceManagementMutation,
+  ToggleResourceManagementMutationVariables
+>;
+
+/**
+ * __useToggleResourceManagementMutation__
+ *
+ * To run a mutation, you first call `useToggleResourceManagementMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useToggleResourceManagementMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [toggleResourceManagementMutation, { data, loading, error }] = useToggleResourceManagementMutation({
+ *   variables: {
+ *      payload: // value for 'payload'
+ *   },
+ * });
+ */
+export function useToggleResourceManagementMutation(
+  baseOptions?: Apollo.MutationHookOptions<ToggleResourceManagementMutation, ToggleResourceManagementMutationVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<ToggleResourceManagementMutation, ToggleResourceManagementMutationVariables>(
+    ToggleResourceManagementDocument,
+    options,
+  );
+}
+export type ToggleResourceManagementMutationHookResult = ReturnType<typeof useToggleResourceManagementMutation>;
+export type ToggleResourceManagementMutationResult = Apollo.MutationResult<ToggleResourceManagementMutation>;
+export type ToggleResourceManagementMutationOptions = Apollo.BaseMutationOptions<
+  ToggleResourceManagementMutation,
+  ToggleResourceManagementMutationVariables
 >;

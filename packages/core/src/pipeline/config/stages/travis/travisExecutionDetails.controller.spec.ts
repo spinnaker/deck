@@ -1,4 +1,5 @@
-import { IScope, IControllerService, IRootScopeService, mock } from 'angular';
+import type { IControllerService, IRootScopeService, IScope } from 'angular';
+import { mock } from 'angular';
 
 import { TRAVIS_EXECUTION_DETAILS_CONTROLLER, TravisExecutionDetailsCtrl } from './travisExecutionDetails.controller';
 
@@ -18,7 +19,9 @@ describe('Travis Execution Details Controller:', () => {
     $scope.stage = stage;
     return $ctrl(TravisExecutionDetailsCtrl, {
       $scope,
-      executionDetailsSectionService: { synchronizeSection: ({}, fn: () => any) => fn() },
+      executionDetailsSectionService: {
+        synchronizeSection: (_availableSections: string[], fn: () => any) => fn(),
+      },
     });
   };
 

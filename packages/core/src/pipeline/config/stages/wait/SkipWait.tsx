@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { Application } from '../../../../application/application.model';
+import type { Application } from '../../../../application/application.model';
 import { ConfirmationModalService } from '../../../../confirmationModal';
-import { IExecution, IExecutionStage } from '../../../../domain';
+import type { IExecution, IExecutionStage } from '../../../../domain';
 import { OrchestratedItemRunningTime } from '../../../executions/execution/OrchestratedItemRunningTime';
 import { ReactInjector } from '../../../../reactShims';
 import { duration } from '../../../../utils/timeFormatters';
@@ -66,11 +66,13 @@ export class SkipWait extends React.Component<ISkipWaitProps, ISkipWaitState> {
 
   public render() {
     const stage = this.props.stage;
+    const waitMs = stage.context.waitTime * 1000;
+
     return (
       <div>
         <div>
           <b>Wait time: </b>
-          {stage.context.waitTime} seconds
+          {stage.context.waitTime > 3600 ? duration(waitMs) : `${stage.context.waitTime} seconds`}
           {stage.context.skipRemainingWait && <span>(skipped after {duration(stage.runningTimeInMs)})</span>}
         </div>
         {stage.isRunning && (

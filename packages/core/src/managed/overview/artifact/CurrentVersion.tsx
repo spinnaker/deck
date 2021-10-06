@@ -1,12 +1,14 @@
 import React from 'react';
 
-import { ArtifactVersionTasks, ITaskArtifactVersionProps } from './ArtifactVersionTasks';
+import type { ITaskArtifactVersionProps } from './ArtifactVersionTasks';
+import { ArtifactVersionTasks } from './ArtifactVersionTasks';
 import { Constraints } from './Constraints';
-import { GitLink } from './GitLink';
-import { QueryArtifactVersion } from '../types';
-import { useCreateVersionActions } from './utils';
-import { VersionMessageData } from '../../versionMetadata/MetadataComponents';
-import { getBaseMetadata, VersionMetadata } from '../../versionMetadata/VersionMetadata';
+import { VersionTitle } from './VersionTitle';
+import { ArtifactActions } from '../../artifactActions/ArtifactActions';
+import type { QueryArtifactVersion } from '../types';
+import { isVersionVetoed, useCreateVersionRollbackActions } from './utils';
+import type { VersionMessageData } from '../../versionMetadata/MetadataComponents';
+import { getBaseMetadata, getVersionCompareLinks, VersionMetadata } from '../../versionMetadata/VersionMetadata';
 
 interface ICurrentVersionProps {
   data: QueryArtifactVersion;
@@ -14,20 +16,29 @@ interface ICurrentVersionProps {
   reference: string;
   numNewerVersions?: number;
   pinned?: VersionMessageData;
+  isPreview?: boolean;
 }
 
-export const CurrentVersion = ({ data, environment, reference, numNewerVersions, pinned }: ICurrentVersionProps) => {
-  const { gitMetadata, constraints, verifications, postDeploy } = data;
-  const actions = useCreateVersionActions({
+export const CurrentVersion = ({
+  data,
+  environment,
+  reference,
+  numNewerVersions,
+  pinned,
+  isPreview,
+}: ICurrentVersionProps) => {
+  const { gitMetadata, constraints, verifications, postDeploy, isCurrent } = data;
+  const actions = useCreateVersionRollbackActions({
     environment,
     reference,
     version: data.version,
-    buildNumber: data.buildNumber,
-    status: data.status,
-    commitMessage: gitMetadata?.commitInfo?.message,
+    isVetoed: isVersionVetoed(data),
     isPinned: Boolean(pinned),
-    compareLinks: {
-      previous: gitMetadata?.comparisonLinks?.toPreviousVersion,
+    isCurrent,
+    selectedVersion: {
+      buildNumber: data.buildNumber,
+      commitMessage: gitMetadata?.commitInfo?.message,
+      commitSha: gitMetadata?.commit,
     },
   });
 
@@ -35,19 +46,22 @@ export const CurrentVersion = ({ data, environment, reference, numNewerVersions,
     environment,
     reference,
     version: data.version,
-    isCurrent: data.isCurrent,
+    isCurrent,
   };
 
   return (
     <div className="artifact-current-version">
-      {gitMetadata ? <GitLink gitMetadata={gitMetadata} /> : <div>Build {data?.version}</div>}
-      <VersionMetadata
-        {...getBaseMetadata(data)}
-        createdAt={data.createdAt}
-        buildsBehind={numNewerVersions}
-        actions={actions}
-        pinned={pinned}
-      />
+      <VersionTitle gitMetadata={gitMetadata} buildNumber={data?.buildNumber} version={data.version} />
+      <VersionMetadata {...getBaseMetadata(data)} buildsBehind={numNewerVersions} pinned={pinned} />
+      {!isPreview && (
+        <ArtifactActions
+          buildNumber={data?.buildNumber}
+          version={data.version}
+          actions={actions}
+          compareLinks={getVersionCompareLinks(data)}
+          className="sp-margin-s-yaxis"
+        />
+      )}
       {constraints && (
         <Constraints constraints={constraints} versionProps={{ environment, reference, version: data.version }} />
       )}

@@ -4,8 +4,9 @@ import { Resource } from './Resource';
 import { Artifact } from './artifact/Artifact';
 import { BaseEnvironment } from '../environmentBaseElements/BaseEnvironment';
 import { useFetchResourceStatusQuery } from '../graphql/graphql-sdk';
-import { CollapsibleSection, ICollapsibleSectionProps, useApplicationContextSafe } from '../../presentation';
-import { QueryEnvironment } from './types';
+import type { ICollapsibleSectionProps } from '../../presentation';
+import { CollapsibleSection, useApplicationContextSafe } from '../../presentation';
+import type { QueryEnvironment } from './types';
 
 const sectionProps: Partial<ICollapsibleSectionProps> = {
   outerDivClassName: 'environment-section',
@@ -23,6 +24,7 @@ export const EnvironmentOverview = ({ environment }: IEnvironmentProps) => {
   const resources = data?.application?.environments.find((env) => env.name === environment.name)?.state.resources;
   const hasResourcesWithIssues = resources?.some((resource) => resource.state?.status !== 'UP_TO_DATE');
   const state = environment.state;
+
   return (
     <BaseEnvironment
       name={environment.name}
@@ -33,7 +35,9 @@ export const EnvironmentOverview = ({ environment }: IEnvironmentProps) => {
     >
       <CollapsibleSection heading="Artifacts" {...sectionProps} defaultExpanded enableCaching={false}>
         {state.artifacts?.length ? (
-          state.artifacts.map((artifact) => <Artifact key={artifact.reference} artifact={artifact} />)
+          state.artifacts.map((artifact) => (
+            <Artifact key={artifact.reference} artifact={artifact} isPreview={environment.isPreview} />
+          ))
         ) : (
           <NoItemsMessage>No artifacts found</NoItemsMessage>
         )}

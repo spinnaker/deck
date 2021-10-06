@@ -2,13 +2,11 @@ import { filter, find, get, orderBy } from 'lodash';
 import React from 'react';
 import { Dropdown, MenuItem, Tooltip } from 'react-bootstrap';
 
+import type { IOwnerOption, IServerGroupActionsProps, IServerGroupJob } from '@spinnaker/core';
 import {
   AddEntityTagLinks,
   ClusterTargetBuilder,
   ConfirmationModalService,
-  IOwnerOption,
-  IServerGroupActionsProps,
-  IServerGroupJob,
   ManagedMenuItem,
   ModalInjector,
   Overridable,
@@ -17,14 +15,13 @@ import {
   SETTINGS,
 } from '@spinnaker/core';
 
-import { IAmazonServerGroupCommand } from '../configure';
+import { AWSProviderSettings } from '../../aws.settings';
+import type { IAmazonServerGroupCommand } from '../configure';
 import { AmazonCloneServerGroupModal } from '../configure/wizard/AmazonCloneServerGroupModal';
-import { IAmazonServerGroup, IAmazonServerGroupView } from '../../domain';
+import type { IAmazonServerGroup, IAmazonServerGroupView } from '../../domain';
 import { AwsReactInjector } from '../../reactShims';
-import {
-  AmazonResizeServerGroupModal,
-  IAmazonResizeServerGroupModalProps,
-} from './resize/AmazonResizeServerGroupModal';
+import type { IAmazonResizeServerGroupModalProps } from './resize/AmazonResizeServerGroupModal';
+import { AmazonResizeServerGroupModal } from './resize/AmazonResizeServerGroupModal';
 
 export interface IAmazonServerGroupActionsProps extends IServerGroupActionsProps {
   serverGroup: IAmazonServerGroupView;
@@ -289,54 +286,58 @@ export class AmazonServerGroupActions extends React.Component<IAmazonServerGroup
     const entityTagTargets: IOwnerOption[] = ClusterTargetBuilder.buildClusterTargets(serverGroup);
 
     return (
-      <Dropdown className="dropdown" id="server-group-actions-dropdown">
-        <Dropdown.Toggle className="btn btn-sm btn-primary dropdown-toggle">Server Group Actions</Dropdown.Toggle>
-        <Dropdown.Menu className="dropdown-menu">
-          {this.isRollbackEnabled() && (
-            <ManagedMenuItem resource={serverGroup} application={app} onClick={this.rollbackServerGroup}>
-              Rollback
-            </ManagedMenuItem>
-          )}
-          {this.isRollbackEnabled() && <li role="presentation" className="divider" />}
-          <AmazonServerGroupActionsResize application={app} serverGroup={serverGroup} />
-          {!serverGroup.isDisabled && (
-            <ManagedMenuItem resource={serverGroup} application={app} onClick={this.disableServerGroup}>
-              Disable
-            </ManagedMenuItem>
-          )}
-          {this.hasDisabledInstances() && !this.isEnableLocked() && (
-            <ManagedMenuItem resource={serverGroup} application={app} onClick={this.enableServerGroup}>
-              Enable
-            </ManagedMenuItem>
-          )}
-          {this.isEnableLocked() && (
-            <li className="disabled">
-              <Tooltip value="Cannot enable this server group until resize operation completes" placement="left">
-                <a>
-                  <span className="small glyphicon glyphicon-lock" /> Enable
+      <>
+        {AWSProviderSettings.adHocInfraWritesEnabled && (
+          <Dropdown className="dropdown" id="server-group-actions-dropdown">
+            <Dropdown.Toggle className="btn btn-sm btn-primary dropdown-toggle">Server Group Actions</Dropdown.Toggle>
+            <Dropdown.Menu className="dropdown-menu">
+              {this.isRollbackEnabled() && (
+                <ManagedMenuItem resource={serverGroup} application={app} onClick={this.rollbackServerGroup}>
+                  Rollback
+                </ManagedMenuItem>
+              )}
+              {this.isRollbackEnabled() && <li role="presentation" className="divider" />}
+              <AmazonServerGroupActionsResize application={app} serverGroup={serverGroup} />
+              {!serverGroup.isDisabled && (
+                <ManagedMenuItem resource={serverGroup} application={app} onClick={this.disableServerGroup}>
+                  Disable
+                </ManagedMenuItem>
+              )}
+              {this.hasDisabledInstances() && !this.isEnableLocked() && (
+                <ManagedMenuItem resource={serverGroup} application={app} onClick={this.enableServerGroup}>
+                  Enable
+                </ManagedMenuItem>
+              )}
+              {this.isEnableLocked() && (
+                <li className="disabled">
+                  <Tooltip value="Cannot enable this server group until resize operation completes" placement="left">
+                    <a>
+                      <span className="small glyphicon glyphicon-lock" /> Enable
+                    </a>
+                  </Tooltip>
+                </li>
+              )}
+              <ManagedMenuItem resource={serverGroup} application={app} onClick={this.destroyServerGroup}>
+                Destroy
+              </ManagedMenuItem>
+              <li>
+                <a className="clickable" onClick={this.cloneServerGroup}>
+                  Clone
                 </a>
-              </Tooltip>
-            </li>
-          )}
-          <ManagedMenuItem resource={serverGroup} application={app} onClick={this.destroyServerGroup}>
-            Destroy
-          </ManagedMenuItem>
-          <li>
-            <a className="clickable" onClick={this.cloneServerGroup}>
-              Clone
-            </a>
-          </li>
-          {showEntityTags && (
-            <AddEntityTagLinks
-              component={serverGroup}
-              application={app}
-              entityType="serverGroup"
-              ownerOptions={entityTagTargets}
-              onUpdate={() => app.serverGroups.refresh()}
-            />
-          )}
-        </Dropdown.Menu>
-      </Dropdown>
+              </li>
+              {showEntityTags && (
+                <AddEntityTagLinks
+                  component={serverGroup}
+                  application={app}
+                  entityType="serverGroup"
+                  ownerOptions={entityTagTargets}
+                  onUpdate={() => app.serverGroups.refresh()}
+                />
+              )}
+            </Dropdown.Menu>
+          </Dropdown>
+        )}
+      </>
     );
   }
 }

@@ -1,7 +1,9 @@
-import { IQService, IRequestConfig, IRootScopeService, mock } from 'angular';
+import type { IQService, IRequestConfig, IRootScopeService } from 'angular';
+import { mock } from 'angular';
 
-import { AUTHENTICATION_INTERCEPTOR_SERVICE, AuthenticationInterceptor } from './authentication.interceptor.service';
 import { AuthenticationService } from './AuthenticationService';
+import type { AuthenticationInterceptor } from './authentication.interceptor.service';
+import { AUTHENTICATION_INTERCEPTOR_SERVICE } from './authentication.interceptor.service';
 import { SETTINGS } from '../config/settings';
 
 describe('authenticationInterceptor', function () {

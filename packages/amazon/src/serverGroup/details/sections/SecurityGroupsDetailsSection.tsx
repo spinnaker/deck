@@ -2,16 +2,11 @@ import { UISref } from '@uirouter/react';
 import { chain, find, sortBy } from 'lodash';
 import React from 'react';
 
-import {
-  CollapsibleSection,
-  confirmNotManaged,
-  FirewallLabels,
-  ISecurityGroup,
-  ISecurityGroupsByAccount,
-  ModalInjector,
-} from '@spinnaker/core';
+import type { ISecurityGroup, ISecurityGroupsByAccount } from '@spinnaker/core';
+import { CollapsibleSection, confirmNotManaged, FirewallLabels, ModalInjector } from '@spinnaker/core';
 
-import { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
+import type { IAmazonServerGroupDetailsSectionProps } from './IAmazonServerGroupDetailsSectionProps';
+import { AWSProviderSettings } from '../../../aws.settings';
 import { AwsSecurityGroupReader } from '../../../securityGroup/securityGroup.reader';
 
 export interface ISecurityGroupsDetailsSectionState {
@@ -113,7 +108,7 @@ export class SecurityGroupsDetailsSection extends React.Component<
             </li>
           ))}
         </ul>
-        {serverGroup.vpcId && (
+        {AWSProviderSettings.adHocInfraWritesEnabled && serverGroup.vpcId && (
           <a className="clickable" onClick={this.updateSecurityGroups}>
             Edit {FirewallLabels.get('Firewalls')}
           </a>
