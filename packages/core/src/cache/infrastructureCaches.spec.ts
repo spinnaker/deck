@@ -1,9 +1,9 @@
-import { CacheFactory, CacheOptions } from 'cachefactory';
+import type { CacheFactory, CacheOptions } from 'cachefactory';
 
-import { noop } from '../utils';
-
+import type { ICache, ICacheConfig } from './deckCacheFactory';
+import { DeckCacheFactory } from './deckCacheFactory';
 import { InfrastructureCaches } from './infrastructureCaches';
-import { DeckCacheFactory, ICacheConfig, ICache } from './deckCacheFactory';
+import { noop } from '../utils';
 
 interface ICacheInstantiation {
   cacheId: string;

@@ -1,10 +1,11 @@
-import { IQProvider, mock } from 'angular';
+import type { IQProvider } from 'angular';
+import { mock } from 'angular';
 
-import { Application } from '../application/application.model';
+import type { Application } from '../application/application.model';
 import { ApplicationModelBuilder } from '../application/applicationModel.builder';
 import { ApplicationDataSourceRegistry } from '../application/service/ApplicationDataSourceRegistry';
-import { EXECUTION_SERVICE } from './service/execution.service';
 import { PipelineConfigService } from './config/services/PipelineConfigService';
+import { EXECUTION_SERVICE } from './service/execution.service';
 
 describe('Pipeline Data Source', function () {
   let application: Application, executionService: any, $scope: ng.IScope, $q: ng.IQService;
@@ -93,8 +94,8 @@ describe('Pipeline Data Source', function () {
 
     it('sets appropriate flags when executions reload fails; subscriber is responsible for error checking', function () {
       spyOn(executionService, 'getExecutions').and.returnValue($q.reject(null));
-      let errorsHandled = 0,
-        successesHandled = 0;
+      let errorsHandled = 0;
+      let successesHandled = 0;
       configureApplication();
       application.getDataSource('executions').activate();
 
@@ -141,8 +142,8 @@ describe('Pipeline Data Source', function () {
     it('sets appropriate flags when pipeline config reload fails; subscriber is responsible for error checking', function () {
       spyOn(PipelineConfigService, 'getPipelinesForApplication').and.returnValue($q.when([]));
       spyOn(PipelineConfigService, 'getStrategiesForApplication').and.returnValue($q.reject([]));
-      let errorsHandled = 0,
-        successesHandled = 0;
+      let errorsHandled = 0;
+      let successesHandled = 0;
       configureApplication();
       application.getDataSource('pipelineConfigs').activate();
 
