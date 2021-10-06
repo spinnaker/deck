@@ -23,8 +23,10 @@ export interface IInstanceTypeTableProps {
 }
 
 export function InstanceTypeTable(props: IInstanceTypeTableProps) {
+  const { currentProfile, selectedInstanceTypesMap } = props;
+
   const handleSortEnd = (sortEnd: SortEnd): void => {
-    const sortedInstanceTypes: string[] = Array.from(props.selectedInstanceTypesMap.values())
+    const sortedInstanceTypes: string[] = Array.from(selectedInstanceTypesMap.values())
       .sort((i1, i2) => i1.priority - i2.priority)
       .map((it) => it.instanceType);
     const instanceTypesInNewOrder = arrayMove(sortedInstanceTypes, sortEnd.oldIndex, sortEnd.newIndex);
@@ -33,26 +35,26 @@ export function InstanceTypeTable(props: IInstanceTypeTableProps) {
   };
 
   const updatePriorityForSelectedTypes = (instanceTypesInNewOrder: string[]): void => {
-    props.selectedInstanceTypesMap.forEach((value, key) => {
+    selectedInstanceTypesMap.forEach((value, key) => {
       const newPriority = 1 + instanceTypesInNewOrder.indexOf(key);
       if (value.priority !== newPriority) {
         value.priority = newPriority;
       }
     });
-    props.handleInstanceTypesChange(Array.from(props.selectedInstanceTypesMap.values()));
+    props.handleInstanceTypesChange(Array.from(selectedInstanceTypesMap.values()));
   };
 
   const removeInstanceType = (instanceType: string): void => {
-    const selectedInstanceTypesMapNew = new Map(props.selectedInstanceTypesMap);
+    const selectedInstanceTypesMapNew = new Map(selectedInstanceTypesMap);
     selectedInstanceTypesMapNew.delete(instanceType);
     props.handleInstanceTypesChange(Array.from(selectedInstanceTypesMapNew.values()));
   };
 
   const addOrUpdateInstanceType = (type: string, weight: string) => {
     const weightNum = Number(weight);
-    const itemToUpdate = props.selectedInstanceTypesMap.has(type)
+    const itemToUpdate = selectedInstanceTypesMap.has(type)
       ? {
-          ...props.selectedInstanceTypesMap.get(type), // update existing item
+          ...selectedInstanceTypesMap.get(type), // update existing item
           weightedCapacity: !_.isNaN(weightNum) && weightNum !== 0 ? weightNum : undefined,
         }
       : {
@@ -60,46 +62,43 @@ export function InstanceTypeTable(props: IInstanceTypeTableProps) {
           weightedCapacity: !_.isNaN(weightNum) && weightNum !== 0 ? weightNum : undefined,
           priority:
             1 +
-            Array.from(props.selectedInstanceTypesMap.values()).reduce(
+            Array.from(selectedInstanceTypesMap.values()).reduce(
               (max, it) => (it.priority > max ? it.priority : max),
               0,
             ),
         };
-    props.selectedInstanceTypesMap.set(type, itemToUpdate);
-    props.handleInstanceTypesChange(Array.from(props.selectedInstanceTypesMap.values()));
+    selectedInstanceTypesMap.set(type, itemToUpdate);
+    props.handleInstanceTypesChange(Array.from(selectedInstanceTypesMap.values()));
   };
 
   const isCpuCreditsEnabled: boolean = AWSProviderSettings.serverGroups?.enableCpuCredits;
-  const selectedInstanceTypeNames = Array.from(props.selectedInstanceTypesMap.keys());
+  const selectedInstanceTypeNames = Array.from(selectedInstanceTypesMap.keys());
   const cpuCreditsToggle = (
     <div>
       <CpuCreditsToggle
         unlimitedCpuCredits={props.unlimitedCpuCreditsInCmd}
-        currentProfile={props.currentProfile}
+        currentProfile={currentProfile}
         selectedInstanceTypes={selectedInstanceTypeNames}
         setUnlimitedCpuCredits={props.setUnlimitedCpuCredits}
       />
     </div>
   );
 
-  if (props.currentProfile && props.currentProfile !== 'custom') {
+  if (currentProfile && currentProfile !== 'custom') {
+    const { label, descriptionListOverride, families, showCpuCredits } = props.profileDetails;
     return (
       <div className={'row sub-section'}>
         <NonCustomHeading
-          profileLabel={props.profileDetails.label}
-          profileDescriptionArr={
-            props.profileDetails.descriptionListOverride
-              ? props.profileDetails.descriptionListOverride
-              : props.profileDetails.families.map((f) => f.description)
-          }
+          profileLabel={label}
+          profileDescriptionArr={descriptionListOverride ? descriptionListOverride : families.map((f) => f.description)}
         />
         {isCpuCreditsEnabled && cpuCreditsToggle}
         <table className="table table-hover">
-          <NonCustomTableHeader showCpuCredits={props.profileDetails.showCpuCredits} />
+          <NonCustomTableHeader showCpuCredits={showCpuCredits} />
           <InstanceTypeTableBody
             isCustom={false}
-            profileFamiliesDetails={props.profileDetails.families}
-            selectedInstanceTypesMap={props.selectedInstanceTypesMap}
+            profileFamiliesDetails={families}
+            selectedInstanceTypesMap={selectedInstanceTypesMap}
             addOrUpdateInstanceType={addOrUpdateInstanceType}
             removeInstanceType={removeInstanceType}
             handleSortEnd={handleSortEnd}
@@ -116,7 +115,7 @@ export function InstanceTypeTable(props: IInstanceTypeTableProps) {
           <CustomTableHeader />
           <InstanceTypeTableBody
             isCustom={true}
-            selectedInstanceTypesMap={props.selectedInstanceTypesMap}
+            selectedInstanceTypesMap={selectedInstanceTypesMap}
             addOrUpdateInstanceType={addOrUpdateInstanceType}
             removeInstanceType={removeInstanceType}
             handleSortEnd={handleSortEnd}

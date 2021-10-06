@@ -21,45 +21,45 @@ export interface IAdvancedModeSelectorProps {
  * Note: Launch templates support is expected to be enabled if this component is rendered.
  */
 export function AdvancedModeSelector(props: IAdvancedModeSelectorProps) {
-  const multipleInstanceTypesInProps = props.command.launchTemplateOverridesForInstanceType;
+  const { command, instanceTypeDetails, setUnlimitedCpuCredits, setFieldValue } = props;
+  const instanceTypesInProps: IAmazonInstanceTypeOverride[] = command.launchTemplateOverridesForInstanceType
+    ? command.launchTemplateOverridesForInstanceType
+    : [{ instanceType: command.instanceType }]; // needed for the case of MixedInstancesPolicy without overrides
 
   const selectedInstanceTypesMap = new Map<string, IAmazonInstanceTypeOverride>(
-    Object.entries(_.keyBy(multipleInstanceTypesInProps, 'instanceType')),
+    Object.entries(_.keyBy(instanceTypesInProps, 'instanceType')),
   );
 
-  const [instanceProfile, setInstanceProfile] = useState(props.command.viewState.instanceProfile || 'custom');
+  const [instanceProfile, setInstanceProfile] = useState(command.viewState.instanceProfile || 'custom');
   const prevInstanceProfile = usePrevious(instanceProfile);
 
   const handleProfileChange = (newProfile: string) => {
     setInstanceProfile(newProfile);
-    props.setFieldValue('viewState', {
-      ...props.command.viewState,
+    setFieldValue('viewState', {
+      ...command.viewState,
       instanceProfile: newProfile,
     });
 
     // update instance types on profile change
     const hasProfileChanged = prevInstanceProfile && newProfile && prevInstanceProfile !== newProfile;
-    const isInstanceTypesUpdateNeeded =
-      newProfile !== 'custom' && multipleInstanceTypesInProps && multipleInstanceTypesInProps.length;
+    const isInstanceTypesUpdateNeeded = newProfile !== 'custom' && instanceTypesInProps && instanceTypesInProps.length;
     if (hasProfileChanged && isInstanceTypesUpdateNeeded) {
       const instanceTypesInProfile: string[] = AwsReactInjector.awsInstanceTypeService.getInstanceTypesInCategory(
-        multipleInstanceTypesInProps.map((it) => it.instanceType),
+        instanceTypesInProps.map((it) => it.instanceType),
         newProfile,
       );
-      const newMultipleTypes = multipleInstanceTypesInProps.filter((o) =>
-        instanceTypesInProfile.includes(o.instanceType),
-      );
-      props.setFieldValue('launchTemplateOverridesForInstanceType', newMultipleTypes);
-      props.command.instanceTypesChanged(props.command);
+      const newMultipleTypes = instanceTypesInProps.filter((o) => instanceTypesInProfile.includes(o.instanceType));
+      setFieldValue('launchTemplateOverridesForInstanceType', newMultipleTypes);
+      command.launchTemplateOverridesChanged(command);
     }
   };
 
   const handleInstanceTypesChange = (types: IAmazonInstanceTypeOverride[]): void => {
-    props.setFieldValue('launchTemplateOverridesForInstanceType', types);
-    props.command.instanceTypesChanged(props.command);
+    setFieldValue('launchTemplateOverridesForInstanceType', types);
+    command.launchTemplateOverridesChanged(command);
   };
 
-  if (!(props.instanceTypeDetails && props.instanceTypeDetails.length > 0)) {
+  if (!(instanceTypeDetails && instanceTypeDetails.length > 0)) {
     return null;
   }
 
@@ -68,30 +68,27 @@ export function AdvancedModeSelector(props: IAdvancedModeSelectorProps) {
       <InstanceProfileSelector
         currentProfile={instanceProfile}
         handleProfileChange={handleProfileChange}
-        instanceProfileList={props.instanceTypeDetails}
+        instanceProfileList={instanceTypeDetails}
       />
       <InstancesDistribution
-        onDemandAllocationStrategy={props.command.onDemandAllocationStrategy}
-        onDemandBaseCapacity={props.command.onDemandBaseCapacity}
-        onDemandPercentageAboveBaseCapacity={props.command.onDemandPercentageAboveBaseCapacity}
-        spotAllocationStrategy={props.command.spotAllocationStrategy}
-        spotInstancePools={props.command.spotInstancePools}
-        spotMaxPrice={props.command.spotPrice}
-        setFieldValue={props.setFieldValue}
+        onDemandAllocationStrategy={command.onDemandAllocationStrategy}
+        onDemandBaseCapacity={command.onDemandBaseCapacity}
+        onDemandPercentageAboveBaseCapacity={command.onDemandPercentageAboveBaseCapacity}
+        spotAllocationStrategy={command.spotAllocationStrategy}
+        spotInstancePools={command.spotInstancePools}
+        spotMaxPrice={command.spotPrice}
+        setFieldValue={setFieldValue}
       />
       <InstanceTypeTable
         currentProfile={instanceProfile}
         selectedInstanceTypesMap={selectedInstanceTypesMap}
-        unlimitedCpuCreditsInCmd={props.command.unlimitedCpuCredits}
-        profileDetails={props.instanceTypeDetails.find((p) => p.type === instanceProfile)}
+        unlimitedCpuCreditsInCmd={command.unlimitedCpuCredits}
+        profileDetails={instanceTypeDetails.find((p) => p.type === instanceProfile)}
         availableInstanceTypesList={
-          (props.command.backingData &&
-            props.command.backingData.filtered &&
-            props.command.backingData.filtered.instanceTypes) ||
-          []
+          (command.backingData && command.backingData.filtered && command.backingData.filtered.instanceTypes) || []
         }
         handleInstanceTypesChange={handleInstanceTypesChange}
-        setUnlimitedCpuCredits={props.setUnlimitedCpuCredits}
+        setUnlimitedCpuCredits={setUnlimitedCpuCredits}
       />
     </div>
   );
