@@ -3,6 +3,170 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.2](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.14.1...@spinnaker/core@0.14.2) (2021-10-05)
+
+
+### Bug Fixes
+
+* **md:** build links ([#9743](https://github.com/spinnaker/deck/issues/9743)) ([b7397f1](https://github.com/spinnaker/deck/commit/b7397f1b5a7e7b175fc601ba6a8512bfd9fd9361))
+
+
+
+
+
+## [0.14.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.14.0...@spinnaker/core@0.14.1) (2021-10-01)
+
+**Note:** Version bump only for package @spinnaker/core
+
+
+
+
+
+# [0.14.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.12.0...@spinnaker/core@0.14.0) (2021-09-30)
+
+
+### Bug Fixes
+
+* bump @types/react to 16.14.10 ([bb62b99](https://github.com/spinnaker/deck/commit/bb62b991514c2a81fbdf467c01f3ce7467f71718))
+* **core/presentation:** Remove return value from useEffect in useMountStatusRef ([b238b9c](https://github.com/spinnaker/deck/commit/b238b9c2357ed33e44bbcd48cffe6255c923dd5c))
+
+
+### Features
+
+* **aws/infrastructure:** Hide aws ad hoc infrastructure action buttons ([#9712](https://github.com/spinnaker/deck/issues/9712)) ([7202efd](https://github.com/spinnaker/deck/commit/7202efd54ad0b048d5c1f45c24162619b25be844))
+* **md:** clean artifact version details by moving the bake and build details to a popover ([#9715](https://github.com/spinnaker/deck/issues/9715)) ([0f2480e](https://github.com/spinnaker/deck/commit/0f2480ec6718730ae58c592f894e6b78dcb67a5d))
+
+
+
+
+
+# [0.13.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.12.0...@spinnaker/core@0.13.0) (2021-09-30)
+
+
+### Bug Fixes
+
+* bump @types/react to 16.14.10 ([bb62b99](https://github.com/spinnaker/deck/commit/bb62b991514c2a81fbdf467c01f3ce7467f71718))
+* **core/presentation:** Remove return value from useEffect in useMountStatusRef ([b238b9c](https://github.com/spinnaker/deck/commit/b238b9c2357ed33e44bbcd48cffe6255c923dd5c))
+
+
+### Features
+
+* **aws/infrastructure:** Hide aws ad hoc infrastructure action buttons ([#9712](https://github.com/spinnaker/deck/issues/9712)) ([7202efd](https://github.com/spinnaker/deck/commit/7202efd54ad0b048d5c1f45c24162619b25be844))
+* **md:** clean artifact version details by moving the bake and build details to a popover ([#9715](https://github.com/spinnaker/deck/issues/9715)) ([0f2480e](https://github.com/spinnaker/deck/commit/0f2480ec6718730ae58c592f894e6b78dcb67a5d))
+
+
+
+
+
+# [0.12.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.7...@spinnaker/core@0.12.0) (2021-09-29)
+
+
+### Bug Fixes
+
+* **core:** Ensure text is stringin CopyToClipboard ([#9704](https://github.com/spinnaker/deck/issues/9704)) ([78da1d8](https://github.com/spinnaker/deck/commit/78da1d8fd2a98533fd202506369d320207e45fc8))
+* **kubernetes:** hide ad-hoc infrastructure action buttons when spinnaker has multiple accounts ([#9707](https://github.com/spinnaker/deck/issues/9707)) ([337ec29](https://github.com/spinnaker/deck/commit/337ec291494bc8d7ff863cd2a44ce38ab98229c1))
+
+
+### Features
+
+* **md:** added a default component if preview environments configured but don't exist ([#9713](https://github.com/spinnaker/deck/issues/9713)) ([9432fd0](https://github.com/spinnaker/deck/commit/9432fd0e5419b0c2015f1b968b95c305acb928e1))
+
+
+
+
+
+## [0.11.7](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.6...@spinnaker/core@0.11.7) (2021-09-24)
+
+
+### Bug Fixes
+
+* **core/cloudProvider:** remove unused ICloudProviderLogoState interface ([57d606c](https://github.com/spinnaker/deck/commit/57d606cb2442b5eb1e465b3cd5bc9f5235ae9d92))
+* **core:** previous commit updated the font to sans serif 3, but not the styleguide. ([#9700](https://github.com/spinnaker/deck/issues/9700)) ([b01afa9](https://github.com/spinnaker/deck/commit/b01afa95ca19455e7a316844101f080adef99ca9))
+* **md:** allow users to enable resource management ([#9690](https://github.com/spinnaker/deck/issues/9690)) ([455be38](https://github.com/spinnaker/deck/commit/455be38a5fee8fbcb2345b6026844e00923418fb))
+
+
+
+
+
+## [0.11.6](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.5...@spinnaker/core@0.11.6) (2021-09-23)
+
+
+### Bug Fixes
+
+* **md:** notify users on error in mutation ([#9691](https://github.com/spinnaker/deck/issues/9691)) ([ad99afb](https://github.com/spinnaker/deck/commit/ad99afbef6fa55bb570d8c2530667b24b2d02c79))
+
+
+
+
+
+## [0.11.5](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.4...@spinnaker/core@0.11.5) (2021-09-23)
+
+
+### Bug Fixes
+
+* **aws/lambda:** Fix functions icon on menu ([#9686](https://github.com/spinnaker/deck/issues/9686)) ([9e6aae3](https://github.com/spinnaker/deck/commit/9e6aae34af206ea6d280fac1b892d7aba7f38abc))
+* **pipelines:** Reduce pipelineConfig fetches ([#9677](https://github.com/spinnaker/deck/issues/9677)) ([106d00b](https://github.com/spinnaker/deck/commit/106d00b942ce19c5a316a130963c411171893108))
+
+
+
+
+
+## [0.11.4](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.3...@spinnaker/core@0.11.4) (2021-09-21)
+
+
+### Bug Fixes
+
+* **md:** render resource status as markdown ([#9674](https://github.com/spinnaker/deck/issues/9674)) ([9f3d12f](https://github.com/spinnaker/deck/commit/9f3d12f3df97f33723b5287ccac5202cd4e2f8c4))
+
+
+
+
+
+## [0.11.3](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.2...@spinnaker/core@0.11.3) (2021-09-18)
+
+
+### Bug Fixes
+
+* **md:** fix version message style ([#9671](https://github.com/spinnaker/deck/issues/9671)) ([c5ff99a](https://github.com/spinnaker/deck/commit/c5ff99ac472645fdb5f931e221bc4d475335c086))
+
+
+
+
+
+## [0.11.2](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.1...@spinnaker/core@0.11.2) (2021-09-18)
+
+
+### Bug Fixes
+
+* **md:** replaced status with statusSummary ([#9669](https://github.com/spinnaker/deck/issues/9669)) ([4defe7f](https://github.com/spinnaker/deck/commit/4defe7f3df71c201533bda4f103e63b116859a96))
+
+
+
+
+
+## [0.11.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.0...@spinnaker/core@0.11.1) (2021-09-16)
+
+
+### Bug Fixes
+
+* **core:** break words in notifications to prevent overflow ([#9665](https://github.com/spinnaker/deck/issues/9665)) ([9e15cc7](https://github.com/spinnaker/deck/commit/9e15cc7aaba7eb88bff64a1d618758de4e6476dd))
+* **md:** Added DELETING state to resource states.  ([#9659](https://github.com/spinnaker/deck/issues/9659)) ([dc36ccd](https://github.com/spinnaker/deck/commit/dc36ccdebdb1c2e20ac1f594f6b8418f470f3076))
+
+
+
+
+
+# [0.11.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.10.0...@spinnaker/core@0.11.0) (2021-09-15)
+
+
+### Features
+
+* **md:** display manifest path and make it configurable ([#9657](https://github.com/spinnaker/deck/issues/9657)) ([c7faaef](https://github.com/spinnaker/deck/commit/c7faaef01ae89b6103f37fa0087a94e33c658d8c))
+
+
+
+
+
 # [0.10.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.9.1...@spinnaker/core@0.10.0) (2021-09-14)
 
 

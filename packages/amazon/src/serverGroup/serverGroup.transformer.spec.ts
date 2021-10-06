@@ -1,7 +1,9 @@
-import { mock, IQService, IRootScopeService, IScope } from 'angular';
+import type { IQService, IRootScopeService, IScope } from 'angular';
+import { mock } from 'angular';
 
-import { AWS_SERVER_GROUP_TRANSFORMER, AwsServerGroupTransformer } from './serverGroup.transformer';
-import { IScalingPolicyAlarmView, IAmazonServerGroup, IStepAdjustment } from '../domain';
+import type { IAmazonServerGroup, IScalingPolicyAlarmView, IStepAdjustment } from '../domain';
+import type { AwsServerGroupTransformer } from './serverGroup.transformer';
+import { AWS_SERVER_GROUP_TRANSFORMER } from './serverGroup.transformer';
 import { VpcReader } from '../vpc/VpcReader';
 
 describe('awsServerGroupTransformer', () => {

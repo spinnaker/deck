@@ -1,7 +1,8 @@
 import { mock } from 'angular';
 
+import type { ConfigSectionFooterController } from './configSectionFooter.component';
+import { CONFIG_SECTION_FOOTER } from './configSectionFooter.component';
 import { ApplicationWriter } from '../../service/ApplicationWriter';
-import { CONFIG_SECTION_FOOTER, ConfigSectionFooterController } from './configSectionFooter.component';
 
 describe('Component: ConfigSectionFooter', () => {
   let $componentController: ng.IComponentControllerService,

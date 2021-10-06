@@ -2,12 +2,14 @@ import React from 'react';
 
 import { Illustration } from '@spinnaker/presentation';
 import { logger } from '../../../utils';
-import { ActionModal, IArtifactActionModalProps } from '../../utils/ActionModal';
+import type { IArtifactActionModalProps } from '../../utils/ActionModal';
+import { ActionModal } from '../../utils/ActionModal';
+import { getDocsUrl } from '../../utils/defaults';
 
 type InternalModalProps = Omit<IArtifactActionModalProps, 'logCategory'> & { application: string };
 
-const MARK_BAD_DOCS_URL = 'https://www.spinnaker.io/guides/user/managed-delivery/marking-as-bad/';
-const PINNING_DOCS_URL = 'https://www.spinnaker.io/guides/user/managed-delivery/pinning';
+const MARK_BAD_DOCS_URL = getDocsUrl('markAsBad');
+const PINNING_DOCS_URL = getDocsUrl('pinning');
 
 export const PinActionModal = ({ application, ...props }: InternalModalProps) => {
   return (

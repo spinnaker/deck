@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/spinnaker/deck/compare/@spinnaker/pluginsdk@0.1.2...@spinnaker/pluginsdk@0.2.0) (2021-10-01)
+
+
+### Features
+
+* **scripts:** make yarn clean delegate to all lerna packages ([3793778](https://github.com/spinnaker/deck/commit/3793778dfefdefd496cf3a9f6032d5c7ff210da9))
+
+
+
+
+
+## [0.1.2](https://github.com/spinnaker/deck/compare/@spinnaker/pluginsdk@0.1.0...@spinnaker/pluginsdk@0.1.2) (2021-09-30)
+
+**Note:** Version bump only for package @spinnaker/pluginsdk
+
+
+
+
+
+## [0.1.1](https://github.com/spinnaker/deck/compare/@spinnaker/pluginsdk@0.1.0...@spinnaker/pluginsdk@0.1.1) (2021-09-30)
+
+**Note:** Version bump only for package @spinnaker/pluginsdk
+
+
+
+
+
+# [0.1.0](https://github.com/spinnaker/deck/compare/@spinnaker/pluginsdk@0.0.42...@spinnaker/pluginsdk@0.1.0) (2021-09-24)
+
+
+### Features
+
+* **packages/pluginsdk:** Migrate to @spinnaker/scripts/read-write-json instead of embedded write-json script ([21c0916](https://github.com/spinnaker/deck/commit/21c0916c393b6b1ad136ba8d94dd7f74c23d8367))
+
+
+
+
+
 ## [0.0.42](https://github.com/spinnaker/deck/compare/@spinnaker/pluginsdk@0.0.41...@spinnaker/pluginsdk@0.0.42) (2021-08-20)
 
 **Note:** Version bump only for package @spinnaker/pluginsdk

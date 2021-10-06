@@ -1,8 +1,10 @@
+import type { ReactWrapper } from 'enzyme';
+import { mount } from 'enzyme';
 import React from 'react';
-import { ReactWrapper, mount } from 'enzyme';
 
+import type { ISearchProps } from './Search';
+import { Search } from './Search';
 import { SearchFilterTypeRegistry } from './SearchFilterTypeRegistry';
-import { ISearchProps, Search } from './Search';
 
 describe('<Search/>', () => {
   SearchFilterTypeRegistry.register({ key: 'account', name: 'Account' });

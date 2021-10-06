@@ -1,12 +1,12 @@
-import React from 'react';
 import { mount } from 'enzyme';
+import React from 'react';
 
+import type { ITriggersPageContentProps } from './TriggersPageContent';
+import { TriggersPageContent } from './TriggersPageContent';
 import { ApplicationModelBuilder } from '../../../application';
 import { ArtifactReferenceService } from '../../../artifact/ArtifactReferenceService';
-import { IExpectedArtifact, ITrigger } from '../../../domain';
+import type { IExpectedArtifact, ITrigger } from '../../../domain';
 import { Registry } from '../../../registry';
-
-import { ITriggersPageContentProps, TriggersPageContent } from './TriggersPageContent';
 
 describe('<TriggersPageContent />', () => {
   let removeReferencesFromStagesSpy: jasmine.Spy;

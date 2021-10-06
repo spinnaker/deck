@@ -2,7 +2,7 @@ import React from 'react';
 
 import { CollapsibleSection, HelpField } from '@spinnaker/core';
 
-import { IAmazonLaunchTemplateOverrides } from '../../../index';
+import type { IAmazonLaunchTemplateOverrides } from '../../../index';
 
 import './multipleInstanceTypesSubSection.less';
 
@@ -32,7 +32,7 @@ export function MultipleInstanceTypesSubSection(props: { instanceTypeOverrides: 
         </thead>
         <tbody>
           {props.instanceTypeOverrides.map((override) => [
-            <tr>
+            <tr key={override.instanceType}>
               <td headers="instanceType">{override.instanceType}</td>
               <td headers="weight">{override.weightedCapacity}</td>
             </tr>,

@@ -1,15 +1,15 @@
-import { mockHttpClient } from '../api/mock/jasmine';
 import { mock } from 'angular';
 import { find } from 'lodash';
 
+import { mockHttpClient } from '../api/mock/jasmine';
+import type { Application } from '../application/application.model';
+import { ApplicationModelBuilder } from '../application/applicationModel.builder';
+import type { ClusterService } from './cluster.service';
+import { CLUSTER_SERVICE } from './cluster.service';
+import { SETTINGS } from '../config/settings';
+import type { IInstanceCounts, IServerGroup } from '../domain';
 import { REACT_MODULE } from '../reactShims';
 import * as State from '../state';
-import { ApplicationModelBuilder } from '../application/applicationModel.builder';
-import { IInstanceCounts, IServerGroup } from '../domain';
-import { Application } from '../application/application.model';
-
-import { CLUSTER_SERVICE, ClusterService } from './cluster.service';
-import { SETTINGS } from '../config/settings';
 
 const ClusterState = State.ClusterState;
 

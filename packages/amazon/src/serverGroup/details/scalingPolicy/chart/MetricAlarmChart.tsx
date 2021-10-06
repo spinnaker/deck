@@ -1,27 +1,15 @@
-import { module } from 'angular';
 import * as React from 'react';
-import { react2angular } from 'react2angular';
-import { Observable } from 'rxjs';
 
-import {
-  CloudMetricsReader,
-  ICloudMetricStatistics,
-  Spinner,
-  useData,
-  useForceUpdate,
-  useObservable,
-} from '@spinnaker/core';
-import { withErrorBoundary } from '@spinnaker/core';
+import type { ICloudMetricStatistics } from '@spinnaker/core';
+import { CloudMetricsReader, Spinner, useData } from '@spinnaker/core';
 
-import { DateLineChart, IDateLine } from './DateLineChart';
-import { IAmazonServerGroup, IScalingPolicyAlarm } from '../../../../domain';
+import type { IDateLine } from './DateLineChart';
+import { DateLineChart } from './DateLineChart';
+import type { IAmazonServerGroup, IScalingPolicyAlarm } from '../../../../domain';
 
 interface IMetricAlarmChartProps {
   serverGroup: IAmazonServerGroup;
   alarm: IScalingPolicyAlarm;
-  // Allows AngularJS to tell the chart to update
-  alarmUpdated?: Observable<any>;
-  // Allows the chart data to inform the parent component of the fetched metric units
   onChartLoaded?: (stats: ICloudMetricStatistics) => void;
 }
 
@@ -32,7 +20,7 @@ export function MetricAlarmChart(props: IMetricAlarmChartProps) {
 export function MetricAlarmChartImpl(props: IMetricAlarmChartProps) {
   const alarm = props.alarm ?? ({} as IScalingPolicyAlarm);
   const serverGroup = props.serverGroup ?? ({} as IAmazonServerGroup);
-  const { type, account, region } = serverGroup;
+  const { account, awsAccount, region, type } = serverGroup;
   const { metricName, namespace, statistic, period } = alarm;
 
   const { status, result } = useData<ICloudMetricStatistics>(
@@ -40,7 +28,8 @@ export function MetricAlarmChartImpl(props: IMetricAlarmChartProps) {
       const parameters: Record<string, string | number> = { namespace, statistics: statistic, period };
       alarm.dimensions.forEach((dimension) => (parameters[dimension.name] = dimension.value));
 
-      const result = await CloudMetricsReader.getMetricStatistics(type, account, region, metricName, parameters);
+      const metricAccount = type === 'aws' ? account : awsAccount;
+      const result = await CloudMetricsReader.getMetricStatistics('aws', metricAccount, region, metricName, parameters);
       result.datapoints = result.datapoints || [];
       props.onChartLoaded?.(result);
 
@@ -49,10 +38,6 @@ export function MetricAlarmChartImpl(props: IMetricAlarmChartProps) {
     { datapoints: [], unit: '' },
     [namespace, statistic, period, type, account, region, metricName],
   );
-
-  // Used by AngularJS to tell the chart to refresh, delete when all callers are reactified
-  const forceUpdate = useForceUpdate();
-  useObservable(props.alarmUpdated, () => forceUpdate());
 
   if (status === 'PENDING') {
     return (
@@ -95,16 +80,3 @@ export function MetricAlarmChartImpl(props: IMetricAlarmChartProps) {
   };
   return <DateLineChart lines={[line, setline]} />;
 }
-
-export const AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_CHART_METRICALARMCHART_COMPONENT =
-  'spinnaker.amazon.serverGroup.details.scalingPolicy.metricAlarmChart.component';
-export const name = AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_CHART_METRICALARMCHART_COMPONENT; // for backwards compatibility
-module(AMAZON_SERVERGROUP_DETAILS_SCALINGPOLICY_CHART_METRICALARMCHART_COMPONENT, []).component(
-  'metricAlarmChart',
-  react2angular(withErrorBoundary(MetricAlarmChart, 'metricAlarmChart'), [
-    'alarm',
-    'serverGroup',
-    'alarmUpdated',
-    'onChartLoaded',
-  ]),
-);

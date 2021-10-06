@@ -67,9 +67,18 @@ export interface INewApplicationDefaults {
   chaosMonkey?: boolean;
 }
 
+export interface IManagedDeliveryURLs {
+  gettingStarted: string;
+  root: string;
+  pinning: string;
+  resourceStatus: string;
+  markAsBad: string;
+  previewEnvironments?: string;
+}
+
 export interface ISpinnakerSettings {
   [key: string]: any;
-
+  accountTagLimit?: number;
   analytics: {
     customConfig?: {
       siteSpeedSampleRate?: number;
@@ -111,9 +120,9 @@ export interface ISpinnakerSettings {
   gitSources: string[];
   hiddenStages: string[];
   managedDelivery?: {
-    gettingStartedUrl?: string;
     defaultManifest: string;
     manifestBasePath: string;
+    urls?: Partial<IManagedDeliveryURLs>;
   };
   maxPipelineAgeDays: number;
   newApplicationDefaults: INewApplicationDefaults;
@@ -149,6 +158,7 @@ export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings ||
 // Make sure to set up some reasonable default settings fields so we do not have to keep checking if they exist everywhere
 SETTINGS.feature = SETTINGS.feature || {};
 SETTINGS.feature.roscoMode = SETTINGS.feature.roscoMode ?? true;
+SETTINGS.kubernetesAdHocInfraWritesEnabled = SETTINGS.kubernetesAdHocInfraWritesEnabled ?? true;
 SETTINGS.analytics = SETTINGS.analytics || {};
 SETTINGS.providers = SETTINGS.providers || {};
 SETTINGS.defaultTimeZone = SETTINGS.defaultTimeZone || 'America/Los_Angeles';

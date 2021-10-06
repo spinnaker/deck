@@ -1,6 +1,7 @@
-import { mock, IQService } from 'angular';
+import type { IQService } from 'angular';
+import { mock } from 'angular';
 
-import { Application } from '../application/application.model';
+import type { Application } from '../application/application.model';
 import { ApplicationModelBuilder } from '../application/applicationModel.builder';
 import { ApplicationDataSourceRegistry } from '../application/service/ApplicationDataSourceRegistry';
 import { TaskReader } from './task.read.service';
@@ -79,8 +80,8 @@ describe('Task Data Source', function () {
 
     it('sets appropriate flags when task reload fails; subscriber is responsible for error checking', function () {
       spyOn(TaskReader, 'getTasks').and.callFake(() => $q.reject(null));
-      let errorsHandled = 0,
-        successesHandled = 0;
+      let errorsHandled = 0;
+      let successesHandled = 0;
       configureApplication();
       application.getDataSource('tasks').onRefresh(
         $scope,

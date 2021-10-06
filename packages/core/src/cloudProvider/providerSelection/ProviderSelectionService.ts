@@ -1,10 +1,12 @@
 import { uniq } from 'lodash';
 import { $q } from 'ngimport';
 
-import { CloudProviderRegistry, ICloudProviderConfig } from '../CloudProviderRegistry';
+import type { ICloudProviderConfig } from '../CloudProviderRegistry';
+import { CloudProviderRegistry } from '../CloudProviderRegistry';
 import { ProviderSelectionModal } from './ProviderSelectionModal';
-import { AccountService, IAccountDetails } from '../../account';
-import { Application } from '../../application';
+import type { IAccountDetails } from '../../account';
+import { AccountService } from '../../account';
+import type { Application } from '../../application';
 import { SETTINGS } from '../../config';
 
 export type IProviderSelectionFilter = (app: Application, acc: IAccountDetails, prov: ICloudProviderConfig) => boolean;
@@ -53,14 +55,12 @@ export class ProviderSelectionService {
   public static isDisabled(app: Application): PromiseLike<boolean> {
     return AccountService.applicationAccounts(app).then((accounts: IAccountDetails[]) => {
       let isDisable = false;
-      if (accounts.length === 1) {
-        accounts
-          .filter((a) => {
-            return CloudProviderRegistry.hasValue(a.cloudProvider, 'kubernetesAdHocInfraWritesEnabled');
-          })
-          .map((a) => {
-            isDisable = !CloudProviderRegistry.getValue(a.cloudProvider, 'kubernetesAdHocInfraWritesEnabled');
-          });
+      const cloudProvidersEnabled = accounts.filter((a) => {
+        return !CloudProviderRegistry.isDisabled(a.cloudProvider);
+      });
+
+      if (cloudProvidersEnabled.length === 0) {
+        isDisable = true;
       }
       return isDisable;
     });

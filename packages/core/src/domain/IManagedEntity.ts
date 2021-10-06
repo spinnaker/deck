@@ -1,5 +1,5 @@
-import { MdConstraintStatus } from '../managed/graphql/graphql-sdk';
-import { IMoniker } from '../naming';
+import type { MdConstraintStatus } from '../managed/graphql/graphql-sdk';
+import type { IMoniker } from '../naming';
 
 export enum ManagedResourceStatus {
   ACTUATING = 'ACTUATING',
@@ -15,6 +15,7 @@ export enum ManagedResourceStatus {
   UNHAPPY = 'UNHAPPY',
   UNKNOWN = 'UNKNOWN',
   WAITING = 'WAITING',
+  DELETING = 'DELETING',
 }
 
 type DeprecatedStatus = 'OVERRIDE_PASS' | 'OVERRIDE_FAIL' | 'NOT_EVALUATED'; // will be removed in future versions
