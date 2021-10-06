@@ -20,6 +20,8 @@ export const MetadataElement: React.FC<{ className?: string }> = ({ className, c
   return <span className={classnames('delimited-element horizontal middle', className)}>{children}</span>;
 };
 
+export const METADATA_TEXT_COLOR = 'nobel';
+
 export interface VersionMessageData {
   by?: string;
   at?: string;
@@ -153,7 +155,7 @@ export const VersionMessage = ({ data, type, newRow = true }: IVersionMessage) =
     <>
       {newRow && <div className="flex-break sp-margin-s-top" />}
       <div className={classnames('version-message', typeProps.className)}>
-        <Icon name={typeProps.icon} size="14px" color="black" className="sp-margin-2xs-top" />
+        <Icon name={typeProps.icon} size="14px" color={METADATA_TEXT_COLOR} className="sp-margin-2xs-top" />
         <div>
           <div>
             {typeProps.text} {data.by},{' '}
@@ -185,7 +187,7 @@ export const VersionBranch = ({ branch }: IVersionBranchProps) => {
   if (!branch) return null;
   return (
     <MetadataElement>
-      <Icon name="spCIBranch" size="11px" className="sp-margin-xs-right" color="concrete" /> {branch}
+      <Icon name="spCIBranch" size="11px" className="sp-margin-xs-right" color={METADATA_TEXT_COLOR} /> {branch}
     </MetadataElement>
   );
 };
