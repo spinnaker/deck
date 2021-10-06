@@ -120,7 +120,7 @@ export interface IAmazonServerGroupCommand extends IServerGroupCommand {
   selectBlockDeviceMappingsSource: (command: IServerGroupCommand, selection: string) => void;
   usePreferredZonesChanged: (command: IServerGroupCommand) => IAmazonServerGroupCommandResult;
   regionIsDeprecated: (command: IServerGroupCommand) => boolean;
-  instanceTypesChanged: (command: IServerGroupCommand) => void;
+  launchTemplateOverridesChanged: (command: IServerGroupCommand) => void;
 }
 
 export class AwsServerGroupConfigurationService {
@@ -661,7 +661,7 @@ export class AwsServerGroupConfigurationService {
     };
 
     // Handles derived values for multiple instance types case
-    cmd.instanceTypesChanged = (command: IAmazonServerGroupCommand): void => {
+    cmd.launchTemplateOverridesChanged = (command: IAmazonServerGroupCommand): void => {
       // set ebsOptimized to true if all instance types in overrides are included in the hard-coded array in awsInstanceTypeService.
       // this function exists for backwards compatibility with single instance type case, matching behavior in `cmd.instanceTypeChanged`
       // note: this parameter has no effect on instance types with EBS optimization enabled by default.

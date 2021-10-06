@@ -10,34 +10,35 @@ export interface ICpuCreditsToggleProps {
 }
 
 export function CpuCreditsToggle(props: ICpuCreditsToggleProps) {
+  const { selectedInstanceTypes, currentProfile } = props;
   const isBurstingSupportedForAllTypes = AwsReactInjector.awsInstanceTypeService.isBurstingSupportedForAllTypes(
-    props.selectedInstanceTypes,
+    selectedInstanceTypes,
   );
   const isAtleastOneTypeInProfile = AwsReactInjector.awsInstanceTypeService.getInstanceTypesInCategory(
-    props.selectedInstanceTypes,
-    props.currentProfile,
+    selectedInstanceTypes,
+    currentProfile,
   ).length
     ? true
     : false;
 
   const [showToggle, setShowToggle] = useState(false);
   useEffect(() => {
-    if (props.selectedInstanceTypes && props.selectedInstanceTypes.length) {
+    if (selectedInstanceTypes && selectedInstanceTypes.length) {
       if (!isBurstingSupportedForAllTypes) {
         props.setUnlimitedCpuCredits(undefined);
       }
       setShowToggle(isBurstingSupportedForAllTypes);
     }
 
-    if (props.currentProfile) {
+    if (currentProfile) {
       setShowToggle(
-        props.selectedInstanceTypes &&
-          props.selectedInstanceTypes.length > 0 &&
+        selectedInstanceTypes &&
+          selectedInstanceTypes.length > 0 &&
           isBurstingSupportedForAllTypes &&
           isAtleastOneTypeInProfile,
       );
     }
-  }, [props.currentProfile, props.selectedInstanceTypes]);
+  }, [currentProfile, selectedInstanceTypes]);
 
   return (
     <div className={'row'} style={{ fontSize: '110%' }}>
