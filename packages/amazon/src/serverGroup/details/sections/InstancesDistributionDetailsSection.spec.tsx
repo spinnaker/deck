@@ -1,9 +1,12 @@
-import React from 'react';
 import { shallow } from 'enzyme';
+import React from 'react';
+
+import type { Application } from '@spinnaker/core';
+import { ApplicationModelBuilder } from '@spinnaker/core';
 import { mockLaunchTemplate, mockServerGroup } from '@spinnaker/mocks';
-import { IAmazonMixedInstancesPolicy, IAmazonServerGroupView, IScalingPolicy } from '../../../domain';
+
+import type { IAmazonMixedInstancesPolicy, IAmazonServerGroupView, IScalingPolicy } from '../../../domain';
 import { InstancesDistributionDetailsSection } from '../../../index';
-import { Application, ApplicationModelBuilder } from '@spinnaker/core';
 
 describe('InstancesDistribution', () => {
   let app: Application;
@@ -50,7 +53,7 @@ describe('InstancesDistribution', () => {
     ]);
     let index = 0;
     expectedLabels.forEach((value, key) => {
-      let labeledValue = actualLabeledValues.at(index++);
+      const labeledValue = actualLabeledValues.at(index++);
       expect(labeledValue.prop('label')).toEqual(key);
       expect(labeledValue.prop('value')).toEqual(value);
     });
@@ -77,7 +80,7 @@ describe('InstancesDistribution', () => {
     ]);
     let index = 0;
     expectedLabels.forEach((value, key) => {
-      let labeledValue = actualLabeledValues.at(index++);
+      const labeledValue = actualLabeledValues.at(index++);
       expect(labeledValue.prop('label')).toEqual(key);
       expect(labeledValue.prop('value')).toEqual(value);
     });

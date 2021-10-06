@@ -1,8 +1,9 @@
-import React from 'react';
 import { mount } from 'enzyme';
-import { IFormInputProps, IStageForSpelPreview, IValidator } from '..';
-import { SpelService } from './SpelService';
+import React from 'react';
+
+import type { IFormInputProps, IStageForSpelPreview, IValidator } from '..';
 import { SpelInput } from './SpelInput';
+import { SpelService } from './SpelService';
 
 function defer() {
   let resolve: Function, reject: Function;
@@ -208,10 +209,14 @@ describe('<SpelInput/>', () => {
       expect(mockValidate).toHaveBeenCalledTimes(1);
       expect(mockValidate.calls.mostRecent().returnValue).toMatch('Async: ');
 
+      let caught = false;
       deferred.reject('something bad happened');
       try {
         await deferred.promise;
-      } catch (error) {}
+      } catch (error) {
+        caught = true;
+      }
+      expect(caught).toBe(true);
       component.setProps({});
 
       expect(mockValidate).toHaveBeenCalledTimes(2);

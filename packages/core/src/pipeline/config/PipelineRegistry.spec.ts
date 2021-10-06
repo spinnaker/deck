@@ -2,13 +2,14 @@ import { mock } from 'angular';
 import { map } from 'lodash';
 import React from 'react';
 
-import { SETTINGS } from '../../config';
-import { IStage, ITriggerTypeConfig, IStageTypeConfig } from '../../domain';
-import { IRegion } from '../../account/AccountService';
-import { Registry } from '../../registry';
-import { ITriggerTemplateComponentProps } from '../manualExecution/TriggerTemplate';
 import { PipelineRegistry } from './PipelineRegistry';
-import { IPreconfiguredJob, makePreconfiguredJobStage, PreconfiguredJobReader } from './stages/preconfiguredJob';
+import type { IRegion } from '../../account/AccountService';
+import { SETTINGS } from '../../config';
+import type { IStage, IStageTypeConfig, ITriggerTypeConfig } from '../../domain';
+import { ITriggerTemplateComponentProps } from '../manualExecution/TriggerTemplate';
+import { Registry } from '../../registry';
+import type { IPreconfiguredJob } from './stages/preconfiguredJob';
+import { makePreconfiguredJobStage, PreconfiguredJobReader } from './stages/preconfiguredJob';
 
 const mockProviderAccount = {
   accountId: 'abc',
@@ -111,35 +112,35 @@ describe('PipelineRegistry: API', function () {
     it(
       'augments provider stages with parent keys, labels, manualExecutionComponents, and descriptions',
       mock.inject(function () {
-        const CompA = ({}: ITriggerTemplateComponentProps) => React.createElement('a');
+        const CompA = () => React.createElement('a');
         const baseStage = {
-            key: 'c',
-            useBaseProvider: true,
-            description: 'c description',
-            label: 'the c',
-            manualExecutionComponent: CompA,
-          },
-          augmentedA = {
-            key: 'd',
-            provides: 'c',
-            description: 'c description',
-            label: 'the c',
-            manualExecutionComponent: CompA,
-          } as any,
-          augmentedB = {
-            key: 'e',
-            provides: 'c',
-            description: 'c description',
-            label: 'the c',
-            manualExecutionComponent: CompA,
-          },
-          augmentedC = {
-            key: 'c',
-            provides: 'c',
-            description: 'c description',
-            label: 'the c',
-            manualExecutionComponent: CompA,
-          };
+          key: 'c',
+          useBaseProvider: true,
+          description: 'c description',
+          label: 'the c',
+          manualExecutionComponent: CompA,
+        };
+        const augmentedA = {
+          key: 'd',
+          provides: 'c',
+          description: 'c description',
+          label: 'the c',
+          manualExecutionComponent: CompA,
+        } as any;
+        const augmentedB = {
+          key: 'e',
+          provides: 'c',
+          description: 'c description',
+          label: 'the c',
+          manualExecutionComponent: CompA,
+        };
+        const augmentedC = {
+          key: 'c',
+          provides: 'c',
+          description: 'c description',
+          label: 'the c',
+          manualExecutionComponent: CompA,
+        };
         Registry.pipeline.registerStage(baseStage as IStageTypeConfig);
         Registry.pipeline.registerStage({ key: 'd', provides: 'c' } as IStageTypeConfig);
         Registry.pipeline.registerStage({ key: 'e', provides: 'c' } as IStageTypeConfig);
@@ -153,8 +154,8 @@ describe('PipelineRegistry: API', function () {
     it(
       'allows provider stages to override of label, description, manualExecutionComponent',
       mock.inject(function () {
-        const CompA = ({}: ITriggerTemplateComponentProps) => React.createElement('a');
-        const CompB = ({}: ITriggerTemplateComponentProps) => React.createElement('b');
+        const CompA = () => React.createElement('a');
+        const CompB = () => React.createElement('b');
         Registry.pipeline.registerStage({
           key: 'a',
           useBaseProvider: true,
@@ -467,7 +468,7 @@ describe('PipelineRegistry: API', function () {
     });
 
     it('hasManualExecutionComponentForTriggerType returns true if declared and available', function () {
-      const CompA = ({}: ITriggerTemplateComponentProps) => React.createElement('a');
+      const CompA = () => React.createElement('a');
       Registry.pipeline.registerTrigger({ key: 'cron', manualExecutionComponent: CompA } as ITriggerTypeConfig);
       expect(Registry.pipeline.hasManualExecutionComponentForTriggerType('cron')).toBe(true);
     });
@@ -479,7 +480,7 @@ describe('PipelineRegistry: API', function () {
     });
 
     it('hasManualExecutionComponentForTriggerType returns handler if declared and available', function () {
-      const CompA = ({}: ITriggerTemplateComponentProps) => React.createElement('a');
+      const CompA = () => React.createElement('a');
       Registry.pipeline.registerTrigger({ key: 'cron', manualExecutionComponent: CompA } as ITriggerTypeConfig);
       expect(Registry.pipeline.getManualExecutionComponentForTriggerType('cron')).toEqual(CompA);
     });
