@@ -13,6 +13,7 @@ export interface ISimpleModeSelectorProps {
 }
 
 export function SimpleModeSelector(props: ISimpleModeSelectorProps) {
+  const { command } = props;
   const { InstanceArchetypeSelector, InstanceTypeSelector } = NgReact;
   const isLaunchTemplatesEnabled = AWSProviderSettings.serverGroups?.enableLaunchTemplates;
   const isCpuCreditsEnabled = AWSProviderSettings.serverGroups?.enableCpuCredits;
@@ -22,13 +23,13 @@ export function SimpleModeSelector(props: ISimpleModeSelectorProps) {
     // Once angular is gone from this component tree, we can move all the viewState stuff
     // into react state
     props.setFieldValue('viewState', {
-      ...props.command.viewState,
+      ...command.viewState,
       instanceProfile: newProfile,
     });
   };
 
   const instanceTypeChanged = (type: string) => {
-    props.command.instanceTypeChanged(props.command);
+    command.instanceTypeChanged(command);
     props.setFieldValue('instanceType', type);
   };
 
@@ -36,22 +37,22 @@ export function SimpleModeSelector(props: ISimpleModeSelectorProps) {
     <div className="container-fluid form-horizontal">
       <div className="row">
         <InstanceArchetypeSelector
-          command={props.command}
+          command={command}
           onTypeChanged={instanceTypeChanged}
           onProfileChanged={instanceProfileChanged}
         />
         <div style={{ padding: '0 15px' }}>
-          {props.command.viewState.instanceProfile && props.command.viewState.instanceProfile !== 'custom' && (
-            <InstanceTypeSelector command={props.command} onTypeChanged={instanceTypeChanged} />
+          {command.viewState.instanceProfile && command.viewState.instanceProfile !== 'custom' && (
+            <InstanceTypeSelector command={command} onTypeChanged={instanceTypeChanged} />
           )}
         </div>
       </div>
       {isLaunchTemplatesEnabled && isCpuCreditsEnabled && (
         <div className="row">
           <CpuCreditsToggle
-            unlimitedCpuCredits={props.command.unlimitedCpuCredits}
-            selectedInstanceTypes={[props.command.instanceType]}
-            currentProfile={props.command.viewState.instanceProfile}
+            unlimitedCpuCredits={command.unlimitedCpuCredits}
+            selectedInstanceTypes={[command.instanceType]}
+            currentProfile={command.viewState.instanceProfile}
             setUnlimitedCpuCredits={props.setUnlimitedCpuCredits}
           />
         </div>

@@ -48,9 +48,11 @@ const TableRows = SortableContainer(
     removeInstanceType: (typeToRemove: string) => void;
     addOrUpdateInstanceType: (instanceType: string, weight: string) => void;
   }) => {
+    const { isCustom, selectedInstanceTypesMap } = props;
+
     let selectedRows, unselectedRows;
-    if (props.isCustom) {
-      selectedRows = Array.from(props.selectedInstanceTypesMap.values())
+    if (isCustom) {
+      selectedRows = Array.from(selectedInstanceTypesMap.values())
         .sort((i1, i2) => i1.priority - i2.priority)
         .map((selectedType, index: number) => (
           <SortableRow
@@ -63,13 +65,14 @@ const TableRows = SortableContainer(
           />
         ));
     } else {
-      const instanceTypesInProfile: string[] = Array.from(props.instanceTypeDetails?.keys());
+      const { instanceTypeDetails } = props;
+      const instanceTypesInProfile: string[] = Array.from(instanceTypeDetails?.keys());
       const unselectedInstanceTypes: string[] = _.difference(
         instanceTypesInProfile,
-        Array.from(props.selectedInstanceTypesMap.keys()),
+        Array.from(selectedInstanceTypesMap.keys()),
       );
 
-      const selectedRowsOrdered: IAmazonInstanceTypeOverride[] = Array.from(props.selectedInstanceTypesMap.values())
+      const selectedRowsOrdered: IAmazonInstanceTypeOverride[] = Array.from(selectedInstanceTypesMap.values())
         .filter((selectedType: IAmazonInstanceTypeOverride) =>
           instanceTypesInProfile.includes(selectedType.instanceType),
         )
@@ -84,7 +87,7 @@ const TableRows = SortableContainer(
             index={index}
             isCustom={false}
             selectedType={selectedType}
-            instanceTypeDetails={props.instanceTypeDetails}
+            instanceTypeDetails={instanceTypeDetails}
             removeInstanceType={props.removeInstanceType}
             addOrUpdateInstanceType={props.addOrUpdateInstanceType}
           />
@@ -97,7 +100,7 @@ const TableRows = SortableContainer(
           <InstanceTypeRow
             key={instanceType}
             isCustom={false}
-            instanceTypeDetails={props.instanceTypeDetails.get(instanceType)}
+            instanceTypeDetails={instanceTypeDetails.get(instanceType)}
             addOrUpdateInstanceType={props.addOrUpdateInstanceType}
           />
         ));
@@ -106,7 +109,7 @@ const TableRows = SortableContainer(
     return (
       <tbody>
         {selectedRows}
-        {!props.isCustom ? unselectedRows : null}
+        {!isCustom ? unselectedRows : null}
       </tbody>
     );
   },
