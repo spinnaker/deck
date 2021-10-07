@@ -6,7 +6,7 @@ import { CurrentVersion } from './CurrentVersion';
 import { EnvironmentItem } from '../../environmentBaseElements/EnvironmentItem';
 import { useMarkVersionAsBad } from './hooks';
 import { HoverablePopover, Markdown, useApplicationContextSafe } from '../../../presentation';
-import { QueryArtifact, QueryArtifactVersion } from '../types';
+import type { QueryArtifact, QueryArtifactVersion } from '../types';
 import { isVersionVetoed } from './utils';
 import { ACTION_BUTTON_CLASS_NAME, tooltipShowHideProps } from '../../utils/defaults';
 import { toPinnedMetadata } from '../../versionMetadata/MetadataComponents';
