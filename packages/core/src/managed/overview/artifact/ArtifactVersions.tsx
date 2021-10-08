@@ -83,6 +83,7 @@ const PendingVersion = ({ data, reference, environment, pinned, index }: IPendin
       buildNumber,
       commitMessage: gitMetadata?.commitInfo?.message,
       commitSha: gitMetadata?.commit,
+      createdAt: data.createdAt,
     },
   });
 

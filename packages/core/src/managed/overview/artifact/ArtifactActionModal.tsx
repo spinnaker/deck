@@ -16,10 +16,13 @@ const PINNING_DOCS_URL = getDocsUrl('pinning');
 
 const CLASS_NAME = 'ArtifactActionModal';
 
+export type IVersionRelativeAgeToCurrent = 'CURRENT' | 'NEWER' | 'OLDER';
+
 interface IVersionDetails {
   buildNumber?: string;
   commitMessage?: string;
   commitSha?: string;
+  createdAt?: string;
 }
 
 export interface IVersionActionsProps {
@@ -52,15 +55,27 @@ const VersionDetails = ({ buildNumber, commitMessage, commitSha, title }: IVersi
   );
 };
 
-type InternalModalProps = Omit<IArtifactActionModalProps, 'logCategory'> & {
-  actionProps: IVersionActionsProps;
+type InternalModalProps<T = any> = Omit<IArtifactActionModalProps, 'logCategory'> & {
+  actionProps: IVersionActionsProps & T;
 };
 
-export const PinActionModal = ({ actionProps, ...props }: InternalModalProps) => {
+const pinActionBody: { [key in IVersionRelativeAgeToCurrent]: string } = {
+  CURRENT: `Pinning ensures an environment uses a specific version, even if Spinnaker would've normally deployed a
+  different one. New versions won't be deployed until you unpin this version.`,
+  NEWER: `Rolling forward will deploy this version even if some of its constraints hasn't passed. Spinnaker will also pin this version and will not deploy newer ones until you unpin this version.`,
+  OLDER:
+    'Rolling forward will deploy this version immediately. Spinnaker will also pin this version and will not deploy newer ones until you unpin this version.',
+};
+
+export const PinActionModal = ({
+  actionProps,
+  ...props
+}: InternalModalProps<IVersionActionsProps & { ageRelativeToCurrent: IVersionRelativeAgeToCurrent }>) => {
   const {
     application,
     selectedVersion: { buildNumber },
     isCurrent,
+    ageRelativeToCurrent,
   } = actionProps;
   return (
     <ActionModal logCategory="Environments::Artifact" className={CLASS_NAME} {...props}>
@@ -70,8 +85,7 @@ export const PinActionModal = ({ actionProps, ...props }: InternalModalProps) =>
         </span>
         <span>
           <p>
-            Pinning ensures an environment uses a specific version, even if Spinnaker would've normally deployed a
-            different one. New versions won't be deployed until you unpin this version. For more information{' '}
+            {pinActionBody[ageRelativeToCurrent]} For more information{' '}
             <a
               target="_blank"
               onClick={() =>

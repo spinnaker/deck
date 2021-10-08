@@ -40,6 +40,7 @@ export const CurrentVersion = ({
       buildNumber: data.buildNumber,
       commitMessage: gitMetadata?.commitInfo?.message,
       commitSha: gitMetadata?.commit,
+      createdAt: data.createdAt,
     },
   });
 

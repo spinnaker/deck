@@ -60,6 +60,7 @@ const VersionInEnvironment = ({
       buildNumber: version.buildNumber,
       commitMessage: version.gitMetadata?.commitInfo?.message,
       commitSha: version.gitMetadata?.commit,
+      createdAt: version.createdAt,
     },
   });
 
