@@ -1,4 +1,4 @@
-import type { IVersionActionsProps, IVersionRelativeAgeToCurrent } from './ArtifactActionModal';
+import type { IVersionActionsProps } from './ArtifactActionModal';
 import { MarkAsBadActionModal, MarkAsGoodActionModal, PinActionModal, UnpinActionModal } from './ArtifactActionModal';
 import {
   FetchPinnedVersionsDocument,
@@ -9,7 +9,7 @@ import {
   useUnpinVersionMutation,
 } from '../../graphql/graphql-sdk';
 import { showModal } from '../../../presentation';
-import type { ICurrentVersion } from './utils';
+import type { ICurrentVersion, IVersionRelativeAgeToCurrent } from './utils';
 import { MODAL_MAX_WIDTH } from '../../utils/defaults';
 
 export const useUnpinVersion = (payload: IVersionActionsProps) => {
