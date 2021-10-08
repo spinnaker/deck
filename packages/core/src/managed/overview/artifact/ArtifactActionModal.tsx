@@ -5,6 +5,8 @@ import { Illustration } from '@spinnaker/presentation';
 import { GitLink } from './GitLink';
 import { LabeledValue } from '../../../presentation';
 import { logger } from '../../../utils';
+import type { ICurrentVersion, IVersionDetails, IVersionRelativeAgeToCurrent } from './utils';
+import { extractVersionRollbackDetails } from './utils';
 import type { IArtifactActionModalProps } from '../../utils/ActionModal';
 import { ActionModal } from '../../utils/ActionModal';
 import { getDocsUrl } from '../../utils/defaults';
@@ -15,15 +17,6 @@ const MARK_BAD_DOCS_URL = getDocsUrl('markAsBad');
 const PINNING_DOCS_URL = getDocsUrl('pinning');
 
 const CLASS_NAME = 'ArtifactActionModal';
-
-export type IVersionRelativeAgeToCurrent = 'CURRENT' | 'NEWER' | 'OLDER';
-
-interface IVersionDetails {
-  buildNumber?: string;
-  commitMessage?: string;
-  commitSha?: string;
-  createdAt?: string;
-}
 
 export interface IVersionActionsProps {
   application: string;
@@ -62,14 +55,18 @@ type InternalModalProps<T = any> = Omit<IArtifactActionModalProps, 'logCategory'
 export const PinActionModal = ({
   actionProps,
   ...props
-}: InternalModalProps<IVersionActionsProps & { ageRelativeToCurrent: IVersionRelativeAgeToCurrent }>) => {
+}: InternalModalProps<
+  IVersionActionsProps & { ageRelativeToCurrent: IVersionRelativeAgeToCurrent; currentVersion?: ICurrentVersion }
+>) => {
   const {
     application,
     selectedVersion: { buildNumber },
     isCurrent,
     environment,
     ageRelativeToCurrent,
+    currentVersion,
   } = actionProps;
+  const rollingType = ageRelativeToCurrent === 'NEWER' ? 'forward' : 'back';
   return (
     <ActionModal logCategory="Environments::Artifact" className={CLASS_NAME} {...props}>
       <div className="flex-container-h middle sp-margin-xl-bottom">
@@ -83,10 +80,10 @@ export const PinActionModal = ({
   different one. New versions won't be deployed until you unpin this version.`
             ) : (
               <>
-                Rolling {ageRelativeToCurrent === 'NEWER' ? 'forward' : 'back'} will:
+                Rolling {rollingType} will:
                 <ul className="sp-margin-xs-top">
                   <li>Ignore any constraints on this version</li>
-                  <li>deploy this version immediately</li>
+                  <li>Deploy this version immediately</li>
                   <li>
                     Pin this version to {environment.toLocaleUpperCase()} so no other versions deploy until you unpin
                   </li>
@@ -112,7 +109,12 @@ export const PinActionModal = ({
           {isCurrent ? (
             <p>Version #{buildNumber} is already live and no actions will be take immediately</p>
           ) : (
-            <VersionDetails title="Deployed Version" {...actionProps.selectedVersion} />
+            <div>
+              {currentVersion && (
+                <VersionDetails title="Live Version" {...extractVersionRollbackDetails(currentVersion)} />
+              )}
+              <VersionDetails title={`Rolling ${rollingType} to`} {...actionProps.selectedVersion} />
+            </div>
           )}
         </span>
       </div>

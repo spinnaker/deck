@@ -152,6 +152,13 @@ query fetchCurrentVersion($appName: String!) {
             version
             buildNumber
             createdAt
+            gitMetadata {
+              commit
+              commitInfo {
+                sha
+                message
+              }
+            }
           }
         }
       }

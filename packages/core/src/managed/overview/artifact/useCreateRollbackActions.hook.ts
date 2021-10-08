@@ -1,9 +1,10 @@
-import type { IVersionActionsProps, IVersionRelativeAgeToCurrent } from './ArtifactActionModal';
+import type { IVersionActionsProps } from './ArtifactActionModal';
 import type { VersionAction } from '../../artifactActions/ArtifactActions';
-import type { FetchCurrentVersionQuery } from '../../graphql/graphql-sdk';
 import { useFetchCurrentVersionQuery } from '../../graphql/graphql-sdk';
 import { useMarkVersionAsBad, useMarkVersionAsGood, usePinVersion, useUnpinVersion } from './hooks';
 import { useApplicationContextSafe } from '../../../presentation';
+import type { IVersionRelativeAgeToCurrent } from './utils';
+import { getRelativeAgeToCurrent } from './utils';
 
 const useGetCurrentVersion = (environment: string, reference: string) => {
   const application = useApplicationContextSafe();
@@ -14,35 +15,10 @@ const useGetCurrentVersion = (environment: string, reference: string) => {
   return currentVersion;
 };
 
-type ICurrentVersion = NonNullable<
-  NonNullable<
-    NonNullable<FetchCurrentVersionQuery['application']>['environments'][number]['state']['artifacts']
-  >[number]['versions']
->[number];
-
 const rollbackText: { [key in IVersionRelativeAgeToCurrent]: string } = {
   CURRENT: 'Pin version...',
   NEWER: 'Roll forward to...',
   OLDER: 'Roll back to...',
-};
-
-const getRelativeAgeToCurrent = ({
-  isCurrent,
-  createdAt,
-  currentVersion,
-}: {
-  isCurrent?: boolean;
-  createdAt?: string;
-  currentVersion?: ICurrentVersion;
-}): IVersionRelativeAgeToCurrent => {
-  if (isCurrent) return 'CURRENT';
-  if (
-    !createdAt ||
-    !currentVersion?.createdAt ||
-    new Date(createdAt).getTime() < new Date(currentVersion.createdAt).getTime()
-  )
-    return 'OLDER';
-  return 'NEWER';
 };
 
 export const useCreateVersionRollbackActions = (
@@ -63,7 +39,7 @@ export const useCreateVersionRollbackActions = (
 
   const onUnpin = useUnpinVersion(basePayload);
 
-  const onPin = usePinVersion(basePayload, relativeAgeToCurrent);
+  const onPin = usePinVersion(basePayload, currentVersion, relativeAgeToCurrent);
 
   const onMarkAsBad = useMarkVersionAsBad(basePayload);
 

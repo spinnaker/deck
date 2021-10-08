@@ -9,6 +9,7 @@ import {
   useUnpinVersionMutation,
 } from '../../graphql/graphql-sdk';
 import { showModal } from '../../../presentation';
+import type { ICurrentVersion } from './utils';
 import { MODAL_MAX_WIDTH } from '../../utils/defaults';
 
 export const useUnpinVersion = (payload: IVersionActionsProps) => {
@@ -46,7 +47,11 @@ const pinAction: { [key in IVersionRelativeAgeToCurrent]: string } = {
   OLDER: 'Roll back',
 };
 
-export const usePinVersion = (payload: IVersionActionsProps, ageRelativeToCurrent: IVersionRelativeAgeToCurrent) => {
+export const usePinVersion = (
+  payload: IVersionActionsProps,
+  currentVersion: ICurrentVersion | undefined,
+  ageRelativeToCurrent: IVersionRelativeAgeToCurrent,
+) => {
   const {
     application,
     environment,
@@ -74,7 +79,7 @@ export const usePinVersion = (payload: IVersionActionsProps, ageRelativeToCurren
           if (!comment) throw new Error('Comment is required');
           await onPin({ variables: { payload: { application, environment, reference, version, comment } } });
         },
-        actionProps: { ...payload, ageRelativeToCurrent },
+        actionProps: { ...payload, ageRelativeToCurrent, currentVersion },
       },
 
       { maxWidth: MODAL_MAX_WIDTH },

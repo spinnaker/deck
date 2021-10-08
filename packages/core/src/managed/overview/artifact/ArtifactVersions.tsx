@@ -6,7 +6,7 @@ import { VersionTitle } from './VersionTitle';
 import { ArtifactActions } from '../../artifactActions/ArtifactActions';
 import type { QueryArtifact, QueryArtifactVersion } from '../types';
 import { useCreateVersionRollbackActions } from './useCreateRollbackActions.hook';
-import { isVersionVetoed } from './utils';
+import { extractVersionRollbackDetails, isVersionVetoed } from './utils';
 import { useLogEvent } from '../../utils/logging';
 import type { VersionMessageData } from '../../versionMetadata/MetadataComponents';
 import { toPinnedMetadata } from '../../versionMetadata/MetadataComponents';
@@ -71,7 +71,7 @@ interface IPendingVersionProps {
 }
 
 const PendingVersion = ({ data, reference, environment, pinned, index }: IPendingVersionProps) => {
-  const { buildNumber, version, gitMetadata, constraints, isCurrent } = data;
+  const { version, gitMetadata, constraints, isCurrent } = data;
   const actions = useCreateVersionRollbackActions({
     environment,
     reference,
@@ -79,12 +79,8 @@ const PendingVersion = ({ data, reference, environment, pinned, index }: IPendin
     isVetoed: isVersionVetoed(data),
     isPinned: Boolean(pinned),
     isCurrent,
-    selectedVersion: {
-      buildNumber,
-      commitMessage: gitMetadata?.commitInfo?.message,
-      commitSha: gitMetadata?.commit,
-      createdAt: data.createdAt,
-    },
+
+    selectedVersion: extractVersionRollbackDetails(data),
   });
 
   return (

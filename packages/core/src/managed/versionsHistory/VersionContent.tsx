@@ -11,7 +11,7 @@ import type { ITaskArtifactVersionProps } from '../overview/artifact/ArtifactVer
 import { ArtifactVersionTasks } from '../overview/artifact/ArtifactVersionTasks';
 import { Constraints } from '../overview/artifact/Constraints';
 import { useCreateVersionRollbackActions } from '../overview/artifact/useCreateRollbackActions.hook';
-import { isVersionVetoed } from '../overview/artifact/utils';
+import { extractVersionRollbackDetails, isVersionVetoed } from '../overview/artifact/utils';
 import { useApplicationContextSafe } from '../../presentation';
 import { LoadingAnimation } from '../../presentation/LoadingAnimation';
 import type {
@@ -56,12 +56,7 @@ const VersionInEnvironment = ({
     isVetoed: isVersionVetoed(version),
     isPinned: Boolean(pinnedData),
     isCurrent: version.isCurrent,
-    selectedVersion: {
-      buildNumber: version.buildNumber,
-      commitMessage: version.gitMetadata?.commitInfo?.message,
-      commitSha: version.gitMetadata?.commit,
-      createdAt: version.createdAt,
-    },
+    selectedVersion: extractVersionRollbackDetails(version),
   });
 
   const versionProps: ITaskArtifactVersionProps = {

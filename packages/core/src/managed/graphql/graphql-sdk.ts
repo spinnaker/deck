@@ -598,7 +598,15 @@ export type FetchCurrentVersionQuery = { __typename?: 'Query' } & {
                             { __typename?: 'MdArtifactVersionInEnvironment' } & Pick<
                               MdArtifactVersionInEnvironment,
                               'id' | 'version' | 'buildNumber' | 'createdAt'
-                            >
+                            > & {
+                                gitMetadata?: Maybe<
+                                  { __typename?: 'MdGitMetadata' } & Pick<MdGitMetadata, 'commit'> & {
+                                      commitInfo?: Maybe<
+                                        { __typename?: 'MdCommitInfo' } & Pick<MdCommitInfo, 'sha' | 'message'>
+                                      >;
+                                    }
+                                >;
+                              }
                           >
                         >;
                       }
@@ -1064,6 +1072,13 @@ export const FetchCurrentVersionDocument = gql`
               version
               buildNumber
               createdAt
+              gitMetadata {
+                commit
+                commitInfo {
+                  sha
+                  message
+                }
+              }
             }
           }
         }
