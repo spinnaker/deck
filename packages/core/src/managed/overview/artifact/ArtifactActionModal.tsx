@@ -59,14 +59,6 @@ type InternalModalProps<T = any> = Omit<IArtifactActionModalProps, 'logCategory'
   actionProps: IVersionActionsProps & T;
 };
 
-const pinActionBody: { [key in IVersionRelativeAgeToCurrent]: string } = {
-  CURRENT: `Pinning ensures an environment uses a specific version, even if Spinnaker would've normally deployed a
-  different one. New versions won't be deployed until you unpin this version.`,
-  NEWER: `Rolling forward will deploy this version even if some of its constraints hasn't passed. Spinnaker will also pin this version and will not deploy newer ones until you unpin this version.`,
-  OLDER:
-    'Rolling forward will deploy this version immediately. Spinnaker will also pin this version and will not deploy newer ones until you unpin this version.',
-};
-
 export const PinActionModal = ({
   actionProps,
   ...props
@@ -75,6 +67,7 @@ export const PinActionModal = ({
     application,
     selectedVersion: { buildNumber },
     isCurrent,
+    environment,
     ageRelativeToCurrent,
   } = actionProps;
   return (
@@ -85,22 +78,37 @@ export const PinActionModal = ({
         </span>
         <span>
           <p>
-            {pinActionBody[ageRelativeToCurrent]} For more information{' '}
-            <a
-              target="_blank"
-              onClick={() =>
-                logger.log({
-                  category: 'Environments - pin version modal',
-                  action: 'Pinning docs link clicked',
-                  data: { label: application, application },
-                })
-              }
-              href={PINNING_DOCS_URL}
-            >
-              check out our documentation
-            </a>
-            .
+            {isCurrent ? (
+              `Pinning ensures an environment uses a specific version, even if Spinnaker would've normally deployed a
+  different one. New versions won't be deployed until you unpin this version.`
+            ) : (
+              <>
+                Rolling {ageRelativeToCurrent === 'NEWER' ? 'forward' : 'back'} will:
+                <ul className="sp-margin-xs-top">
+                  <li>Ignore any constraints on this version</li>
+                  <li>deploy this version immediately</li>
+                  <li>
+                    Pin this version to {environment.toLocaleUpperCase()} so no other versions deploy until you unpin
+                  </li>
+                </ul>
+              </>
+            )}
           </p>
+          For more information{' '}
+          <a
+            target="_blank"
+            onClick={() =>
+              logger.log({
+                category: 'Environments - pin version modal',
+                action: 'Pinning docs link clicked',
+                data: { label: application, application },
+              })
+            }
+            href={PINNING_DOCS_URL}
+          >
+            check out our documentation
+          </a>
+          .<p></p>
           {isCurrent ? (
             <p>Version #{buildNumber} is already live and no actions will be take immediately</p>
           ) : (
