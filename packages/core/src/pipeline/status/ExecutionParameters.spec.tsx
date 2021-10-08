@@ -1,10 +1,11 @@
-import React from 'react';
-import { ShallowWrapper, shallow } from 'enzyme';
 import { mock } from 'angular';
+import type { ShallowWrapper } from 'enzyme';
+import { shallow } from 'enzyme';
+import React from 'react';
 
+import type { IDisplayableParameter, IExecutionParametersProps } from './ExecutionParameters';
+import { ExecutionParameters } from './ExecutionParameters';
 import { REACT_MODULE } from '../../reactShims';
-
-import { IExecutionParametersProps, ExecutionParameters, IDisplayableParameter } from './ExecutionParameters';
 
 describe('<ExecutionParameters/>', () => {
   let component: ShallowWrapper<IExecutionParametersProps>;

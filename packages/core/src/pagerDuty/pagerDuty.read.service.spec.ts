@@ -1,6 +1,8 @@
-import { mockHttpClient } from '../api/mock/jasmine';
 import { mock } from 'angular';
-import { IPagerDutyService, PagerDutyReader } from './pagerDuty.read.service';
+
+import { mockHttpClient } from '../api/mock/jasmine';
+import type { IPagerDutyService } from './pagerDuty.read.service';
+import { PagerDutyReader } from './pagerDuty.read.service';
 
 describe('PagerDutyReader', () => {
   beforeEach(mock.module());

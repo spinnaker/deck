@@ -1,15 +1,18 @@
-import React from 'react';
 import { shallow } from 'enzyme';
+import React from 'react';
+
+import type { Application } from '@spinnaker/core';
+import { ApplicationModelBuilder } from '@spinnaker/core';
 import {
   createCustomMockLaunchTemplate,
   mockLaunchTemplate,
   mockLaunchTemplateData,
   mockServerGroup,
 } from '@spinnaker/mocks';
-import { Application, ApplicationModelBuilder } from '@spinnaker/core';
-import { IAmazonServerGroupView, IAmazonMixedInstancesPolicy, IScalingPolicy } from '../../../domain';
+
 import { LaunchTemplateDetailsSection } from './LaunchTemplateDetailsSection';
 import { MultipleInstanceTypesSubSection } from './MultipleInstanceTypesSubSection';
+import type { IAmazonMixedInstancesPolicy, IAmazonServerGroupView, IScalingPolicy } from '../../../domain';
 
 describe('Launch template details', () => {
   let app: Application;
@@ -144,7 +147,7 @@ describe('Launch template details', () => {
     ]);
     let index = 0;
     expectedLabels.forEach((value, key) => {
-      let labeledValue = actualLabeledValues.at(index++);
+      const labeledValue = actualLabeledValues.at(index++);
       expect(labeledValue.prop('label')).toEqual(key);
       value != '' && expect(labeledValue.prop('value')).toEqual(value);
     });
@@ -239,7 +242,7 @@ describe('Launch template details', () => {
   });
 
   it('should not render multiple instance types subsection when overrides are not specified', () => {
-    let testServerGroup = baseServerGroupWithMipOverrides;
+    const testServerGroup = baseServerGroupWithMipOverrides;
     testServerGroup.mixedInstancesPolicy.launchTemplateOverridesForInstanceType = null;
 
     const multipleInstanceTypes = shallow(

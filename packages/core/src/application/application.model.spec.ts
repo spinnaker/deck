@@ -1,14 +1,13 @@
 import { mock } from 'angular';
 
-import { Application } from './application.model';
+import type { Application } from './application.model';
 import { ApplicationModelBuilder } from './applicationModel.builder';
-import { ApplicationDataSourceRegistry } from './service/ApplicationDataSourceRegistry';
+import type { IEntityTag, IEntityTags, IInstanceCounts, ILoadBalancer, IServerGroup } from '../domain';
 import { LOAD_BALANCER_DATA_SOURCE } from '../loadBalancer/loadBalancer.dataSource';
-import { SecurityGroupReader } from '../securityGroup/securityGroupReader.service';
-import { SERVER_GROUP_DATA_SOURCE } from '../serverGroup/serverGroup.dataSource';
 import { SECURITY_GROUP_DATA_SOURCE } from '../securityGroup/securityGroup.dataSource';
-
-import { IEntityTag, IEntityTags, IServerGroup, IInstanceCounts, ILoadBalancer } from '../domain';
+import type { SecurityGroupReader } from '../securityGroup/securityGroupReader.service';
+import { SERVER_GROUP_DATA_SOURCE } from '../serverGroup/serverGroup.dataSource';
+import { ApplicationDataSourceRegistry } from './service/ApplicationDataSourceRegistry';
 
 describe('Application Model', function () {
   let application: Application,
@@ -187,19 +186,19 @@ describe('Application Model', function () {
   describe('setting default credentials and regions', function () {
     it('sets default credentials and region from server group when only one account/region found', function () {
       const serverGroups: IServerGroup[] = [
-          {
-            name: 'deck-test-v001',
-            cluster: 'deck-test',
-            account: 'test',
-            region: 'us-west-2',
-            type: 'aws',
-            cloudProvider: 'aws',
-            instances: [],
-            instanceCounts: {} as IInstanceCounts,
-          },
-        ],
-        loadBalancers: ILoadBalancer[] = [],
-        securityGroupsByApplicationName: any[] = [];
+        {
+          name: 'deck-test-v001',
+          cluster: 'deck-test',
+          account: 'test',
+          region: 'us-west-2',
+          type: 'aws',
+          cloudProvider: 'aws',
+          instances: [],
+          instanceCounts: {} as IInstanceCounts,
+        },
+      ];
+      const loadBalancers: ILoadBalancer[] = [];
+      const securityGroupsByApplicationName: any[] = [];
 
       configureApplication(serverGroups, loadBalancers, securityGroupsByApplicationName);
       expect(application.defaultCredentials.aws).toBe('test');
@@ -207,11 +206,11 @@ describe('Application Model', function () {
     });
 
     it('sets default credentials and region from load balancer when only one account/region found', function () {
-      const serverGroups: IServerGroup[] = [],
-        loadBalancers: ILoadBalancer[] = [
-          { name: 'deck-frontend', cloudProvider: 'gce', vpcId: 'vpc0', region: 'us-central-1', account: 'prod' },
-        ],
-        securityGroupsByApplicationName: any[] = [];
+      const serverGroups: IServerGroup[] = [];
+      const loadBalancers: ILoadBalancer[] = [
+        { name: 'deck-frontend', cloudProvider: 'gce', vpcId: 'vpc0', region: 'us-central-1', account: 'prod' },
+      ];
+      const securityGroupsByApplicationName: any[] = [];
 
       configureApplication(serverGroups, loadBalancers, securityGroupsByApplicationName);
       expect(application.defaultCredentials.gce).toBe('prod');
@@ -219,11 +218,11 @@ describe('Application Model', function () {
     });
 
     it('sets default credentials and region from firewall', function () {
-      const serverGroups: any[] = [],
-        loadBalancers: ILoadBalancer[] = [],
-        securityGroupsByApplicationName: any[] = [
-          { name: 'deck-test', provider: 'cf', accountName: 'test', region: 'us-south-7' },
-        ];
+      const serverGroups: any[] = [];
+      const loadBalancers: ILoadBalancer[] = [];
+      const securityGroupsByApplicationName: any[] = [
+        { name: 'deck-test', provider: 'cf', accountName: 'test', region: 'us-south-7' },
+      ];
 
       configureApplication(serverGroups, loadBalancers, securityGroupsByApplicationName);
       expect(application.defaultCredentials.cf).toBe('test');
@@ -231,13 +230,13 @@ describe('Application Model', function () {
     });
 
     it('does not set defaults when multiple values found for the same provider', function () {
-      const serverGroups: IServerGroup[] = [],
-        loadBalancers: ILoadBalancer[] = [
-          { name: 'deck-frontend', cloudProvider: 'aws', vpcId: 'vpcId', region: 'us-west-1', account: 'prod' },
-        ],
-        securityGroupsByApplicationName: any[] = [
-          { name: 'deck-test', provider: 'aws', accountName: 'test', region: 'us-east-1' },
-        ];
+      const serverGroups: IServerGroup[] = [];
+      const loadBalancers: ILoadBalancer[] = [
+        { name: 'deck-frontend', cloudProvider: 'aws', vpcId: 'vpcId', region: 'us-west-1', account: 'prod' },
+      ];
+      const securityGroupsByApplicationName: any[] = [
+        { name: 'deck-test', provider: 'aws', accountName: 'test', region: 'us-east-1' },
+      ];
 
       configureApplication(serverGroups, loadBalancers, securityGroupsByApplicationName);
       expect(application.defaultCredentials.aws).toBeUndefined();
@@ -245,13 +244,13 @@ describe('Application Model', function () {
     });
 
     it('sets default region or default credentials if possible', function () {
-      const serverGroups: IServerGroup[] = [],
-        loadBalancers: ILoadBalancer[] = [
-          { name: 'deck-frontend', cloudProvider: 'aws', vpcId: 'vpcId', region: 'us-east-1', account: 'prod' },
-        ],
-        securityGroupsByApplicationName: any[] = [
-          { name: 'deck-test', provider: 'aws', accountName: 'test', region: 'us-east-1' },
-        ];
+      const serverGroups: IServerGroup[] = [];
+      const loadBalancers: ILoadBalancer[] = [
+        { name: 'deck-frontend', cloudProvider: 'aws', vpcId: 'vpcId', region: 'us-east-1', account: 'prod' },
+      ];
+      const securityGroupsByApplicationName: any[] = [
+        { name: 'deck-test', provider: 'aws', accountName: 'test', region: 'us-east-1' },
+      ];
 
       configureApplication(serverGroups, loadBalancers, securityGroupsByApplicationName);
       expect(application.defaultCredentials.aws).toBeUndefined();
@@ -259,13 +258,13 @@ describe('Application Model', function () {
     });
 
     it('sets default credentials, even if region cannot be set', function () {
-      const serverGroups: IServerGroup[] = [],
-        loadBalancers: ILoadBalancer[] = [
-          { name: 'deck-frontend', cloudProvider: 'aws', vpcId: 'vpc0', region: 'us-east-1', account: 'test' },
-        ],
-        securityGroupsByApplicationName: any[] = [
-          { name: 'deck-test', provider: 'aws', accountName: 'test', region: 'us-west-1' },
-        ];
+      const serverGroups: IServerGroup[] = [];
+      const loadBalancers: ILoadBalancer[] = [
+        { name: 'deck-frontend', cloudProvider: 'aws', vpcId: 'vpc0', region: 'us-east-1', account: 'test' },
+      ];
+      const securityGroupsByApplicationName: any[] = [
+        { name: 'deck-test', provider: 'aws', accountName: 'test', region: 'us-west-1' },
+      ];
 
       configureApplication(serverGroups, loadBalancers, securityGroupsByApplicationName);
       expect(application.defaultCredentials.aws).toBe('test');
@@ -274,35 +273,35 @@ describe('Application Model', function () {
 
     it('should set defaults for multiple providers', function () {
       const serverGroups: any[] = [
-          {
-            name: 'deck-test-v001',
-            account: 'test',
-            region: 'us-west-2',
-            provider: 'aws',
-            instances: [],
-            instanceCounts: { up: 0, down: 0, starting: 0, unknown: 0, outOfService: 0 },
-          },
-          {
-            name: 'deck-gce-v001',
-            account: 'gce-test',
-            region: 'us-central-1',
-            provider: 'gce',
-            instances: [],
-            instanceCounts: { up: 0, down: 0, starting: 0, unknown: 0, outOfService: 0 },
-          },
-        ],
-        loadBalancers: ILoadBalancer[] = [
-          {
-            name: 'deck-frontend',
-            account: 'gce-test',
-            cloudProvider: 'gce',
-            region: 'us-central-1',
-            serverGroups: [],
-          },
-        ],
-        securityGroupsByApplicationName: any[] = [
-          { name: 'deck-test', provider: 'aws', accountName: 'test', region: 'us-west-2' },
-        ];
+        {
+          name: 'deck-test-v001',
+          account: 'test',
+          region: 'us-west-2',
+          provider: 'aws',
+          instances: [],
+          instanceCounts: { up: 0, down: 0, starting: 0, unknown: 0, outOfService: 0 },
+        },
+        {
+          name: 'deck-gce-v001',
+          account: 'gce-test',
+          region: 'us-central-1',
+          provider: 'gce',
+          instances: [],
+          instanceCounts: { up: 0, down: 0, starting: 0, unknown: 0, outOfService: 0 },
+        },
+      ];
+      const loadBalancers: ILoadBalancer[] = [
+        {
+          name: 'deck-frontend',
+          account: 'gce-test',
+          cloudProvider: 'gce',
+          region: 'us-central-1',
+          serverGroups: [],
+        },
+      ];
+      const securityGroupsByApplicationName: any[] = [
+        { name: 'deck-test', provider: 'aws', accountName: 'test', region: 'us-west-2' },
+      ];
 
       configureApplication(serverGroups, loadBalancers, securityGroupsByApplicationName);
       expect(application.defaultCredentials.aws).toBe('test');

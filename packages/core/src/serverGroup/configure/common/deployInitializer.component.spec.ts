@@ -1,6 +1,10 @@
-import { IComponentControllerService, mock } from 'angular';
-import { DeployInitializerController, DEPLOY_INITIALIZER_COMPONENT } from './deployInitializer.component';
-import { Application, ApplicationModelBuilder } from '../../../application';
+import type { IComponentControllerService } from 'angular';
+import { mock } from 'angular';
+
+import type { Application } from '../../../application';
+import { ApplicationModelBuilder } from '../../../application';
+import type { DeployInitializerController } from './deployInitializer.component';
+import { DEPLOY_INITIALIZER_COMPONENT } from './deployInitializer.component';
 
 describe('Component: deployInitializer', () => {
   let ctrl: DeployInitializerController, $componentController: IComponentControllerService, application: Application;

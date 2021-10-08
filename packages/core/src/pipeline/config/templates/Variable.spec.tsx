@@ -1,12 +1,13 @@
 import { mock } from 'angular';
+import type { ReactWrapper } from 'enzyme';
+import { mount } from 'enzyme';
 import React from 'react';
-import { mount, ReactWrapper } from 'enzyme';
 
-import { REACT_MODULE } from '../../../reactShims/react.module';
-import { PIPELINE_TEMPLATE_MODULE } from './pipelineTemplate.module';
+import type { VariableType } from './PipelineTemplateReader';
 import { Variable } from './Variable';
-import { IVariableError, IVariableProps } from './inputs/variableInput.service';
-import { VariableType } from './PipelineTemplateReader';
+import type { IVariableError, IVariableProps } from './inputs/variableInput.service';
+import { PIPELINE_TEMPLATE_MODULE } from './pipelineTemplate.module';
+import { REACT_MODULE } from '../../../reactShims/react.module';
 
 describe('Variable component', () => {
   const generateProps = (type: VariableType, value: any) => {
