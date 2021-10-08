@@ -6,7 +6,8 @@ import { Constraints } from './Constraints';
 import { VersionTitle } from './VersionTitle';
 import { ArtifactActions } from '../../artifactActions/ArtifactActions';
 import type { QueryArtifactVersion } from '../types';
-import { isVersionVetoed, useCreateVersionRollbackActions } from './utils';
+import { useCreateVersionRollbackActions } from './useCreateRollbackActions.hook';
+import { isVersionVetoed } from './utils';
 import type { VersionMessageData } from '../../versionMetadata/MetadataComponents';
 import { getBaseMetadata, getVersionCompareLinks, VersionMetadata } from '../../versionMetadata/VersionMetadata';
 

@@ -10,7 +10,8 @@ import { useFetchVersionQuery } from '../graphql/graphql-sdk';
 import type { ITaskArtifactVersionProps } from '../overview/artifact/ArtifactVersionTasks';
 import { ArtifactVersionTasks } from '../overview/artifact/ArtifactVersionTasks';
 import { Constraints } from '../overview/artifact/Constraints';
-import { isVersionVetoed, useCreateVersionRollbackActions } from '../overview/artifact/utils';
+import { useCreateVersionRollbackActions } from '../overview/artifact/useCreateRollbackActions.hook';
+import { isVersionVetoed } from '../overview/artifact/utils';
 import { useApplicationContextSafe } from '../../presentation';
 import { LoadingAnimation } from '../../presentation/LoadingAnimation';
 import type {
