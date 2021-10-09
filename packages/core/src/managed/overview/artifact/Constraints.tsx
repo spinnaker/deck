@@ -25,8 +25,6 @@ interface IConstraintContentProps {
   versionProps: ArtifactVersionProps;
 }
 
-const shouldShowRestartButton = (constraint: QueryConstraint) => constraint.status === 'FAIL';
-
 const ConstraintContent = ({ constraint, versionProps }: IConstraintContentProps) => {
   const description = constraintsManager.renderDescription(constraint);
   const actions = constraintsManager.getActions(constraint)?.sort((action) => (action.pass ? -1 : 1)); // positive actions first
@@ -36,7 +34,7 @@ const ConstraintContent = ({ constraint, versionProps }: IConstraintContentProps
   const refetchVariables: FetchVersionQueryVariables = { appName: application.name, versions: [versionProps.version] };
   const refetchQueries = [{ query: FetchVersionDocument, variables: refetchVariables }];
 
-  const showRestartButton = shouldShowRestartButton(constraint);
+  const showRestartButton = constraintsManager.showRestart(constraint);
 
   const baseRequestProps = {
     application: application.name,
@@ -142,7 +140,7 @@ const Constraint = ({ constraint, versionProps }: IConstraintProps) => {
           </div>
         )}
       >
-        {hasContent || shouldShowRestartButton(constraint) ? (
+        {hasContent || constraintsManager.showRestart(constraint) ? (
           <ConstraintContent constraint={constraint} versionProps={versionProps} />
         ) : undefined}
       </CollapsibleSection>
