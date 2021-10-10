@@ -48,7 +48,10 @@ export interface IConstraintHandler<K = string> {
   overrideActions?: { [status in ConstraintStatus]?: IConstraintOverrideAction[] };
 
   /** determines when to show the restart constraint button. By default, only when the status is FAIL  */
-  showRestart?: (props: { constraint: RelaxedConstraint }) => boolean;
+  restartProps?: {
+    isVisible?: (props: { constraint: RelaxedConstraint }) => boolean;
+    displayName?: string;
+  };
 }
 
 class ConstraintsManager extends BasePluginManager<IConstraintHandler> {
@@ -116,9 +119,13 @@ class ConstraintsManager extends BasePluginManager<IConstraintHandler> {
     return constraint.status === 'FAIL';
   };
 
-  showRestart(constraint: IConstraint): boolean {
-    const showRestartFunc = this.getHandler(constraint.type)?.showRestart || this.defaultShowRestart;
+  isRestartVisible(constraint: IConstraint): boolean {
+    const showRestartFunc = this.getHandler(constraint.type)?.restartProps?.isVisible || this.defaultShowRestart;
     return showRestartFunc({ constraint });
+  }
+
+  getRestartDisplayName(constraint: IConstraint): string {
+    return this.getHandler(constraint.type)?.restartProps?.displayName || 'Reset';
   }
 }
 
@@ -139,7 +146,9 @@ const baseHandlers: Array<IConstraintHandler<IConstraint['type']>> = [
         },
       ],
     },
-    showRestart: () => false,
+    restartProps: {
+      isVisible: () => false,
+    },
   },
   {
     kind: 'depends-on',
@@ -148,7 +157,9 @@ const baseHandlers: Array<IConstraintHandler<IConstraint['type']>> = [
       displayName: 'Depends on',
       displayStatus: getDependsOnStatus,
     },
-    showRestart: () => false,
+    restartProps: {
+      isVisible: () => false,
+    },
   },
   {
     kind: 'manual-judgement',

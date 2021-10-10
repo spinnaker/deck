@@ -34,7 +34,7 @@ const ConstraintContent = ({ constraint, versionProps }: IConstraintContentProps
   const refetchVariables: FetchVersionQueryVariables = { appName: application.name, versions: [versionProps.version] };
   const refetchQueries = [{ query: FetchVersionDocument, variables: refetchVariables }];
 
-  const showRestartButton = constraintsManager.showRestart(constraint);
+  const showRestartButton = constraintsManager.isRestartVisible(constraint);
 
   const baseRequestProps = {
     application: application.name,
@@ -97,7 +97,7 @@ const ConstraintContent = ({ constraint, versionProps }: IConstraintContentProps
                 restartConstraint();
               }}
             >
-              Reset
+              {constraintsManager.getRestartDisplayName(constraint)}
             </button>
           )}
           {isUpdatingConstraint ||
@@ -140,7 +140,7 @@ const Constraint = ({ constraint, versionProps }: IConstraintProps) => {
           </div>
         )}
       >
-        {hasContent || constraintsManager.showRestart(constraint) ? (
+        {hasContent || constraintsManager.isRestartVisible(constraint) ? (
           <ConstraintContent constraint={constraint} versionProps={versionProps} />
         ) : undefined}
       </CollapsibleSection>
