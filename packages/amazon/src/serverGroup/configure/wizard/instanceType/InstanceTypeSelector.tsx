@@ -1,20 +1,22 @@
+import type { FormikProps } from 'formik';
 import React, { useEffect, useState } from 'react';
 
-import { HelpField, IInstanceTypeCategory } from '@spinnaker/core';
+import type { IInstanceTypeCategory } from '@spinnaker/core';
+import { HelpField } from '@spinnaker/core';
 
 import { AdvancedModeSelector } from './advancedMode/AdvancedModeSelector';
 import { AWSProviderSettings } from '../../../../aws.settings';
-import { IAmazonInstanceTypeOverride, IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
+import type { IAmazonInstanceTypeOverride, IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
 import { SimpleModeSelector } from './simpleMode/SimpleModeSelector';
 
 export interface IInstanceTypeSelectorProps {
-  command: IAmazonServerGroupCommand;
-  setFieldValue: (field: keyof IAmazonServerGroupCommand, value: any, shouldValidate?: boolean) => void;
+  formik: FormikProps<IAmazonServerGroupCommand>;
   instanceTypeDetails: IInstanceTypeCategory[];
 }
 
 export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
-  const { command, setFieldValue, instanceTypeDetails } = props;
+  const { instanceTypeDetails } = props;
+  const { values: command, setFieldValue } = props.formik;
   const isLaunchTemplatesEnabled = AWSProviderSettings.serverGroups?.enableLaunchTemplates;
 
   const [useSimpleMode, setUseSimpleMode] = React.useState(command.viewState.useSimpleInstanceTypeSelector);
@@ -84,10 +86,9 @@ export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
           </i>
         </div>
         <AdvancedModeSelector
-          command={command}
+          formik={props.formik}
           instanceTypeDetails={instanceTypeDetails}
           setUnlimitedCpuCredits={setUnlimitedCpuCredits}
-          setFieldValue={setFieldValue}
         />
       </div>
     );
@@ -100,11 +101,10 @@ export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
         <p>
           To configure mixed server groups with multiple instance types, use{' '}
           <a className="clickable" onClick={() => handleModeChange(false)}>
-            {' '}
-            Advanced Mode{' '}
+            <span>Advanced Mode</span>
           </a>
+          <HelpField id={'aws.serverGroup.advancedMode'} />.
         </p>
-        <HelpField id={'aws.serverGroup.advancedMode'} />.
         <i>
           <b>Note:</b> If an instance type is already selected in simple mode, it will be preserved in advanced mode.
         </i>
@@ -114,7 +114,7 @@ export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
     advancedModeMessage = (
       <div>
         <p>
-          To configure mixed server groups with multiple instance types,{' '}
+          To configure mixed server groups with multiple instance types,
           <a
             href={
               'https://spinnaker.io/docs/setup/other_config/server-group-launch-settings/aws-ec2/launch-templates-setup/'

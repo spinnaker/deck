@@ -121,12 +121,11 @@ export class ServerGroupInstanceType
   }
 
   public render() {
-    const { setFieldValue, values } = this.props.formik;
+    const { values } = this.props.formik;
     const showTypeSelector = !!(values.viewState.disableImageSelection || values.amiName);
 
     // mark unavailable instance types for all profiles
-    const availableInstanceTypesForConfig: string[] =
-      (values.backingData && values.backingData.filtered && values.backingData.filtered.instanceTypes) || [];
+    const availableInstanceTypesForConfig: string[] = values.backingData?.filtered?.instanceTypes ?? [];
     const markedInstanceTypeDetails: IAmazonInstanceTypeCategory[] = Array.from(this.state.instanceTypeDetails);
     if (!values.viewState.disableImageSelection && availableInstanceTypesForConfig.length) {
       markedInstanceTypeDetails.forEach((profile) => {
@@ -139,13 +138,7 @@ export class ServerGroupInstanceType
     }
 
     if (showTypeSelector && values) {
-      return (
-        <InstanceTypeSelector
-          command={values}
-          setFieldValue={setFieldValue}
-          instanceTypeDetails={markedInstanceTypeDetails}
-        />
-      );
+      return <InstanceTypeSelector formik={this.props.formik} instanceTypeDetails={markedInstanceTypeDetails} />;
     }
 
     return <h5 className="text-center">Please select an image.</h5>;
