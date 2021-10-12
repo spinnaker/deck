@@ -108,8 +108,15 @@ angular
 
       this.hasInstanceTypeDeployments = () => {
         return stage.clusters.some((cluster) => {
-          return cluster.instanceType !== undefined;
+          return (
+            cluster.instanceType !== undefined ||
+            (cluster.launchTemplateOverridesForInstanceType && cluster.launchTemplateOverridesForInstanceType.length)
+          );
         });
+      };
+
+      this.getInstanceTypes = function (cluster) {
+        return cluster.instanceType || _.map(cluster.launchTemplateOverridesForInstanceType, 'instanceType').toString();
       };
 
       this.getSubnet = (cluster) => {
