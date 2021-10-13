@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { ArtifactCollapsibleSection } from './ArtifactCollapsibleSection';
 import type { ITaskArtifactVersionProps } from './ArtifactVersionTasks';
 import { ArtifactVersionTasks } from './ArtifactVersionTasks';
 import { Constraints } from './Constraints';
@@ -9,7 +8,7 @@ import { ArtifactActions } from '../../artifactActions/ArtifactActions';
 import type { QueryArtifact, QueryArtifactVersion } from '../types';
 import { useCreateVersionRollbackActions } from './useCreateRollbackActions.hook';
 import { extractVersionRollbackDetails, isVersionVetoed } from './utils';
-import { toPinnedMetadata, VersionMessageData } from '../../versionMetadata/MetadataComponents';
+import { toPinnedMetadata } from '../../versionMetadata/MetadataComponents';
 import { getBaseMetadata, getVersionCompareLinks, VersionMetadata } from '../../versionMetadata/VersionMetadata';
 
 interface ICurrentVersionProps<T = QueryArtifactVersion> {
