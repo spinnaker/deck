@@ -107,6 +107,14 @@ const helpContents: { [key: string]: string } = {
   'aws.securityGroup.name':
     '<p>The {{firewall}} name is formed by combining the application name, the <b>Stack</b> field, and the <b>Detail</b> field.</p>',
   'aws.securityGroup.cross.account.ingress.help': '<p>Accounts that are excluded will not show up in this list</p>',
+  'aws.securityGroup.volume.devicename': 'The device name (for example, /dev/sdh or xvdh).',
+  'aws.securityGroup.volume.size': 'Must be an integer and represents the amount in GiB',
+  'aws.securityGroup.volume.type':'Amazon EBS Volume Type',
+  'aws.securityGroup.volume.iops':'Maximum number of input/output operations per second (IOPS) that the volume should provide. You can specify IOPS only for gp3, io1, and io2 volumes.',
+  'aws.securityGroup.volume.encrypted':'If the instance type supports EBS encryption and you want to encrypt the volume',
+  'aws.securityGroup.volume.snapshot':'Type the ID of the snapshot from which you are restoring the volume',
+  'aws.securityGroup.volume.delete.on.termination':'Meaning the volume will automatically be deleted when you destroy the instance.',
+  'aws.securityGroup.volume.virtual.name':'The virtual device name (ephemeralN). The name must be in the form ephemeralX where X is a number starting from zero (0). For example, an instance type with 2 available instance store volumes can specify mappings for ephemeral0 and ephemeral1. The number of available instance store volumes depends on the instance type. After you connect to the instance, you must mount the volume.',
   'aws.scalingPolicy.search.restricted': `<p>Resets dimensions to "AutoScalingGroupName: {name of the ASG}" and provides
         a simpler, combined input for the namespace and metric name fields.</p>`,
   'aws.scalingPolicy.search.all': `

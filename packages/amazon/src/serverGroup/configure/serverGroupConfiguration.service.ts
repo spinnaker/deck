@@ -85,6 +85,27 @@ export interface IAmazonServerGroupCommandViewState extends IServerGroupCommandV
   spelLoadBalancers: string[];
 }
 
+export interface IBlockDevicesCommand {
+  blockDevices: IServerGroupCommandBlockDevice[];
+}
+
+export interface IServerGroupCommandBlockDevice {
+  deleteOnTermination: boolean;
+  deviceName: string;
+  size: number;
+  volumeType: string;
+  virtualName: string;
+  iops: number;
+  snapshotId: string;
+  encrypted: boolean;
+}
+
+export interface IVolumeListenerAction {
+  order?: number;
+  volumeActionConfig?: IServerGroupCommandBlockDevice; // writes
+  volumeConfig?: IServerGroupCommandBlockDevice; // reads
+}
+
 export interface IAmazonServerGroupCommand extends IServerGroupCommand {
   associateIPv6Address?: boolean;
   associatePublicIpAddress: boolean;
@@ -104,6 +125,8 @@ export interface IAmazonServerGroupCommand extends IServerGroupCommand {
   unlimitedCpuCredits?: boolean;
   capacityRebalance?: boolean;
   viewState: IAmazonServerGroupCommandViewState;
+  blockDevices: IServerGroupCommandBlockDevice[];
+  blockDeviceTags: string[];
 
   getBlockDeviceMappingsSource: (command: IServerGroupCommand) => IBlockDeviceMappingSource;
   selectBlockDeviceMappingsSource: (command: IServerGroupCommand, selection: string) => void;
