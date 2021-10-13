@@ -99,7 +99,7 @@ interface IArtifactProps {
 const ArtifactResources = ({ environment, resources }: Pick<QueryArtifact, 'environment' | 'resources'>) => {
   const isUpdatingResources = useIsUpdatingResources(environment);
   return (
-    <ArtifactCollapsibleSection heading="DEPLOYED INFRA" isUpdating={isUpdatingResources}>
+    <ArtifactCollapsibleSection heading="DEPLOYED TO" isUpdating={isUpdatingResources}>
       {resources?.map((resource) => (
         <Resource
           key={resource.id}
@@ -147,8 +147,8 @@ export const Artifact = ({ artifact, isPreview }: IArtifactProps) => {
             <PinnedVersion version={pinnedVersion} />
           )}
       </div>
+      <ArtifactVersions title="Now deploying" artifact={artifact} versions={deployingVersion} isDeploying={true} />
       <ArtifactResources {...{ environment, resources }} />
-      <ArtifactVersions title="Now deploying" artifact={artifact} versions={deployingVersion} />
       <ArtifactVersions
         title={`${pendingVersions.length} pending version` + (pendingVersions.length > 1 ? 's' : '')}
         artifact={artifact}

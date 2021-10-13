@@ -17,11 +17,12 @@ export interface IPendingVersionsProps {
   artifact: QueryArtifact;
   title: string;
   versions?: QueryArtifactVersion[];
+  isDeploying?: boolean;
 }
 
 const NUM_VERSIONS_WHEN_COLLAPSED = 1;
 
-export const ArtifactVersions = ({ artifact, versions, title }: IPendingVersionsProps) => {
+export const ArtifactVersions = ({ artifact, versions, title, isDeploying }: IPendingVersionsProps) => {
   const numVersions = versions?.length || 0;
   const [isExpanded, setIsExpanded] = React.useState(false);
   const logEvent = useLogEvent('ArtifactPendingVersion');
@@ -31,7 +32,11 @@ export const ArtifactVersions = ({ artifact, versions, title }: IPendingVersions
   const versionsToShow = isExpanded ? versions : versions.slice(0, NUM_VERSIONS_WHEN_COLLAPSED);
   const { pinnedVersion } = artifact;
   return (
-    <ArtifactCollapsibleSection outerDivClassName="artifact-versions artifact-section" heading={title}>
+    <ArtifactCollapsibleSection
+      outerDivClassName="artifact-versions artifact-section"
+      heading={title}
+      isUpdating={isDeploying}
+    >
       <div className="artifact-pending-versions-list">
         {versionsToShow.map((version, index) => (
           <PendingVersion
