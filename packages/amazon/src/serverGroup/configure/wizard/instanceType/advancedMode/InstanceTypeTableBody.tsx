@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { difference, flatten, keyBy } from 'lodash';
 import React from 'react';
 import { SortableContainer, SortableElement, SortEnd } from 'react-sortable-hoc';
 
@@ -27,10 +27,7 @@ export function InstanceTypeTableBody(props: {
           ? null
           : new Map(
               Object.entries(
-                _.keyBy(
-                  _.flatten(props.profileFamiliesDetails.map((f: IInstanceTypeFamily) => f.instanceTypes)),
-                  'name',
-                ),
+                keyBy(flatten(props.profileFamiliesDetails.map((f: IInstanceTypeFamily) => f.instanceTypes)), 'name'),
               ),
             )
       }
@@ -52,22 +49,24 @@ const TableRows = SortableContainer(
 
     let selectedRows, unselectedRows;
     if (isCustom) {
-      selectedRows = Array.from(selectedInstanceTypesMap.values())
-        .sort((i1, i2) => i1.priority - i2.priority)
-        .map((selectedType, index: number) => (
-          <SortableRow
-            key={`${selectedType.instanceType}-${index}`}
-            index={index}
-            isCustom={true}
-            selectedType={selectedType}
-            removeInstanceType={props.removeInstanceType}
-            addOrUpdateInstanceType={props.addOrUpdateInstanceType}
-          />
-        ));
+      selectedRows =
+        selectedInstanceTypesMap.size > 0 &&
+        Array.from(selectedInstanceTypesMap.values())
+          .sort((i1, i2) => i1.priority - i2.priority)
+          .map((selectedType, index: number) => (
+            <SortableRow
+              key={`${selectedType.instanceType}-${index}`}
+              index={index}
+              isCustom={true}
+              selectedType={selectedType}
+              removeInstanceType={props.removeInstanceType}
+              addOrUpdateInstanceType={props.addOrUpdateInstanceType}
+            />
+          ));
     } else {
       const { instanceTypeDetails } = props;
       const instanceTypesInProfile: string[] = Array.from(instanceTypeDetails?.keys());
-      const unselectedInstanceTypes: string[] = _.difference(
+      const unselectedInstanceTypes: string[] = difference(
         instanceTypesInProfile,
         Array.from(selectedInstanceTypesMap.keys()),
       );

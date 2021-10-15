@@ -3,12 +3,30 @@ import Select, { Option } from 'react-select';
 
 import { HelpField } from '@spinnaker/core';
 
-export function CustomHeading() {
+export function Heading(props: { isCustom: boolean; profileLabel?: string; profileDescriptionArr?: string[] }) {
+  let description;
+  if (props.isCustom) {
+    description = <p>Choose the instance types that best suit the needs of your application.</p>;
+  } else {
+    description = (
+      <>
+        <p>
+          <b>{props.profileLabel}</b>
+        </p>
+        <ul>
+          {props.profileDescriptionArr.map((d, index) => (
+            <li key={index}>{d}</li>
+          ))}
+        </ul>
+      </>
+    );
+  }
+
   return (
-    <div className={'row sub-section text'}>
+    <div className={'row sub-section'}>
       <h4>Instance Types</h4>
       <div className={'description'}>
-        <p>Choose the instance types that best suit the needs of your application.</p>
+        {description}
         <i>
           <b>Note:</b>
           <ul>
@@ -24,28 +42,61 @@ export function CustomHeading() {
   );
 }
 
-export function CustomTableHeader() {
+export function Header(props: { isCustom: boolean; showCpuCredits?: boolean }) {
+  let emptyHeaders, instanceTypeHeader, otherHeaders, tailingEmptyHeader;
+  if (props.isCustom) {
+    emptyHeaders = <th />;
+    instanceTypeHeader = (
+      <th>
+        Instance Type <HelpField id="aws.serverGroup.instanceTypes" />
+      </th>
+    );
+    otherHeaders = null;
+    tailingEmptyHeader = <th />;
+  } else {
+    emptyHeaders = (
+      <>
+        <th />
+        <th />
+      </>
+    );
+    instanceTypeHeader = <th>InstanceType</th>;
+    otherHeaders = (
+      <>
+        <th>vCPU</th>
+        <th>Mem (GiB)</th>
+        {props.showCpuCredits && <th>CPU Credits</th>}
+        <th>
+          Storage (GB)
+          <HelpField id={'aws.serverGroup.storageType'} />
+        </th>
+        <th>Cost</th>
+      </>
+    );
+    tailingEmptyHeader = null;
+  }
+
   return (
     <thead>
       <tr>
-        <th />
-        <th>
-          Instance Type <HelpField id="aws.serverGroup.instanceTypes" />
-        </th>
+        {emptyHeaders}
+        {instanceTypeHeader}
+        {otherHeaders}
         <th>
           Weight <HelpField id="aws.serverGroup.instanceTypeWeight" />
         </th>
-        <th />
+        {tailingEmptyHeader}
       </tr>
     </thead>
   );
 }
 
-export function CustomTableFooter(props: {
+export function Footer(props: {
+  isCustom: boolean;
   availableInstanceTypesList: string[];
   addOrUpdateInstanceType: (type: string, weight: string) => void;
 }) {
-  return (
+  return props.isCustom ? (
     <tfoot>
       <tr>
         <td>
@@ -60,7 +111,7 @@ export function CustomTableFooter(props: {
         <td></td>
       </tr>
     </tfoot>
-  );
+  ) : null;
 }
 
 const InstanceTypeSelect = (props: {

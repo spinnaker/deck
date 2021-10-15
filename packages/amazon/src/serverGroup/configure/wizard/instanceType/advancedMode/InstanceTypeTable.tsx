@@ -1,11 +1,10 @@
-import _ from 'lodash';
 import React from 'react';
 import { arrayMove, SortEnd } from 'react-sortable-hoc';
 
 import { CpuCreditsToggle } from '../CpuCreditsToggle';
-import { CustomHeading, CustomTableFooter, CustomTableHeader } from './Custom';
 import { InstanceTypeTableBody } from './InstanceTypeTableBody';
-import { NonCustomHeading, NonCustomTableHeader } from './NonCustom';
+import { Header, Heading } from './InstanceTypeTableParts';
+import { Footer } from './InstanceTypeTableParts';
 import { AWSProviderSettings } from '../../../../../aws.settings';
 import { IAmazonInstanceTypeCategory } from '../../../../../instance/awsInstanceType.service';
 import { IAmazonInstanceTypeOverride } from '../../../serverGroupConfiguration.service';
@@ -55,11 +54,11 @@ export function InstanceTypeTable(props: IInstanceTypeTableProps) {
     const itemToUpdate = selectedInstanceTypesMap.has(type)
       ? {
           ...selectedInstanceTypesMap.get(type), // update existing item
-          weightedCapacity: !_.isNaN(weightNum) && weightNum !== 0 ? weightNum : undefined,
+          weightedCapacity: !isNaN(weightNum) && weightNum !== 0 ? weightNum : undefined,
         }
       : {
           instanceType: type, // new item
-          weightedCapacity: !_.isNaN(weightNum) && weightNum !== 0 ? weightNum : undefined,
+          weightedCapacity: !isNaN(weightNum) && weightNum !== 0 ? weightNum : undefined,
           priority:
             1 +
             Array.from(selectedInstanceTypesMap.values()).reduce(
@@ -86,17 +85,19 @@ export function InstanceTypeTable(props: IInstanceTypeTableProps) {
 
   if (currentProfile && currentProfile !== 'custom') {
     const { label, descriptionListOverride, families, showCpuCredits } = props.profileDetails;
+    const isCustom = false;
     return (
       <div className={'row sub-section'}>
-        <NonCustomHeading
+        <Heading
+          isCustom={isCustom}
           profileLabel={label}
           profileDescriptionArr={descriptionListOverride ? descriptionListOverride : families.map((f) => f.description)}
         />
         {isCpuCreditsEnabled && cpuCreditsToggle}
         <table className="table table-hover">
-          <NonCustomTableHeader showCpuCredits={showCpuCredits} />
+          <Header isCustom={isCustom} showCpuCredits={showCpuCredits} />
           <InstanceTypeTableBody
-            isCustom={false}
+            isCustom={isCustom}
             profileFamiliesDetails={families}
             selectedInstanceTypesMap={selectedInstanceTypesMap}
             addOrUpdateInstanceType={addOrUpdateInstanceType}
@@ -107,20 +108,22 @@ export function InstanceTypeTable(props: IInstanceTypeTableProps) {
       </div>
     );
   } else {
+    const isCustom = true;
     return (
       <div className={'row sub-section'}>
-        <CustomHeading />
+        <Heading isCustom={isCustom} />
         {isCpuCreditsEnabled && cpuCreditsToggle}
         <table className="table table-hover">
-          <CustomTableHeader />
+          <Header isCustom={isCustom} />
           <InstanceTypeTableBody
-            isCustom={true}
+            isCustom={isCustom}
             selectedInstanceTypesMap={selectedInstanceTypesMap}
             addOrUpdateInstanceType={addOrUpdateInstanceType}
             removeInstanceType={removeInstanceType}
             handleSortEnd={handleSortEnd}
           />
-          <CustomTableFooter
+          <Footer
+            isCustom={isCustom}
             availableInstanceTypesList={props.availableInstanceTypesList.filter(
               (it) => !selectedInstanceTypeNames.includes(it),
             )}

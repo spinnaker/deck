@@ -1,33 +1,45 @@
-import _ from 'lodash';
-import React, { useState } from 'react';
+import type { FormikProps } from 'formik/dist/types';
+import { keyBy } from 'lodash';
+import React, { useEffect, useState } from 'react';
 
 import { usePrevious } from '@spinnaker/core';
 
 import { InstanceProfileSelector } from './InstanceProfileSelector';
 import { InstanceTypeTable } from './InstanceTypeTable';
 import { InstancesDistribution } from './InstancesDistribution';
-import { IAmazonInstanceTypeCategory } from '../../../../../instance/awsInstanceType.service';
+import type { IAmazonInstanceTypeCategory } from '../../../../../instance/awsInstanceType.service';
 import { AwsReactInjector } from '../../../../../reactShims';
-import { IAmazonInstanceTypeOverride, IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
+import type { IAmazonInstanceTypeOverride, IAmazonServerGroupCommand } from '../../../serverGroupConfiguration.service';
 
 export interface IAdvancedModeSelectorProps {
-  command: IAmazonServerGroupCommand;
+  formik: FormikProps<IAmazonServerGroupCommand>;
   instanceTypeDetails: IAmazonInstanceTypeCategory[];
   setUnlimitedCpuCredits: (unlimitedCpuCredits: boolean | undefined) => void;
-  setFieldValue: (field: keyof IAmazonServerGroupCommand, value: any, shouldValidate?: boolean) => void;
 }
 
 /**
  * Note: Launch templates support is expected to be enabled if this component is rendered.
  */
 export function AdvancedModeSelector(props: IAdvancedModeSelectorProps) {
-  const { command, instanceTypeDetails, setUnlimitedCpuCredits, setFieldValue } = props;
+  const { instanceTypeDetails, setUnlimitedCpuCredits } = props;
+  const { values: command, setFieldValue } = props.formik;
+
+  // for the case of MixedInstancesPolicy without overrides, copy command.instanceType to command.launchTemplateOverridesForInstanceType
+  const { instanceType, launchTemplateOverridesForInstanceType } = command;
+  useEffect(() => {
+    if (!launchTemplateOverridesForInstanceType && instanceType) {
+      props.formik.setFieldValue('launchTemplateOverridesForInstanceType', [
+        { instanceType: command.instanceType, priority: 1 },
+      ]);
+    }
+  });
+
   const instanceTypesInProps: IAmazonInstanceTypeOverride[] = command.launchTemplateOverridesForInstanceType
     ? command.launchTemplateOverridesForInstanceType
-    : [{ instanceType: command.instanceType }]; // needed for the case of MixedInstancesPolicy without overrides
+    : undefined;
 
   const selectedInstanceTypesMap = new Map<string, IAmazonInstanceTypeOverride>(
-    Object.entries(_.keyBy(instanceTypesInProps, 'instanceType')),
+    Object.entries(keyBy(instanceTypesInProps, 'instanceType')),
   );
 
   const [instanceProfile, setInstanceProfile] = useState(command.viewState.instanceProfile || 'custom');
@@ -70,15 +82,7 @@ export function AdvancedModeSelector(props: IAdvancedModeSelectorProps) {
         handleProfileChange={handleProfileChange}
         instanceProfileList={instanceTypeDetails}
       />
-      <InstancesDistribution
-        onDemandAllocationStrategy={command.onDemandAllocationStrategy}
-        onDemandBaseCapacity={command.onDemandBaseCapacity}
-        onDemandPercentageAboveBaseCapacity={command.onDemandPercentageAboveBaseCapacity}
-        spotAllocationStrategy={command.spotAllocationStrategy}
-        spotInstancePools={command.spotInstancePools}
-        spotMaxPrice={command.spotPrice}
-        setFieldValue={setFieldValue}
-      />
+      <InstancesDistribution formik={props.formik} />
       <InstanceTypeTable
         currentProfile={instanceProfile}
         selectedInstanceTypesMap={selectedInstanceTypesMap}

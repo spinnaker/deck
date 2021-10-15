@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Checkbox } from 'react-bootstrap';
 import { SortableHandle } from 'react-sortable-hoc';
-import { Tooltip } from '@spinnaker/core';
+import { TextInput, Tooltip } from '@spinnaker/core';
 import { IAmazonPreferredInstanceType } from '../../../../../instance/awsInstanceType.service';
 import { CostFactor } from '../../../../../instance/details/CostFactor';
 import { IAmazonInstanceTypeOverride } from '../../../serverGroupConfiguration.service';
@@ -27,6 +27,15 @@ export function InstanceTypeRow(props: IRowProps) {
     setNewWeightedCap('');
   };
 
+  const handleWeightChange = (e: React.ChangeEvent<any>): void => {
+    setNewWeightedCap(e.target.value);
+    if (isRowSelected) {
+      selectOrUpdateRow(instanceType, e.target.value);
+    } else {
+      document.getElementById(`selectInstanceType-${instanceType}`).focus();
+    }
+  };
+
   let row;
   if (props.isCustom) {
     row = (
@@ -36,15 +45,12 @@ export function InstanceTypeRow(props: IRowProps) {
         </td>
         <td>{instanceType}</td>
         <td title={'Enter optional weight (allowed values: 1 to 999).'}>
-          <input
-            className="form-control input input-sm"
-            type="text"
+          <TextInput
+            className={'form-control input input-sm'}
             pattern="[0-9]*"
             placeholder="Enter optional weight (allowed values: 1 to 999)."
             value={props.selectedType?.weightedCapacity || ''}
-            onChange={(e) => {
-              selectOrUpdateRow(instanceType, e.target.value);
-            }}
+            onChange={(e) => selectOrUpdateRow(instanceType, e.target.value)}
           />
         </td>
         <td>
@@ -111,25 +117,17 @@ export function InstanceTypeRow(props: IRowProps) {
         {storage.type === 'EBS' && <td>EBS Only</td>}
         {storage.type === 'SSD' && <td>{storage.count + 'x' + storage.size}</td>}
         <td>
-          <CostFactor costFactor={costFactor} />
+          <CostFactor min={costFactor} />
         </td>
         <td title={!disableRow ? 'Enter optional weight (allowed values: 1 to 999).' : ''}>
-          <input
-            className="form-control input input-sm"
+          <TextInput
+            inputClassName={'form-control input input-sm'}
             id={`weightedCapacity-${instanceType}`}
-            type="text"
             pattern="[0-9]*"
             placeholder="Enter optional weight (allowed values: 1 to 999)."
             disabled={disableRow}
             value={props.selectedType?.weightedCapacity || newWeightedCap || ''}
-            onChange={(e) => {
-              setNewWeightedCap(e.target.value);
-              if (isRowSelected) {
-                selectOrUpdateRow(instanceType, e.target.value);
-              } else {
-                document.getElementById(`selectInstanceType-${instanceType}`).focus();
-              }
-            }}
+            onChange={handleWeightChange}
           />
         </td>
       </tr>
