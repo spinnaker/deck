@@ -1,23 +1,25 @@
+import type { FormikProps } from 'formik/dist/types';
 import React, { useEffect, useState } from 'react';
 
-import { HelpField, IInstanceTypeCategory } from '@spinnaker/core';
+import type { IInstanceTypeCategory } from '@spinnaker/core';
+import { HelpField } from '@spinnaker/core';
 
 import { AdvancedModeSelector } from './advancedMode/AdvancedModeSelector';
 import { AWSProviderSettings } from '../../../../aws.settings';
-import { IAmazonInstanceTypeOverride, IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
+import type { IAmazonInstanceTypeOverride, IAmazonServerGroupCommand } from '../../serverGroupConfiguration.service';
 import { SimpleModeSelector } from './simpleMode/SimpleModeSelector';
 
 export interface IInstanceTypeSelectorProps {
-  command: IAmazonServerGroupCommand;
-  setFieldValue: (field: keyof IAmazonServerGroupCommand, value: any, shouldValidate?: boolean) => void;
+  formik: FormikProps<IAmazonServerGroupCommand>;
   instanceTypeDetails: IInstanceTypeCategory[];
 }
 
 export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
-  const { command, setFieldValue, instanceTypeDetails } = props;
+  const { instanceTypeDetails } = props;
+  const { values: command, setFieldValue } = props.formik;
   const isLaunchTemplatesEnabled = AWSProviderSettings.serverGroups?.enableLaunchTemplates;
 
-  const [useSimpleMode, setUseSimpleMode] = React.useState(command.viewState.useSimpleInstanceTypeSelector);
+  const useSimpleMode = command.viewState.useSimpleInstanceTypeSelector;
   const [unlimitedCpuCredits, setUnlimitedCpuCredits] = useState(command.unlimitedCpuCredits);
 
   useEffect(() => {
@@ -28,8 +30,6 @@ export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
 
   const handleModeChange = (useSimpleModeNew: boolean) => {
     if (useSimpleMode !== useSimpleModeNew) {
-      setUseSimpleMode(useSimpleModeNew);
-
       setFieldValue('viewState', {
         ...command.viewState,
         useSimpleInstanceTypeSelector: useSimpleModeNew,
@@ -73,8 +73,7 @@ export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
           <p>
             To configure a single instance type, use
             <a className="clickable" onClick={() => handleModeChange(true)}>
-              {' '}
-              Simple Mode
+              <span> Simple Mode</span>
             </a>
             .
           </p>
@@ -84,54 +83,46 @@ export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
           </i>
         </div>
         <AdvancedModeSelector
-          command={command}
+          formik={props.formik}
           instanceTypeDetails={instanceTypeDetails}
           setUnlimitedCpuCredits={setUnlimitedCpuCredits}
-          setFieldValue={setFieldValue}
         />
-      </div>
-    );
-  }
-
-  let advancedModeMessage;
-  if (isLaunchTemplatesEnabled) {
-    advancedModeMessage = (
-      <div>
-        <p>
-          To configure mixed server groups with multiple instance types, use{' '}
-          <a className="clickable" onClick={() => handleModeChange(false)}>
-            {' '}
-            Advanced Mode{' '}
-          </a>
-        </p>
-        <HelpField id={'aws.serverGroup.advancedMode'} />.
-        <i>
-          <b>Note:</b> If an instance type is already selected in simple mode, it will be preserved in advanced mode.
-        </i>
-      </div>
-    );
-  } else {
-    advancedModeMessage = (
-      <div>
-        <p>
-          To configure mixed server groups with multiple instance types,{' '}
-          <a
-            href={
-              'https://spinnaker.io/docs/setup/other_config/server-group-launch-settings/aws-ec2/launch-templates-setup/'
-            }
-          >
-            enable launch templates
-          </a>{' '}
-          and use <a className="disabled"> Advanced Mode </a>
-          <HelpField id={'aws.serverGroup.advancedMode'} />.
-        </p>
       </div>
     );
   }
 
   return (
     <div className="container-fluid form-horizontal" style={{ padding: '0 15px' }}>
-      {advancedModeMessage}
+      <div>
+        <span>To configure mixed server groups with multiple instance types,</span>
+        {!isLaunchTemplatesEnabled && (
+          <span>
+            <a
+              href={
+                'https://spinnaker.io/docs/setup/other_config/server-group-launch-settings/aws-ec2/launch-templates-setup/'
+              }
+            >
+              <span> enable launch templates</span>
+            </a>
+            <span> and</span>
+          </span>
+        )}
+        <span>
+          <a
+            className={isLaunchTemplatesEnabled ? 'clickable' : 'disabled'}
+            onClick={isLaunchTemplatesEnabled ? () => handleModeChange(false) : () => {}}
+          >
+            <span> use Advanced Mode </span>
+          </a>
+          <HelpField id={'aws.serverGroup.advancedMode'} />.
+        </span>
+        <p></p>
+        {isLaunchTemplatesEnabled && (
+          <i>
+            <b>Note:</b> If an instance type is already selected in simple mode, it will be preserved in advanced mode.
+          </i>
+        )}
+      </div>
       <SimpleModeSelector
         command={command}
         setUnlimitedCpuCredits={setUnlimitedCpuCredits}

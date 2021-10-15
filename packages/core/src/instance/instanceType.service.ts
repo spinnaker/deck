@@ -1,5 +1,6 @@
 import { module } from 'angular';
-import _ from 'lodash';
+import { uniq } from 'lodash';
+
 import type { ProviderServiceDelegate } from '../cloudProvider/providerService.delegate';
 import { PROVIDER_SERVICE_DELEGATE } from '../cloudProvider/providerService.delegate';
 
@@ -86,7 +87,7 @@ export class InstanceTypeService {
     const promises = instanceTypes.map((it) => this.getCategoryForInstanceType(cloudProvider, it));
 
     return Promise.all(promises).then((categories: string[]) => {
-      const distinctCategories = _.uniq(categories);
+      const distinctCategories = uniq(categories);
       return distinctCategories.length === 1 ? distinctCategories[0] : 'custom';
     });
   }

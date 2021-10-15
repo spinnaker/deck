@@ -1,5 +1,5 @@
 import type { FormikErrors, FormikProps } from 'formik';
-import _ from 'lodash';
+import { some } from 'lodash';
 import React from 'react';
 import { Subject } from 'rxjs';
 
@@ -64,7 +64,7 @@ export class ServerGroupInstanceType
       errors.instanceType = 'Weighted capacity must be specified for all instance types selected or none.';
     }
     if (
-      _.some(weightsSpecified, function (instanceType) {
+      some(weightsSpecified, function (instanceType) {
         return instanceType.weightedCapacity < 1 || instanceType.weightedCapacity > 999;
       })
     ) {
@@ -121,12 +121,11 @@ export class ServerGroupInstanceType
   }
 
   public render() {
-    const { setFieldValue, values } = this.props.formik;
+    const { values } = this.props.formik;
     const showTypeSelector = !!(values.viewState.disableImageSelection || values.amiName);
 
     // mark unavailable instance types for all profiles
-    const availableInstanceTypesForConfig: string[] =
-      (values.backingData && values.backingData.filtered && values.backingData.filtered.instanceTypes) || [];
+    const availableInstanceTypesForConfig: string[] = values.backingData?.filtered?.instanceTypes ?? [];
     const markedInstanceTypeDetails: IAmazonInstanceTypeCategory[] = Array.from(this.state.instanceTypeDetails);
     if (!values.viewState.disableImageSelection && availableInstanceTypesForConfig.length) {
       markedInstanceTypeDetails.forEach((profile) => {
@@ -139,13 +138,7 @@ export class ServerGroupInstanceType
     }
 
     if (showTypeSelector && values) {
-      return (
-        <InstanceTypeSelector
-          command={values}
-          setFieldValue={setFieldValue}
-          instanceTypeDetails={markedInstanceTypeDetails}
-        />
-      );
+      return <InstanceTypeSelector formik={this.props.formik} instanceTypeDetails={markedInstanceTypeDetails} />;
     }
 
     return <h5 className="text-center">Please select an image.</h5>;
