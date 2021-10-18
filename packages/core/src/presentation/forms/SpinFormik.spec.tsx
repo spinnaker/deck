@@ -1,6 +1,7 @@
-import React from 'react';
 import { mount } from 'enzyme';
-import { FormikProps } from 'formik';
+import type { FormikProps } from 'formik';
+import React from 'react';
+
 import { SpinFormik } from './SpinFormik';
 
 describe('SpinFormik', () => {

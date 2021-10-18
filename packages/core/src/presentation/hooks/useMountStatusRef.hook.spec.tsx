@@ -1,5 +1,7 @@
-import React, { RefObject } from 'react';
 import { mount } from 'enzyme';
+import type { RefObject } from 'react';
+import React from 'react';
+
 import { useMountStatusRef } from './useMountStatusRef.hook';
 
 describe('useMountStatusRef', () => {

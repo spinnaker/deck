@@ -2,14 +2,10 @@ import { groupBy } from 'lodash';
 import { DateTime } from 'luxon';
 
 import { ACTION_DISPLAY_NAMES, getActionStatusData } from './VersionOperation';
-import type { MdArtifactStatusInEnvironment } from '../../graphql/graphql-sdk';
-import { useMarkVersionAsBad, useMarkVersionAsGood, usePinVersion, useUnpinVersion } from './hooks';
-import { useApplicationContextSafe } from '../../../presentation';
+import type { FetchCurrentVersionQuery } from '../../graphql/graphql-sdk';
 import type { QueryArtifactVersion, QueryConstraint, QueryLifecycleStep } from '../types';
 import { timeDiffToString } from '../../../utils';
-import { copyTextToClipboard } from '../../../utils/clipboard/copyTextToClipboard';
-import { getIsDebugMode } from '../../utils/debugMode';
-import type { VersionAction } from '../../versionMetadata/MetadataComponents';
+import type { HistoryArtifactVersionExtended, SingleVersionArtifactVersion } from '../../versionsHistory/types';
 
 export const getConstraintsStatusSummary = (constraints: QueryConstraint[]) => {
   let finalStatus: QueryConstraint['status'] = 'PASS';
@@ -84,82 +80,53 @@ export const getLifecycleEventSummary = (
   };
 };
 
-interface ICreateVersionActionsProps {
-  environment: string;
-  reference: string;
-  version: string;
+export const isVersionVetoed = (version?: QueryArtifactVersion | SingleVersionArtifactVersion) =>
+  version?.status === 'VETOED';
+
+export const isVersionPending = (version?: QueryArtifactVersion | SingleVersionArtifactVersion) =>
+  version?.status === 'APPROVED' || version?.status === 'PENDING';
+
+export type ICurrentVersion = NonNullable<
+  NonNullable<
+    NonNullable<FetchCurrentVersionQuery['application']>['environments'][number]['state']['artifacts']
+  >[number]['versions']
+>[number];
+
+export type IVersionRelativeAgeToCurrent = 'CURRENT' | 'NEWER' | 'OLDER';
+
+export const getRelativeAgeToCurrent = ({
+  isCurrent,
+  createdAt,
+  currentVersion,
+}: {
+  isCurrent?: boolean;
+  createdAt?: string;
+  currentVersion?: ICurrentVersion;
+}): IVersionRelativeAgeToCurrent => {
+  if (isCurrent) return 'CURRENT';
+  if (
+    !createdAt ||
+    !currentVersion?.createdAt ||
+    new Date(createdAt).getTime() < new Date(currentVersion.createdAt).getTime()
+  )
+    return 'OLDER';
+  return 'NEWER';
+};
+
+export interface IVersionDetails {
   buildNumber?: string;
   commitMessage?: string;
-  isPinned: boolean;
-  status?: MdArtifactStatusInEnvironment;
-  compareLinks?: {
-    previous?: string;
-    current?: string;
-  };
+  commitSha?: string;
+  createdAt?: string;
 }
 
-export const useCreateVersionActions = ({
-  environment,
-  reference,
-  version,
-  status,
-  buildNumber,
-  commitMessage,
-  isPinned,
-  compareLinks,
-}: ICreateVersionActionsProps): VersionAction[] | undefined => {
-  const application = useApplicationContextSafe();
-
-  const basePayload = { application: application.name, environment, reference, version };
-
-  const onUnpin = useUnpinVersion(basePayload, [`Unpin #${buildNumber}`, commitMessage].filter(Boolean).join(' - '));
-  const onPin = usePinVersion(basePayload, [`Pin #${buildNumber}`, commitMessage].filter(Boolean).join(' - '));
-
-  const onMarkAsBad = useMarkVersionAsBad(
-    basePayload,
-    [`Mark #${buildNumber} as Bad`, commitMessage].filter(Boolean).join(' - '),
-  );
-
-  const onMarkAsGood = useMarkVersionAsGood(
-    basePayload,
-    [`Mark #${buildNumber} as Good`, commitMessage].filter(Boolean).join(' - '),
-  );
-
-  const actions: VersionAction[] = [
-    isPinned
-      ? {
-          content: 'Unpin version',
-          onClick: onUnpin,
-        }
-      : {
-          content: 'Pin version',
-          onClick: onPin,
-        },
-    status === 'VETOED'
-      ? {
-          content: 'Mark as good',
-          onClick: onMarkAsGood,
-        }
-      : {
-          content: 'Mark as bad',
-          onClick: onMarkAsBad,
-        },
-  ];
-  if (compareLinks?.current) {
-    actions.push({ content: 'Compare to current version', href: compareLinks.current });
-  }
-  if (compareLinks?.previous) {
-    actions.push({ content: 'Compare to previous version', href: compareLinks.previous });
-  }
-
-  if (getIsDebugMode()) {
-    actions.push({
-      content: 'Copy artifact version [Debug]',
-      onClick: () => {
-        copyTextToClipboard(version);
-      },
-    });
-  }
-
-  return actions.length ? actions : undefined;
+export const extractVersionRollbackDetails = (
+  version: QueryArtifactVersion | HistoryArtifactVersionExtended | ICurrentVersion,
+): IVersionDetails => {
+  return {
+    buildNumber: version.buildNumber,
+    commitMessage: version.gitMetadata?.commitInfo?.message,
+    commitSha: version.gitMetadata?.commit,
+    createdAt: version.createdAt,
+  };
 };

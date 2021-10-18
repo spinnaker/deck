@@ -55,6 +55,8 @@ export interface MdArtifact {
   reference: Scalars['String'];
   versions?: Maybe<Array<MdArtifactVersionInEnvironment>>;
   pinnedVersion?: Maybe<MdPinnedVersion>;
+  latestApprovedVersion?: Maybe<MdArtifactVersionInEnvironment>;
+  resources?: Maybe<Array<MdResource>>;
 }
 
 export interface MdArtifactVersionsArgs {
@@ -87,7 +89,6 @@ export interface MdArtifactVersionInEnvironment {
   buildNumber?: Maybe<Scalars['String']>;
   createdAt?: Maybe<Scalars['InstantTime']>;
   deployedAt?: Maybe<Scalars['InstantTime']>;
-  resources?: Maybe<Array<MdResource>>;
   gitMetadata?: Maybe<MdGitMetadata>;
   packageDiff?: Maybe<MdPackageDiff>;
   environment?: Maybe<Scalars['String']>;
@@ -330,6 +331,7 @@ export interface MdResource {
 
 export interface MdResourceActuationState {
   __typename?: 'MdResourceActuationState';
+  resourceId: Scalars['String'];
   status: MdResourceActuationStatus;
   reason?: Maybe<Scalars['String']>;
   event?: Maybe<Scalars['String']>;
@@ -342,7 +344,16 @@ export interface MdResourceTask {
   __typename?: 'MdResourceTask';
   id: Scalars['String'];
   name: Scalars['String'];
+  running: Scalars['Boolean'];
   summary?: Maybe<MdExecutionSummary>;
+}
+
+export interface MdRestartConstraintEvaluationPayload {
+  application: Scalars['String'];
+  environment: Scalars['String'];
+  type: Scalars['String'];
+  reference: Scalars['String'];
+  version: Scalars['String'];
 }
 
 export interface MdRetryArtifactActionPayload {
@@ -409,6 +420,7 @@ export interface MdVersionVeto {
 export interface Mutation {
   __typename?: 'Mutation';
   updateConstraintStatus?: Maybe<Scalars['Boolean']>;
+  restartConstraintEvaluation?: Maybe<Scalars['Boolean']>;
   toggleManagement?: Maybe<Scalars['Boolean']>;
   pinArtifactVersion?: Maybe<Scalars['Boolean']>;
   markArtifactVersionAsBad?: Maybe<Scalars['Boolean']>;
@@ -423,6 +435,10 @@ export interface Mutation {
 
 export interface MutationUpdateConstraintStatusArgs {
   payload: MdConstraintStatusPayload;
+}
+
+export interface MutationRestartConstraintEvaluationArgs {
+  payload: MdRestartConstraintEvaluationPayload;
 }
 
 export interface MutationToggleManagementArgs {
@@ -538,6 +554,14 @@ export type BaseEnvironmentFieldsFragment = { __typename?: 'MdEnvironment' } & P
     >;
   };
 
+export type BaesResourceFieldsFragment = { __typename?: 'MdResource' } & Pick<
+  MdResource,
+  'id' | 'kind' | 'displayName' | 'rawDefinition'
+> & {
+    moniker?: Maybe<{ __typename?: 'MdMoniker' } & Pick<MdMoniker, 'app' | 'stack' | 'detail'>>;
+    location?: Maybe<{ __typename?: 'MdLocation' } & Pick<MdLocation, 'account' | 'regions'>>;
+  };
+
 export type FetchApplicationQueryVariables = Exact<{
   appName: Scalars['String'];
   statuses?: Maybe<Array<MdArtifactStatusInEnvironment> | MdArtifactStatusInEnvironment>;
@@ -545,7 +569,7 @@ export type FetchApplicationQueryVariables = Exact<{
 
 export type FetchApplicationQuery = { __typename?: 'Query' } & {
   application?: Maybe<
-    { __typename?: 'MdApplication' } & Pick<MdApplication, 'id' | 'name' | 'account'> & {
+    { __typename?: 'MdApplication' } & Pick<MdApplication, 'id' | 'name'> & {
         config?: Maybe<{ __typename?: 'MdConfig' } & Pick<MdConfig, 'id' | 'previewEnvironmentsConfigured'>>;
         environments: Array<
           { __typename?: 'MdEnvironment' } & Pick<MdEnvironment, 'isDeleting'> & {
@@ -559,22 +583,52 @@ export type FetchApplicationQuery = { __typename?: 'Query' } & {
                           versions?: Maybe<
                             Array<{ __typename?: 'MdArtifactVersionInEnvironment' } & DetailedVersionFieldsFragment>
                           >;
+                          resources?: Maybe<Array<{ __typename?: 'MdResource' } & BaesResourceFieldsFragment>>;
                         } & ArtifactPinnedVersionFieldsFragment
                     >
                   >;
-                  resources?: Maybe<
-                    Array<
-                      { __typename?: 'MdResource' } & Pick<
-                        MdResource,
-                        'id' | 'kind' | 'displayName' | 'rawDefinition'
-                      > & {
-                          moniker?: Maybe<{ __typename?: 'MdMoniker' } & Pick<MdMoniker, 'app' | 'stack' | 'detail'>>;
-                          location?: Maybe<{ __typename?: 'MdLocation' } & Pick<MdLocation, 'account' | 'regions'>>;
-                        }
-                    >
-                  >;
+                  resources?: Maybe<Array<{ __typename?: 'MdResource' } & BaesResourceFieldsFragment>>;
                 };
             } & BaseEnvironmentFieldsFragment
+        >;
+      }
+  >;
+};
+
+export type FetchCurrentVersionQueryVariables = Exact<{
+  appName: Scalars['String'];
+}>;
+
+export type FetchCurrentVersionQuery = { __typename?: 'Query' } & {
+  application?: Maybe<
+    { __typename?: 'MdApplication' } & Pick<MdApplication, 'id' | 'name'> & {
+        environments: Array<
+          { __typename?: 'MdEnvironment' } & Pick<MdEnvironment, 'id' | 'name'> & {
+              state: { __typename?: 'MdEnvironmentState' } & {
+                artifacts?: Maybe<
+                  Array<
+                    { __typename?: 'MdArtifact' } & Pick<MdArtifact, 'id' | 'name' | 'reference' | 'environment'> & {
+                        versions?: Maybe<
+                          Array<
+                            { __typename?: 'MdArtifactVersionInEnvironment' } & Pick<
+                              MdArtifactVersionInEnvironment,
+                              'id' | 'version' | 'buildNumber' | 'createdAt'
+                            > & {
+                                gitMetadata?: Maybe<
+                                  { __typename?: 'MdGitMetadata' } & Pick<MdGitMetadata, 'commit'> & {
+                                      commitInfo?: Maybe<
+                                        { __typename?: 'MdCommitInfo' } & Pick<MdCommitInfo, 'sha' | 'message'>
+                                      >;
+                                    }
+                                >;
+                              }
+                          >
+                        >;
+                      }
+                  >
+                >;
+              };
+            }
         >;
       }
   >;
@@ -587,7 +641,7 @@ export type FetchVersionsHistoryQueryVariables = Exact<{
 
 export type FetchVersionsHistoryQuery = { __typename?: 'Query' } & {
   application?: Maybe<
-    { __typename?: 'MdApplication' } & Pick<MdApplication, 'id' | 'name' | 'account'> & {
+    { __typename?: 'MdApplication' } & Pick<MdApplication, 'id' | 'name'> & {
         environments: Array<
           { __typename?: 'MdEnvironment' } & {
             state: { __typename?: 'MdEnvironmentState' } & Pick<MdEnvironmentState, 'id'> & {
@@ -836,6 +890,15 @@ export type ToggleResourceManagementMutationVariables = Exact<{
 
 export type ToggleResourceManagementMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'toggleResourceManagement'>;
 
+export type RestartConstraintEvaluationMutationVariables = Exact<{
+  payload: MdRestartConstraintEvaluationPayload;
+}>;
+
+export type RestartConstraintEvaluationMutation = { __typename?: 'Mutation' } & Pick<
+  Mutation,
+  'restartConstraintEvaluation'
+>;
+
 export const ActionDetailsFragmentDoc = gql`
   fragment actionDetails on MdAction {
     id
@@ -933,12 +996,28 @@ export const BaseEnvironmentFieldsFragmentDoc = gql`
     basedOn
   }
 `;
+export const BaesResourceFieldsFragmentDoc = gql`
+  fragment baesResourceFields on MdResource {
+    id
+    kind
+    displayName
+    moniker {
+      app
+      stack
+      detail
+    }
+    location {
+      account
+      regions
+    }
+    rawDefinition
+  }
+`;
 export const FetchApplicationDocument = gql`
   query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironment!]) {
     application(appName: $appName) {
       id
       name
-      account
       config {
         id
         previewEnvironmentsConfigured
@@ -958,21 +1037,12 @@ export const FetchApplicationDocument = gql`
               ...detailedVersionFields
             }
             ...artifactPinnedVersionFields
+            resources {
+              ...baesResourceFields
+            }
           }
           resources {
-            id
-            kind
-            displayName
-            moniker {
-              app
-              stack
-              detail
-            }
-            location {
-              account
-              regions
-            }
-            rawDefinition
+            ...baesResourceFields
           }
         }
       }
@@ -981,6 +1051,7 @@ export const FetchApplicationDocument = gql`
   ${BaseEnvironmentFieldsFragmentDoc}
   ${DetailedVersionFieldsFragmentDoc}
   ${ArtifactPinnedVersionFieldsFragmentDoc}
+  ${BaesResourceFieldsFragmentDoc}
 `;
 
 /**
@@ -1015,12 +1086,85 @@ export function useFetchApplicationLazyQuery(
 export type FetchApplicationQueryHookResult = ReturnType<typeof useFetchApplicationQuery>;
 export type FetchApplicationLazyQueryHookResult = ReturnType<typeof useFetchApplicationLazyQuery>;
 export type FetchApplicationQueryResult = Apollo.QueryResult<FetchApplicationQuery, FetchApplicationQueryVariables>;
+export const FetchCurrentVersionDocument = gql`
+  query fetchCurrentVersion($appName: String!) {
+    application(appName: $appName) {
+      id
+      name
+      environments {
+        id
+        name
+        state {
+          artifacts {
+            id
+            name
+            reference
+            environment
+            versions(statuses: [CURRENT]) {
+              id
+              version
+              buildNumber
+              createdAt
+              gitMetadata {
+                commit
+                commitInfo {
+                  sha
+                  message
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * __useFetchCurrentVersionQuery__
+ *
+ * To run a query within a React component, call `useFetchCurrentVersionQuery` and pass it any options that fit your needs.
+ * When your component renders, `useFetchCurrentVersionQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useFetchCurrentVersionQuery({
+ *   variables: {
+ *      appName: // value for 'appName'
+ *   },
+ * });
+ */
+export function useFetchCurrentVersionQuery(
+  baseOptions: Apollo.QueryHookOptions<FetchCurrentVersionQuery, FetchCurrentVersionQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useQuery<FetchCurrentVersionQuery, FetchCurrentVersionQueryVariables>(
+    FetchCurrentVersionDocument,
+    options,
+  );
+}
+export function useFetchCurrentVersionLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<FetchCurrentVersionQuery, FetchCurrentVersionQueryVariables>,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useLazyQuery<FetchCurrentVersionQuery, FetchCurrentVersionQueryVariables>(
+    FetchCurrentVersionDocument,
+    options,
+  );
+}
+export type FetchCurrentVersionQueryHookResult = ReturnType<typeof useFetchCurrentVersionQuery>;
+export type FetchCurrentVersionLazyQueryHookResult = ReturnType<typeof useFetchCurrentVersionLazyQuery>;
+export type FetchCurrentVersionQueryResult = Apollo.QueryResult<
+  FetchCurrentVersionQuery,
+  FetchCurrentVersionQueryVariables
+>;
 export const FetchVersionsHistoryDocument = gql`
   query fetchVersionsHistory($appName: String!, $limit: Int) {
     application(appName: $appName) {
       id
       name
-      account
       environments {
         ...baseEnvironmentFields
         state {
@@ -1941,4 +2085,49 @@ export type ToggleResourceManagementMutationResult = Apollo.MutationResult<Toggl
 export type ToggleResourceManagementMutationOptions = Apollo.BaseMutationOptions<
   ToggleResourceManagementMutation,
   ToggleResourceManagementMutationVariables
+>;
+export const RestartConstraintEvaluationDocument = gql`
+  mutation RestartConstraintEvaluation($payload: MdRestartConstraintEvaluationPayload!) {
+    restartConstraintEvaluation(payload: $payload)
+  }
+`;
+export type RestartConstraintEvaluationMutationFn = Apollo.MutationFunction<
+  RestartConstraintEvaluationMutation,
+  RestartConstraintEvaluationMutationVariables
+>;
+
+/**
+ * __useRestartConstraintEvaluationMutation__
+ *
+ * To run a mutation, you first call `useRestartConstraintEvaluationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRestartConstraintEvaluationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [restartConstraintEvaluationMutation, { data, loading, error }] = useRestartConstraintEvaluationMutation({
+ *   variables: {
+ *      payload: // value for 'payload'
+ *   },
+ * });
+ */
+export function useRestartConstraintEvaluationMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    RestartConstraintEvaluationMutation,
+    RestartConstraintEvaluationMutationVariables
+  >,
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<RestartConstraintEvaluationMutation, RestartConstraintEvaluationMutationVariables>(
+    RestartConstraintEvaluationDocument,
+    options,
+  );
+}
+export type RestartConstraintEvaluationMutationHookResult = ReturnType<typeof useRestartConstraintEvaluationMutation>;
+export type RestartConstraintEvaluationMutationResult = Apollo.MutationResult<RestartConstraintEvaluationMutation>;
+export type RestartConstraintEvaluationMutationOptions = Apollo.BaseMutationOptions<
+  RestartConstraintEvaluationMutation,
+  RestartConstraintEvaluationMutationVariables
 >;

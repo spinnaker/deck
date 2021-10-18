@@ -1,5 +1,6 @@
+import type { ISlackChannel } from './SlackReader';
+import { SlackReader } from './SlackReader';
 import { mockHttpClient } from '../api/mock/jasmine';
-import { ISlackChannel, SlackReader } from './SlackReader';
 
 const mockSlackChannels: ISlackChannel[] = [
   {

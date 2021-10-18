@@ -1,10 +1,11 @@
 import { mock } from 'angular';
-import { REACT_MODULE } from '../../reactShims';
-import { CLUSTER_SERVICE } from '../cluster.service';
-import { Application } from '../../application/application.model';
-import { ApplicationModelBuilder } from '../../application/applicationModel.builder';
-import * as State from '../../state';
 import { cloneDeep, filter } from 'lodash';
+
+import type { Application } from '../../application/application.model';
+import { ApplicationModelBuilder } from '../../application/applicationModel.builder';
+import { CLUSTER_SERVICE } from '../cluster.service';
+import { REACT_MODULE } from '../../reactShims';
+import * as State from '../../state';
 
 const ClusterState = State.ClusterState;
 
@@ -324,8 +325,8 @@ describe('Service: clusterFilterService', function () {
 
   describe('filter by starting status', function () {
     it('should filter by starting status if checked', function (done) {
-      const starting: any = { healthState: 'Unknown' },
-        serverGroup = application.getDataSource('serverGroups').data[0];
+      const starting: any = { healthState: 'Unknown' };
+      const serverGroup = application.getDataSource('serverGroups').data[0];
       serverGroup.instances.push(starting);
 
       ClusterState.filterModel.asFilterModel.sortFilter.status = { Starting: true };
@@ -348,8 +349,8 @@ describe('Service: clusterFilterService', function () {
 
   describe('filter by out of service status', function () {
     it('should filter out by out of service status if checked', function (done) {
-      const starting: any = { healthState: 'Unknown' },
-        serverGroup = application.getDataSource('serverGroups').data[0];
+      const starting: any = { healthState: 'Unknown' };
+      const serverGroup = application.getDataSource('serverGroups').data[0];
       serverGroup.instances.push(starting);
 
       ClusterState.filterModel.asFilterModel.sortFilter.status = { OutOfService: true };
@@ -363,8 +364,8 @@ describe('Service: clusterFilterService', function () {
 
   describe('filter by unknown status', function () {
     it('should filter out by unknown status if checked', function (done) {
-      const starting: any = { healthState: 'Up' },
-        serverGroup = application.getDataSource('serverGroups').data[0];
+      const starting: any = { healthState: 'Up' };
+      const serverGroup = application.getDataSource('serverGroups').data[0];
       serverGroup.instances.push(starting);
 
       ClusterState.filterModel.asFilterModel.sortFilter.status = { Unknown: true };
@@ -650,8 +651,8 @@ describe('Service: clusterFilterService', function () {
 
     it('should remove all instanceIds if server group is no longer visible, and add back when visible again', function (done) {
       ClusterState.filterModel.asFilterModel.sortFilter.listInstances = true;
-      const serverGroup = application.getDataSource('serverGroups').data[0],
-        multiselectGroup = ClusterState.multiselectModel.getOrCreateInstanceGroup(serverGroup);
+      const serverGroup = application.getDataSource('serverGroups').data[0];
+      const multiselectGroup = ClusterState.multiselectModel.getOrCreateInstanceGroup(serverGroup);
 
       serverGroup.instances.push({ id: 'i-1234' });
       ClusterState.multiselectModel.toggleSelectAll(serverGroup, ['i-1234']);
@@ -1133,8 +1134,8 @@ describe('Service: clusterFilterService', function () {
     });
 
     it('adds executions and running tasks, even when stringVal does not change', function (done) {
-      const runningTasks: any = [{ name: 'a' }],
-        executions: any = [{ name: 'b' }];
+      const runningTasks: any = [{ name: 'a' }];
+      const executions: any = [{ name: 'b' }];
       application = this.buildApplication({
         serverGroups: {
           data: [

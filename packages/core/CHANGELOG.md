@@ -3,6 +3,61 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.14.2](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.14.1...@spinnaker/core@0.14.2) (2021-10-05)
+
+
+### Bug Fixes
+
+* **md:** build links ([#9743](https://github.com/spinnaker/deck/issues/9743)) ([b7397f1](https://github.com/spinnaker/deck/commit/b7397f1b5a7e7b175fc601ba6a8512bfd9fd9361))
+
+
+
+
+
+## [0.14.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.14.0...@spinnaker/core@0.14.1) (2021-10-01)
+
+**Note:** Version bump only for package @spinnaker/core
+
+
+
+
+
+# [0.14.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.12.0...@spinnaker/core@0.14.0) (2021-09-30)
+
+
+### Bug Fixes
+
+* bump @types/react to 16.14.10 ([bb62b99](https://github.com/spinnaker/deck/commit/bb62b991514c2a81fbdf467c01f3ce7467f71718))
+* **core/presentation:** Remove return value from useEffect in useMountStatusRef ([b238b9c](https://github.com/spinnaker/deck/commit/b238b9c2357ed33e44bbcd48cffe6255c923dd5c))
+
+
+### Features
+
+* **aws/infrastructure:** Hide aws ad hoc infrastructure action buttons ([#9712](https://github.com/spinnaker/deck/issues/9712)) ([7202efd](https://github.com/spinnaker/deck/commit/7202efd54ad0b048d5c1f45c24162619b25be844))
+* **md:** clean artifact version details by moving the bake and build details to a popover ([#9715](https://github.com/spinnaker/deck/issues/9715)) ([0f2480e](https://github.com/spinnaker/deck/commit/0f2480ec6718730ae58c592f894e6b78dcb67a5d))
+
+
+
+
+
+# [0.13.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.12.0...@spinnaker/core@0.13.0) (2021-09-30)
+
+
+### Bug Fixes
+
+* bump @types/react to 16.14.10 ([bb62b99](https://github.com/spinnaker/deck/commit/bb62b991514c2a81fbdf467c01f3ce7467f71718))
+* **core/presentation:** Remove return value from useEffect in useMountStatusRef ([b238b9c](https://github.com/spinnaker/deck/commit/b238b9c2357ed33e44bbcd48cffe6255c923dd5c))
+
+
+### Features
+
+* **aws/infrastructure:** Hide aws ad hoc infrastructure action buttons ([#9712](https://github.com/spinnaker/deck/issues/9712)) ([7202efd](https://github.com/spinnaker/deck/commit/7202efd54ad0b048d5c1f45c24162619b25be844))
+* **md:** clean artifact version details by moving the bake and build details to a popover ([#9715](https://github.com/spinnaker/deck/issues/9715)) ([0f2480e](https://github.com/spinnaker/deck/commit/0f2480ec6718730ae58c592f894e6b78dcb67a5d))
+
+
+
+
+
 # [0.12.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.11.7...@spinnaker/core@0.12.0) (2021-09-29)
 
 

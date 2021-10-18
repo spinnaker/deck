@@ -1,4 +1,5 @@
-import { IScope, IControllerService, IRootScopeService, mock } from 'angular';
+import type { IControllerService, IRootScopeService, IScope } from 'angular';
+import { mock } from 'angular';
 
 import {
   WERCKER_EXECUTION_DETAILS_CONTROLLER,
@@ -21,7 +22,9 @@ describe('Wercker Execution Details Controller:', () => {
     $scope.stage = stage;
     return $ctrl(WerckerExecutionDetailsCtrl, {
       $scope,
-      executionDetailsSectionService: { synchronizeSection: ({}, fn: () => any) => fn() },
+      executionDetailsSectionService: {
+        synchronizeSection: (_availableSections: string[], fn: () => any) => fn(),
+      },
     });
   };
 
