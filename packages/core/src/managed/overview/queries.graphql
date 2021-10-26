@@ -90,11 +90,26 @@ fragment baseEnvironmentFields on MdEnvironment {
   basedOn
 }
 
+fragment baesResourceFields on MdResource {
+  id
+  kind
+  displayName
+  moniker {
+    app
+    stack
+    detail
+  }
+  location {
+    account
+    regions
+  }
+  rawDefinition
+}
+
 query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironment!]) {
   application(appName: $appName) {
     id
     name
-    account
     config {
       id
       previewEnvironmentsConfigured
@@ -114,21 +129,44 @@ query fetchApplication($appName: String!, $statuses: [MdArtifactStatusInEnvironm
             ...detailedVersionFields
           }
           ...artifactPinnedVersionFields
+          resources {
+            ...baesResourceFields
+          }
         }
         resources {
+          ...baesResourceFields
+        }
+      }
+    }
+  }
+}
+
+query fetchCurrentVersion($appName: String!) {
+  application(appName: $appName) {
+    id
+    name
+    environments {
+      id
+      name
+      state {
+        artifacts {
           id
-          kind
-          displayName
-          moniker {
-            app
-            stack
-            detail
+          name
+          reference
+          environment
+          versions(statuses: [CURRENT]) {
+            id
+            version
+            buildNumber
+            createdAt
+            gitMetadata {
+              commit
+              commitInfo {
+                sha
+                message
+              }
+            }
           }
-          location {
-            account
-            regions
-          }
-          rawDefinition
         }
       }
     }
@@ -139,7 +177,6 @@ query fetchVersionsHistory($appName: String!, $limit: Int) {
   application(appName: $appName) {
     id
     name
-    account
     environments {
       ...baseEnvironmentFields
       state {
@@ -346,4 +383,8 @@ mutation ImportDeliveryConfig($application: String!) {
 
 mutation ToggleResourceManagement($payload: MdToggleResourceManagementPayload) {
   toggleResourceManagement(payload: $payload)
+}
+
+mutation RestartConstraintEvaluation($payload: MdRestartConstraintEvaluationPayload!) {
+  restartConstraintEvaluation(payload: $payload)
 }
