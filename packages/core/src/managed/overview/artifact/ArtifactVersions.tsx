@@ -1,11 +1,13 @@
 import { isEmpty } from 'lodash';
 import React from 'react';
 
+import { ArtifactCollapsibleSection } from './ArtifactCollapsibleSection';
 import { Constraints } from './Constraints';
 import { VersionTitle } from './VersionTitle';
 import { ArtifactActions } from '../../artifactActions/ArtifactActions';
 import type { QueryArtifact, QueryArtifactVersion } from '../types';
-import { isVersionVetoed, useCreateVersionRollbackActions } from './utils';
+import { useCreateVersionRollbackActions } from './useCreateRollbackActions.hook';
+import { extractVersionRollbackDetails, isVersionVetoed } from './utils';
 import { useLogEvent } from '../../utils/logging';
 import type { VersionMessageData } from '../../versionMetadata/MetadataComponents';
 import { toPinnedMetadata } from '../../versionMetadata/MetadataComponents';
@@ -13,26 +15,28 @@ import { getBaseMetadata, getVersionCompareLinks, VersionMetadata } from '../../
 
 export interface IPendingVersionsProps {
   artifact: QueryArtifact;
-  pendingVersions?: QueryArtifactVersion[];
+  title: string;
+  versions?: QueryArtifactVersion[];
+  isDeploying?: boolean;
 }
 
 const NUM_VERSIONS_WHEN_COLLAPSED = 1;
 
-export const PendingVersions = ({ artifact, pendingVersions }: IPendingVersionsProps) => {
-  const numVersions = pendingVersions?.length || 0;
+export const ArtifactVersions = ({ artifact, versions, title, isDeploying }: IPendingVersionsProps) => {
+  const numVersions = versions?.length || 0;
   const [isExpanded, setIsExpanded] = React.useState(false);
   const logEvent = useLogEvent('ArtifactPendingVersion');
 
-  if (!pendingVersions || !numVersions) return null;
+  if (!versions || !numVersions) return null;
 
-  const versionsToShow = isExpanded ? pendingVersions : pendingVersions.slice(0, NUM_VERSIONS_WHEN_COLLAPSED);
-  const numDeploying = pendingVersions.filter((version) => version.status === 'DEPLOYING').length;
+  const versionsToShow = isExpanded ? versions : versions.slice(0, NUM_VERSIONS_WHEN_COLLAPSED);
   const { pinnedVersion } = artifact;
   return (
-    <section className="artifact-pending-versions">
-      <div className="artifact-versions-title">
-        {numVersions} Pending Versions {numDeploying > 0 ? `(${numDeploying} deploying)` : ''}
-      </div>
+    <ArtifactCollapsibleSection
+      outerDivClassName="artifact-versions artifact-section"
+      heading={title}
+      isUpdating={isDeploying}
+    >
       <div className="artifact-pending-versions-list">
         {versionsToShow.map((version, index) => (
           <PendingVersion
@@ -59,7 +63,7 @@ export const PendingVersions = ({ artifact, pendingVersions }: IPendingVersionsP
           </div>
         ) : undefined}
       </div>
-    </section>
+    </ArtifactCollapsibleSection>
   );
 };
 
@@ -72,7 +76,7 @@ interface IPendingVersionProps {
 }
 
 const PendingVersion = ({ data, reference, environment, pinned, index }: IPendingVersionProps) => {
-  const { buildNumber, version, gitMetadata, constraints, isCurrent } = data;
+  const { version, gitMetadata, constraints, isCurrent } = data;
   const actions = useCreateVersionRollbackActions({
     environment,
     reference,
@@ -80,11 +84,8 @@ const PendingVersion = ({ data, reference, environment, pinned, index }: IPendin
     isVetoed: isVersionVetoed(data),
     isPinned: Boolean(pinned),
     isCurrent,
-    selectedVersion: {
-      buildNumber,
-      commitMessage: gitMetadata?.commitInfo?.message,
-      commitSha: gitMetadata?.commit,
-    },
+
+    selectedVersion: extractVersionRollbackDetails(data),
   });
 
   return (
