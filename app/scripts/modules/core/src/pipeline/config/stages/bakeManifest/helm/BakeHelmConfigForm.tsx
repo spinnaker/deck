@@ -1,6 +1,17 @@
 import React from 'react';
 
+<<<<<<< HEAD:app/scripts/modules/core/src/pipeline/config/stages/bakeManifest/helm/BakeHelmConfigForm.tsx
 import { AccountService } from 'core/account';
+=======
+import type { IFormikStageConfigInjectedProps } from '../../FormikStageConfig';
+import { AccountService } from '../../../../../account';
+import {
+  ArtifactTypePatterns,
+  excludeAllTypesExcept,
+  ExpectedArtifactService,
+  StageArtifactSelectorDelegate,
+} from '../../../../../artifact';
+>>>>>>> 9c4e438d4f (fix(bake): make helm chart path visible for git/repo artifact (#9768)):packages/core/src/pipeline/config/stages/bakeManifest/helm/BakeHelmConfigForm.tsx
 import { StageConfigField } from '../../common/stageConfigField/StageConfigField';
 import { CheckboxInput, TextInput } from 'core/presentation';
 import { MapEditor } from 'core/forms';
@@ -41,6 +52,25 @@ export class BakeHelmConfigForm extends React.Component<IFormikStageConfigInject
         },
       ]);
     }
+
+    // If the Expected Artifact id is provided but the account is not, then attempt to find the artifact from
+    // upstream stages and set the account value.
+    // This is needed because helm chart file path field will need to be rendered if the artifact has a git repo account type
+    const expectedArtifact = this.getInputArtifact(stage, 0);
+    if (expectedArtifact.id && !expectedArtifact.account) {
+      const availableArtifacts = ExpectedArtifactService.getExpectedArtifactsAvailableToStage(
+        stage,
+        this.props.pipeline,
+      );
+      const expectedMatchedArtifact = availableArtifacts.find((a) => a.id === expectedArtifact.id);
+      if (expectedMatchedArtifact && expectedMatchedArtifact.matchArtifact) {
+        this.props.formik.setFieldValue(
+          `inputArtifacts[0].account`,
+          expectedMatchedArtifact.matchArtifact.artifactAccount,
+        );
+      }
+    }
+
     AccountService.getArtifactAccounts().then((artifactAccounts) => {
       this.setState({
         gitRepoArtifactAccountNames: artifactAccounts
@@ -56,9 +86,16 @@ export class BakeHelmConfigForm extends React.Component<IFormikStageConfigInject
     this.props.formik.setFieldValue(`inputArtifacts[${index}].account`, artifact.artifactAccount);
   };
 
-  private onTemplateArtifactSelected = (id: string, index: number) => {
-    this.props.formik.setFieldValue(`inputArtifacts[${index}].id`, id);
+  private onTemplateArtifactSelected = (artifact: IExpectedArtifact, index: number) => {
+    this.props.formik.setFieldValue(`inputArtifacts[${index}].id`, artifact.id);
     this.props.formik.setFieldValue(`inputArtifacts[${index}].artifact`, null);
+    // Set the account to matchArtifact.artifactAccount if it exists.
+    // This account value will be used to determine if the Helm Chart File Path should be displayed.
+    if (artifact.matchArtifact) {
+      this.props.formik.setFieldValue(`inputArtifacts[${index}].account`, artifact.matchArtifact.artifactAccount);
+    } else {
+      this.props.formik.setFieldValue(`inputArtifacts[${index}].account`, null);
+    }
   };
 
   private addInputArtifact = () => {
@@ -119,7 +156,6 @@ export class BakeHelmConfigForm extends React.Component<IFormikStageConfigInject
 
   public render() {
     const stage = this.props.formik.values;
-
     return (
       <>
         <h4>Helm Options</h4>
@@ -150,7 +186,7 @@ export class BakeHelmConfigForm extends React.Component<IFormikStageConfigInject
           onArtifactEdited={(artifact) => {
             this.onTemplateArtifactEdited(artifact, 0);
           }}
-          onExpectedArtifactSelected={(artifact: IExpectedArtifact) => this.onTemplateArtifactSelected(artifact.id, 0)}
+          onExpectedArtifactSelected={(artifact: IExpectedArtifact) => this.onTemplateArtifactSelected(artifact, 0)}
           pipeline={this.props.pipeline}
           stage={stage}
         />
@@ -180,7 +216,7 @@ export class BakeHelmConfigForm extends React.Component<IFormikStageConfigInject
                         this.onTemplateArtifactEdited(artifact, index + 1);
                       }}
                       onExpectedArtifactSelected={(artifact: IExpectedArtifact) =>
-                        this.onTemplateArtifactSelected(artifact.id, index + 1)
+                        this.onTemplateArtifactSelected(artifact, index + 1)
                       }
                       pipeline={this.props.pipeline}
                       stage={stage}
