@@ -73,10 +73,12 @@ export class StageFailureMessage extends React.Component<IStageFailureMessagePro
   public render() {
     const { message, messages } = this.props;
     const { isFailed, failedTask, failedExecutionId, failedStageName, failedStageId } = this.state;
-    if (isFailed || failedTask || message || messages.length) {
+
+    const hasMessages = message || !messages.length ? message : messages;
+    if (hasMessages) {
       const exceptionTitle = isFailed ? (messages.length ? 'Exceptions' : 'Exception') : 'Warning';
 
-      let displayMessages = message || !messages.length ? message : messages;
+      let displayMessages = [];
       if (isFailed || stage.context?.skipExpressionEvaluation) {
         // filter out expression evaluation failure messages if:
         // - there was an actual failure as these can get *really* long and hide the failure message
@@ -85,8 +87,13 @@ export class StageFailureMessage extends React.Component<IStageFailureMessagePro
         displayMessages = displayMessages.filter((m) => !m.startsWith('Failed to evaluate'));
       }
 
+      if (displayMessages.length === 0) {
+        // no messages to be displayed
+        return;
+      }
+
       displayMessages =
-        displayMessages.length > 1 ? (
+        displayMessages.length === 1 ? (
           <Markdown message={message || StageFailureMessages.NO_REASON_PROVIDED} className="break-word" />
         ) : (
           messages.map((m, i) => (
