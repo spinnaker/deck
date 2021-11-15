@@ -1,6 +1,5 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import { IStage } from 'core/domain';
 import { REACT_MODULE } from 'core/reactShims';
 import { mock } from 'angular';
 
@@ -10,16 +9,9 @@ import { AccountService } from 'core/account';
 
 import { StageConfigField } from 'core/pipeline';
 import { BakeHelmConfigForm } from './BakeHelmConfigForm';
-<<<<<<< HEAD:app/scripts/modules/core/src/pipeline/config/stages/bakeManifest/helm/BakeHelmConfigForm.spec.tsx
 import { SpinFormik } from 'core/presentation';
-=======
-import { AccountService } from '../../../../../account';
-import { ApplicationModelBuilder } from '../../../../../application';
-import { ExpectedArtifactService } from '../../../../../artifact';
-import type { IExpectedArtifact, IStage } from '../../../../../domain';
-import { SpinFormik } from '../../../../../presentation';
-import { REACT_MODULE } from '../../../../../reactShims';
->>>>>>> 9c4e438d4f (fix(bake): make helm chart path visible for git/repo artifact (#9768)):packages/core/src/pipeline/config/stages/bakeManifest/helm/BakeHelmConfigForm.spec.tsx
+import { ExpectedArtifactService } from 'core/artifact';
+import type { IExpectedArtifact, IStage } from 'core/domain';
 
 describe('<BakeHelmConfigForm />', () => {
   beforeEach(mock.module(REACT_MODULE));
