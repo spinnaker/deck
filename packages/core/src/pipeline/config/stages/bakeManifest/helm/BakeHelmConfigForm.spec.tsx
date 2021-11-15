@@ -1,6 +1,5 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import { IStage } from '../../../../../domain';
 import { REACT_MODULE } from '../../../../../reactShims';
 import { mock } from 'angular';
 
@@ -10,13 +9,8 @@ import { AccountService } from '../../../../../account';
 
 import { StageConfigField } from '../../../..';
 import { BakeHelmConfigForm } from './BakeHelmConfigForm';
-<<<<<<< HEAD
-=======
-import { AccountService } from '../../../../../account';
-import { ApplicationModelBuilder } from '../../../../../application';
 import { ExpectedArtifactService } from '../../../../../artifact';
 import type { IExpectedArtifact, IStage } from '../../../../../domain';
->>>>>>> 9c4e438d4f (fix(bake): make helm chart path visible for git/repo artifact (#9768))
 import { SpinFormik } from '../../../../../presentation';
 
 describe('<BakeHelmConfigForm />', () => {
