@@ -71,18 +71,30 @@ export class StageFailureMessage extends React.Component<IStageFailureMessagePro
   }
 
   public render() {
-    const { message, messages } = this.props;
+    const { message, messages, stage } = this.props;
     const { isFailed, failedTask, failedExecutionId, failedStageName, failedStageId } = this.state;
-    if (isFailed || failedTask || message || messages.length) {
+
+    const stageMessages = message || !messages.length ? [message] : messages;
+    if (stageMessages.length > 0) {
       const exceptionTitle = isFailed ? (messages.length ? 'Exceptions' : 'Exception') : 'Warning';
-      const displayMessages =
-        message || !messages.length ? (
-          <Markdown message={message || StageFailureMessages.NO_REASON_PROVIDED} className="break-word" />
-        ) : (
-          messages.map((m, i) => (
-            <Markdown key={i} message={m || StageFailureMessages.NO_REASON_PROVIDED} className="break-word" />
-          ))
-        );
+
+      let filteredMessages: string[] = [];
+      if (isFailed || stage.context?.skipExpressionEvaluation) {
+        // filter out expression evaluation failure messages if:
+        // - there was an actual failure as these can get *really* long and hide the failure message
+        // - expression evaluation was explicitly disabled (as Orca still processes these and populates errors
+        //   even when disabled)
+        filteredMessages = stageMessages.filter((m) => !m.startsWith('Failed to evaluate'));
+      }
+
+      if (filteredMessages.length === 0) {
+        // no messages to be displayed after filtering
+        return null;
+      }
+
+      const displayMessages = filteredMessages.map((m, i) => (
+        <Markdown key={i} message={m || StageFailureMessages.NO_REASON_PROVIDED} className="break-word" />
+      ));
 
       if (displayMessages) {
         return (
