@@ -1,22 +1,16 @@
 import React from 'react';
 
-<<<<<<< HEAD:app/scripts/modules/core/src/pipeline/config/stages/bakeManifest/helm/BakeHelmConfigForm.tsx
 import { AccountService } from 'core/account';
-=======
-import type { IFormikStageConfigInjectedProps } from '../../FormikStageConfig';
-import { AccountService } from '../../../../../account';
+import { StageConfigField } from '../../common/stageConfigField/StageConfigField';
+import { CheckboxInput, TextInput } from 'core/presentation';
+import { MapEditor } from 'core/forms';
+import { IArtifact, IExpectedArtifact } from 'core/domain';
 import {
   ArtifactTypePatterns,
   excludeAllTypesExcept,
   ExpectedArtifactService,
   StageArtifactSelectorDelegate,
-} from '../../../../../artifact';
->>>>>>> 9c4e438d4f (fix(bake): make helm chart path visible for git/repo artifact (#9768)):packages/core/src/pipeline/config/stages/bakeManifest/helm/BakeHelmConfigForm.tsx
-import { StageConfigField } from '../../common/stageConfigField/StageConfigField';
-import { CheckboxInput, TextInput } from 'core/presentation';
-import { MapEditor } from 'core/forms';
-import { IArtifact, IExpectedArtifact } from 'core/domain';
-import { excludeAllTypesExcept, ArtifactTypePatterns, StageArtifactSelectorDelegate } from 'core/artifact';
+} from 'core/artifact';
 import { IFormikStageConfigInjectedProps } from '../../FormikStageConfig';
 
 export interface IBakeHelmConfigFormState {
