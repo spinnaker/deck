@@ -52,7 +52,7 @@ export function ExecutionOptionsPageContent(props: IExecutionOptionsPageContentP
         {!pipeline.limitConcurrent && (
           <div>
             <label className="col-md-3 sm-label-right">
-              Maximum number of pipeline executions <HelpField id={'pipeline.config.parallel.max.concurrent'} />
+              Maximum concurrent pipeline executions <HelpField id={'pipeline.config.parallel.max.concurrent'} />
             </label>
             <div className="col-md-8">
               <FormField
