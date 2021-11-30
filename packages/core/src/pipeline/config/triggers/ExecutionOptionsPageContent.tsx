@@ -2,7 +2,7 @@ import React from 'react';
 
 import type { IPipeline } from '../../../domain';
 import { HelpField } from '../../../help';
-import { CheckboxInput, FormField } from '../../../presentation';
+import { CheckboxInput, FormField, NumberInput } from '../../../presentation';
 
 export interface IExecutionOptionsPageContentProps {
   pipeline: IPipeline;
@@ -23,6 +23,10 @@ export function ExecutionOptionsPageContent(props: IExecutionOptionsPageContentP
           )}
           onChange={() => {
             updatePipelineConfig({ limitConcurrent: !pipeline.limitConcurrent });
+            if (!pipeline.limitConcurrent && !pipeline.keepWaitingPipelines) {
+              pipeline.keepWaitingPipelines = true;
+              updatePipelineConfig({ keepWaitingPipelines: true });
+            }
           }}
           value={pipeline.limitConcurrent}
         />
@@ -44,6 +48,22 @@ export function ExecutionOptionsPageContent(props: IExecutionOptionsPageContentP
             }}
             value={pipeline.keepWaitingPipelines}
           />
+        )}
+        {!pipeline.limitConcurrent && (
+          <div>
+            <label className="col-md-3 sm-label-right">
+              Maximum number of pipeline executions <HelpField id={'pipeline.config.parallel.max.concurrent'} />
+            </label>
+            <div className="col-md-8">
+              <FormField
+                input={(inputProps) => <NumberInput {...inputProps} min={0} max={65534} />}
+                onChange={(e) => {
+                  updatePipelineConfig({ maxConcurrentExecutions: Number.parseInt(e.target.value) });
+                }}
+                value={pipeline.maxConcurrentExecutions || '0'}
+              />
+            </div>
+          </div>
         )}
       </div>
     </div>
