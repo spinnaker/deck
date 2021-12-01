@@ -2811,15 +2811,10 @@
   resolved "https://registry.yarnpkg.com/@spinnaker/mocks/-/mocks-1.0.7.tgz#3e30fde4d691b310910e7fa5201c7424609042c0"
   integrity sha512-WXoNtZoFZFNDTrckCbbTShxoRN088IN+awWweNNv89EU4GsMX8HnnG/9J6N9rAt0R3ZgzhJmaNG06/JHHBzxEw==
 
-"@spinnaker/styleguide@2.0.0":
+"@spinnaker/styleguide@2.0.0", "@spinnaker/styleguide@^2.0.0":
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@spinnaker/styleguide/-/styleguide-2.0.0.tgz#25c2e1cd8245bc6ecde49ecae286bd0e5bdaa44e"
   integrity sha512-27S/ZCxe7cGfCVJiggqgESRdGwXcQtMLyThfxuSsrbL6iW3qCXbSZQu64K3y6FUyn47drrYRwMExUsX5GHF3VQ==
-
-"@spinnaker/styleguide@^1.0.24", "@spinnaker/styleguide@^1.0.26":
-  version "1.0.28"
-  resolved "https://registry.yarnpkg.com/@spinnaker/styleguide/-/styleguide-1.0.28.tgz#679a153cdc3f1ed0a72d059ebc6142ca9fdf5679"
-  integrity sha512-My+bAw7/vLIz8hkkfofR2mNN6Nf3GFmTHSIGfzEWyihPKW07zUYFpUBmjkN8JvzjKS7LoV7VeAv7AmIUDy2oKg==
 
 "@svgr/babel-plugin-add-jsx-attribute@^5.4.0":
   version "5.4.0"
@@ -3750,10 +3745,6 @@ JSONStream@^1.0.4:
   dependencies:
     jsonparse "^1.2.0"
     through ">=2.2.7 <3"
-
-"Select2@git://github.com/select2/select2.git#3.4.8":
-  version "3.4.8"
-  resolved "git://github.com/select2/select2.git#b5f3b2839c48c53f9641d6bb1bccafc5260c7620"
 
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.5"
@@ -15150,9 +15141,15 @@ select-hose@^2.0.0:
   resolved "https://registry.yarnpkg.com/select-hose/-/select-hose-2.0.0.tgz#625d8658f865af43ec962bfc376a37359a4994ca"
   integrity sha1-Yl2GWPhlr0Psliv8N2o3NZpJlMo=
 
-"select2-bootstrap-css@git://github.com/t0m/select2-bootstrap-css.git#v1.3.1":
-  version "1.3.1"
-  resolved "git://github.com/t0m/select2-bootstrap-css.git#c3cb2590a6947e006df761071cd4bd83ed05730c"
+select2-bootstrap-css@1.4.6:
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/select2-bootstrap-css/-/select2-bootstrap-css-1.4.6.tgz#5cfb68246f5299ca1858e01efd788804c734997e"
+  integrity sha1-XPtoJG9SmcoYWOAe/XiIBMc0mX4=
+
+select2@3.5.1:
+  version "3.5.1"
+  resolved "https://registry.yarnpkg.com/select2/-/select2-3.5.1.tgz#f2819489bbc65fd6d328be72bbe2b95dd7e87cfe"
+  integrity sha1-8oGUibvGX9bTKL5yu+K5XdfofP4=
 
 select@^1.1.2:
   version "1.1.2"
