@@ -60,7 +60,7 @@ export function ExecutionOptionsPageContent(props: IExecutionOptionsPageContentP
                 onChange={(e) => {
                   updatePipelineConfig({ maxConcurrentExecutions: Number.parseInt(e.target.value) });
                 }}
-                value={pipeline.maxConcurrentExecutions || '0'}
+                value={pipeline.maxConcurrentExecutions || 0}
               />
             </div>
           </div>
