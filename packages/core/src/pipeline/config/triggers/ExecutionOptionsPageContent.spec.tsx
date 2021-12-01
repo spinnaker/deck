@@ -61,7 +61,7 @@ describe('Execution Options Page Content', () => {
         const checkbox = wrapper.find('input').at(0);
         checkbox.simulate('change', { target: { checked: true } });
         const concurrentInput = wrapper.find('input[type="number"]').at(0);
-        expect(concurrentInput.prop('value')).toEqual('0');
+        expect(concurrentInput.prop('value')).toEqual(0);
       });
     });
 
@@ -85,18 +85,6 @@ describe('Execution Options Page Content', () => {
       const concurrentInput = wrapper.find('input[type="number"]').at(0);
       concurrentInput.simulate('change', { target: { value } });
       expect(pipeline.maxConcurrentExecutions).toEqual(3);
-    });
-
-    it('sets the error class if max concurrent is set to a negative value', () => {
-      setPipeline();
-      const value = -5;
-      const wrapper = mount(<ExecutionOptionsPageContent pipeline={pipeline} updatePipelineConfig={update} />);
-      const checkbox = wrapper.find('input').at(0);
-      checkbox.simulate('change', { target: { checked: true } });
-      const concurrentInput = wrapper.find('input[type="number"]').at(0);
-      concurrentInput.simulate('change', { target: { value } });
-      const errorClass = '.ng-invalid';
-      expect(wrapper.find(errorClass).length).toEqual(1);
     });
   });
 });
