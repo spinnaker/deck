@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import type { IPipeline } from '../../../domain';
 import { HelpField } from '../../../help';
@@ -11,6 +11,13 @@ export interface IExecutionOptionsPageContentProps {
 
 export function ExecutionOptionsPageContent(props: IExecutionOptionsPageContentProps) {
   const { pipeline, updatePipelineConfig } = props;
+  const [currentMaxConcurrent, setCurrentMaxConcurrent] = useState(pipeline.maxConcurrentExecutions || 0);
+  const handleMaxConcurrentChange = (changeEvent: any) => {
+    const value = Number.parseInt(changeEvent.target.value);
+    setCurrentMaxConcurrent(value);
+    updatePipelineConfig({ maxConcurrentExecutions: value });
+  };
+
   return (
     <div className="row">
       <div className="col-md-11 col-md-offset-1">
@@ -57,10 +64,8 @@ export function ExecutionOptionsPageContent(props: IExecutionOptionsPageContentP
             <div className="col-md-8">
               <FormField
                 input={(inputProps) => <NumberInput {...inputProps} min={0} max={65534} />}
-                onChange={(e) => {
-                  updatePipelineConfig({ maxConcurrentExecutions: Number.parseInt(e.target.value) });
-                }}
-                value={pipeline.maxConcurrentExecutions || 0}
+                onChange={handleMaxConcurrentChange}
+                value={currentMaxConcurrent}
               />
             </div>
           </div>
