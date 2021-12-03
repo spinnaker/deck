@@ -7,14 +7,15 @@ import { takeUntil } from 'rxjs/operators';
 import type { IAccount, IRegion, IStageConfigProps } from '@spinnaker/core';
 import { AccountService, ReactSelectInput, StageConfigField, TextInput } from '@spinnaker/core';
 
-interface ICloudfoundryShareServiceStageConfigState {
+interface ICloudFoundryShareServiceStageConfigState {
   accounts: IAccount[];
   regions: string[];
+  shareToRegionsList: string[];
 }
 
-export class CloudfoundryUnshareServiceStageConfig extends React.Component<
+export class CloudFoundryShareServiceStageConfig extends React.Component<
   IStageConfigProps,
-  ICloudfoundryShareServiceStageConfigState
+  ICloudFoundryShareServiceStageConfigState
 > {
   private destroy$ = new Subject();
 
@@ -24,6 +25,7 @@ export class CloudfoundryUnshareServiceStageConfig extends React.Component<
     this.state = {
       accounts: [],
       regions: [],
+      shareToRegionsList: [],
     };
   }
 
@@ -45,9 +47,13 @@ export class CloudfoundryUnshareServiceStageConfig extends React.Component<
     observableFrom(AccountService.getRegionsForAccount(this.props.stage.credentials))
       .pipe(takeUntil(this.destroy$))
       .subscribe((regionList: IRegion[]) => {
+        const { region } = this.props.stage;
         const regions = regionList.map((r) => r.name);
         regions.sort((a, b) => a.localeCompare(b));
         this.setState({ regions });
+        if (region) {
+          this.clearAndResetShareToRegionList(region, regions);
+        }
       });
   };
 
@@ -55,25 +61,43 @@ export class CloudfoundryUnshareServiceStageConfig extends React.Component<
     this.props.updateStageField({ serviceInstanceName: event.target.value });
   };
 
+  private clearAndResetShareToRegionList = (region: string, regions: string[]) => {
+    this.setState({ shareToRegionsList: regions.filter((r) => r !== region) });
+  };
+
   private accountUpdated = (option: Option<string>) => {
     const credentials = option.target.value;
-    this.setState({ regions: [] });
+    this.setState({
+      regions: [],
+      shareToRegionsList: [],
+    });
     this.props.updateStageField({
       credentials,
-      unshareFromRegions: [],
+      region: '',
+      shareToRegions: [],
     });
     if (credentials) {
       this.clearAndReloadRegions();
     }
   };
 
-  private unshareFromRegionsUpdated = (option: Option<string>) => {
-    this.props.updateStageField({ unshareFromRegions: option.map((o: Option) => o.value) });
+  private regionUpdated = (option: Option<string>) => {
+    const region = option.target.value;
+    this.setState({ shareToRegionsList: [] });
+    this.props.updateStageField({
+      region,
+      shareToRegions: [],
+    });
+    this.clearAndResetShareToRegionList(region, this.state.regions);
+  };
+
+  private shareToRegionsUpdated = (option: Option<string>) => {
+    this.props.updateStageField({ shareToRegions: option.map((o: Option) => o.value) });
   };
 
   public render() {
-    const { credentials, serviceInstanceName, unshareFromRegions } = this.props.stage;
-    const { accounts, regions } = this.state;
+    const { credentials, region, serviceInstanceName, shareToRegions } = this.props.stage;
+    const { accounts, regions, shareToRegionsList } = this.state;
 
     return (
       <div className="form-horizontal">
@@ -85,6 +109,9 @@ export class CloudfoundryUnshareServiceStageConfig extends React.Component<
             stringOptions={accounts.map((it) => it.name)}
           />
         </StageConfigField>
+        <StageConfigField label="Region">
+          <ReactSelectInput clearable={false} onChange={this.regionUpdated} value={region} stringOptions={regions} />
+        </StageConfigField>
         <StageConfigField label="Service Instance Name">
           <TextInput
             type="text"
@@ -93,19 +120,19 @@ export class CloudfoundryUnshareServiceStageConfig extends React.Component<
             value={serviceInstanceName}
           />
         </StageConfigField>
-        <StageConfigField label="Unshare From Regions">
+        <StageConfigField label="Share To Regions">
           <Select
             options={
-              regions &&
-              regions.map((r: string) => ({
+              shareToRegionsList &&
+              shareToRegionsList.map((r: string) => ({
                 label: r,
                 value: r,
               }))
             }
             multi={true}
             clearable={false}
-            value={unshareFromRegions}
-            onChange={this.unshareFromRegionsUpdated}
+            value={shareToRegions}
+            onChange={this.shareToRegionsUpdated}
           />
         </StageConfigField>
       </div>
