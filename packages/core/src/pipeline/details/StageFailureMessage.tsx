@@ -78,18 +78,21 @@ export class StageFailureMessage extends React.Component<IStageFailureMessagePro
     if (stageMessages.length > 0) {
       const exceptionTitle = isFailed ? (messages.length ? 'Exceptions' : 'Exception') : 'Warning';
 
-      let filteredMessages: string[] = [];
-      if (isFailed || stage.context?.skipExpressionEvaluation) {
-        // filter out expression evaluation failure messages if:
-        // - there was an actual failure as these can get *really* long and hide the failure message
-        // - expression evaluation was explicitly disabled (as Orca still processes these and populates errors
-        //   even when disabled)
-        filteredMessages = stageMessages.filter((m) => !m.startsWith('Failed to evaluate'));
-      }
+      // expression evaluation warnings can get really long and hide actual failure messages, source
+      // filter out expression evaluation failure messages if either:
+      // - there was a stage failure (and failed expressions don't fail the stage)
+      // - expression evaluation was explicitly disabled for the stage(as Orca still processes expressions and populates
+      //   warnings when evaluation is disabled disabled)
+      const shouldFilterExpressionFailures =
+        (isFailed && !stage.context?.failOnFailedExpressions) || stage.context?.skipExpressionEvaluation;
 
-      if (filteredMessages.length === 0) {
-        // no messages to be displayed after filtering
-        return null;
+      if (shouldFilterExpressionFailures) {
+        stageMessages = stageMessages.filter((m) => !m.startsWith('Failed to evaluate'));
+
+        if (stageMessages.length === 0) {
+          // no messages to be displayed after filtering
+          return null;
+        }
       }
 
       const displayMessages = filteredMessages.map((m, i) => (
