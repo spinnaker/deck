@@ -160,7 +160,6 @@ module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeServ
         }
       });
 
-      // todo pdk: verify
       return availableTypes.sort((a, b) => sortTypesByFamilyAndSize(a.name, b.name));
     }
 
