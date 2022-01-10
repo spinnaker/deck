@@ -150,7 +150,7 @@ module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeServ
 
       // prime the list of available types
       if (selectedRegions && selectedRegions.length) {
-        availableTypes = availableInstanceTypes[selectedRegions[0]];
+        availableTypes = availableInstanceTypes[selectedRegions[0]] || [];
       }
 
       // this will perform an unnecessary intersection with the first region, which is fine
@@ -160,7 +160,7 @@ module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeServ
         }
       });
 
-      return availableTypes.sort((a, b) => sortTypesByFamilyAndSize(a.name, b.name));
+      return availableTypes?.sort((a, b) => sortTypesByFamilyAndSize(a.name, b.name));
     }
 
     const families: { [key: string]: string[] } = {
@@ -173,10 +173,10 @@ module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeServ
       instanceTypes: IAmazonInstanceType[],
       virtualizationType: string,
       vpcConfigured: boolean,
-      architectureSelected: string,
+      architecture: string,
     ): IAmazonInstanceType[] {
       return _.filter(instanceTypes, function (i) {
-        if (virtualizationType === '*' && architectureSelected === '*') {
+        if (virtualizationType === '*' && architecture === '*') {
           // show all instance types
           return true;
         }
@@ -187,7 +187,7 @@ module(AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE, []).factory('awsInstanceTypeServ
         if (virtualizationType && !i.supportedVirtualizationTypes.includes(virtualizationType)) {
           return false;
         }
-        if (architectureSelected && !i.supportedArchitectures.includes(architectureSelected)) {
+        if (architecture && !i.supportedArchitectures.includes(architecture)) {
           return false;
         }
 
