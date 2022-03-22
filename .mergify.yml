@@ -14,7 +14,11 @@ pull_request_rules:
       queue:
         method: squash
         name: default
+<<<<<<< HEAD
       label: 
+=======
+      label:
+>>>>>>> f5fe6c22a8 (chore(ci): GHA - container image and apt package build & push (#9823))
         add: ["auto merged"]
   - name: Automatically merge release branch changes on CI success and release manager review
     conditions:
@@ -28,6 +32,7 @@ pull_request_rules:
         name: default
       label:
         add: ["auto merged"]
+<<<<<<< HEAD
   # This rule exists to handle release branches that are still building using Travis CI instead of
   # using Github actions. It can be deleted once all active release branches are running Github actions.
   - name: Automatically merge release branch changes on Travis CI success and release manager review
@@ -43,17 +48,51 @@ pull_request_rules:
       label:
         add: ["auto merged"]
   - name: Automatically merge PRs from maintainers on CI success and review
+=======
+  - name: Automatically self merge on CI success
+>>>>>>> f5fe6c22a8 (chore(ci): GHA - container image and apt package build & push (#9823))
     conditions:
       - base=master
       - status-success=build
       - "label=ready to merge"
+<<<<<<< HEAD
       - "author=@oss-approvers"
+=======
+      - "label=self merge"
+>>>>>>> f5fe6c22a8 (chore(ci): GHA - container image and apt package build & push (#9823))
     actions:
       queue:
         method: squash
         name: default
       label:
         add: ["auto merged"]
+<<<<<<< HEAD
+=======
+  - name: Automatically rebase and merge on CI success and review
+    conditions:
+      - base=master
+      - status-success=build
+      - "label=ready to rebase"
+      - "approved-reviews-by=@oss-approvers"
+    actions:
+      queue:
+        method: rebase
+        name: default
+      label:
+        add: ["auto merged"]
+  - name: Automatically rebase and self merge on CI success
+    conditions:
+      - "label=ready to rebase"
+      - "label=self merge"
+      - base=master
+      - status-success=build
+    actions:
+      queue:
+        method: rebase
+        name: default
+      label:
+        add: ["auto merged"]
+>>>>>>> f5fe6c22a8 (chore(ci): GHA - container image and apt package build & push (#9823))
   - name: Automatically merge autobump PRs on CI success
     conditions:
       - base=master
