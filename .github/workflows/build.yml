@@ -66,7 +66,7 @@ jobs:
       - name: Build
         env:
           ORG_GRADLE_PROJECT_version: ${{ steps.build_variables.outputs.VERSION }}
-        run: ./gradlew build --stacktrace ${{ steps.build_variables.outputs.REPO }}-web:installDist
+        run: ./gradlew build --stacktrace
       - name: Login to GAR
         # Only run this on repositories in the 'spinnaker' org, not on forks.
         if: startsWith(github.repository, 'spinnaker/')
