@@ -30,11 +30,12 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Build Modules
         run: yarn modules
-      - name: Eslint Plugin Build
-        run: |
-          cd packages/eslint-plugin
-          yarn tsc
-          yarn test
+      # DISABLED: PR's adding eslint support not in release-1.27.x branch
+      # - name: Eslint Plugin Build
+      #   run: |
+      #     cd packages/eslint-plugin
+      #     yarn tsc
+      #     yarn test
       - name: Assert - no lint violations
         run: yarn lint
       - name: Assert - code is formatted
