@@ -77,13 +77,8 @@
     "react2angular": "3.2.1",
     "recoil": "0.0.10",
     "rxjs": "6.6.7",
-<<<<<<< HEAD
-    "select2-bootstrap-css": "git://github.com/t0m/select2-bootstrap-css.git#v1.3.1",
-    "source-sans-pro": "2.0.10",
-=======
     "select2-bootstrap-css": "1.4.6",
     "source-sans": "3.46.0",
->>>>>>> deee318cc8 (chore(deps): use select2 version from NPM)
     "spel2js": "0.2.6",
     "ui-select": "0.19.8"
   },
