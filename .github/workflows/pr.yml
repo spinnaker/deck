@@ -28,6 +28,8 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Install Dependencies
         run: yarn --frozen-lockfile
+      - name: Build Modules
+        run: yarn modules
       - name: Eslint Plugin Build
         run: |
           cd packages/eslint-plugin
@@ -37,8 +39,6 @@ jobs:
         run: yarn lint
       - name: Assert - code is formatted
         run: yarn prettier:check
-      - name: Build Modules
-        run: yarn modules
       - name: Unit Tests
         run: yarn test --single-run
       - name: Functional Tests
