@@ -45,8 +45,9 @@ jobs:
       #     yarn test
       - name: Assert - no lint violations
         run: yarn lint
-      - name: Assert - code is formatted
-        run: yarn prettier:check
+      # DISABLED: prettier hasn't been run for release-1.27.x branch
+      # - name: Assert - code is formatted
+      #   run: yarn prettier:check
       - name: Unit Tests
         run: yarn test --single-run
       - name: Functional Tests
