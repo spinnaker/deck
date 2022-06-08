@@ -37,6 +37,13 @@ var appengine = {
     account: '{%appengine.default.account%}',
   },
 };
+
+var cloudrun = {
+  defaults: {
+    account: '{%cloudrun.default.account%}',
+  },
+};
+
 var oracle = {
   defaults: {
     account: '{%oracle.default.account%}',
@@ -147,6 +154,7 @@ window.spinnakerSettings = {
     gce: gce,
     huaweicloud: huaweicloud,
     kubernetes: {},
+    cloudrun: cloudrun,
     oracle: oracle,
     tencentcloud: tencentcloud,
   },

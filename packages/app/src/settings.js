@@ -94,6 +94,7 @@ window.spinnakerSettings = {
     'gce',
     'huaweicloud',
     'kubernetes',
+    'cloudrun',
     'oracle',
     'tencentcloud',
   ],
@@ -174,6 +175,12 @@ window.spinnakerSettings = {
         account: 'my-appengine-account',
       },
     },
+
+    cloudrun: {
+      defaults: {
+        account: 'my-cloudrun-account',
+      },
+    },
     aws: {
       defaults: {
         account: 'test',
@@ -250,6 +257,7 @@ window.spinnakerSettings = {
       },
     },
     kubernetes: {},
+
     oracle: {
       defaults: {
         account: 'DEFAULT',

@@ -27,6 +27,7 @@ async function buildModules() {
         'google',
         'huaweicloud',
         'kubernetes',
+        'cloudrun',
         'oracle',
         'tencentcloud',
       ].map((module) => runYarnBuild(`${PACKAGES_ROOT}/${module}`)),

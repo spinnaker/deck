@@ -28,6 +28,7 @@ const packages = [
   'packages/google/',
   'packages/huaweicloud/',
   'packages/kubernetes/',
+  'packages/cloudrun/',
   'packages/oracle/',
   'packages/tencentcloud/',
   'packages/titus/',
