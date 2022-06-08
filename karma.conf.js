@@ -52,6 +52,8 @@ const webpackConfig = {
       '@spinnaker/tencentcloud': path.resolve(`${MODULES_ROOT}/tencentcloud/src`),
       titus: path.resolve(`${MODULES_ROOT}/titus/src`),
       '@spinnaker/titus': path.resolve(`${MODULES_ROOT}/titus/src`),
+      cloudrun: path.resolve(`${MODULES_ROOT}/cloudrun/src`),
+      '@spinnaker/cloudrun': path.resolve(`${MODULES_ROOT}/cloudrun/src`),
     },
   },
   plugins: [new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })],

@@ -63,3 +63,6 @@ testContext.keys().forEach(testContext);
 
 testContext = require.context('./packages/titus/src', true, /\.spec\.(js|ts|tsx)$/);
 testContext.keys().forEach(testContext);
+
+testContext = require.context('./packages/cloudrun/src', true, /\.spec\.(js|ts|tsx)$/);
+testContext.keys().forEach(testContext);

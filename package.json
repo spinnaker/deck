@@ -81,6 +81,7 @@
   "workspaces": [
     "packages/app",
     "packages/amazon",
+    "packages/cloudrun",
     "packages/appengine",
     "packages/azure",
     "packages/cloudfoundry",

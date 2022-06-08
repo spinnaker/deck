@@ -11,6 +11,7 @@ import { AZURE_MODULE } from '@spinnaker/azure';
 import { GOOGLE_MODULE } from '@spinnaker/google';
 import { CANARY_MODULE } from './canary/canary.module';
 import { KUBERNETES_MODULE } from '@spinnaker/kubernetes';
+import { CLOUDRUN_MODULE } from '@spinnaker/cloudrun';
 import { ORACLE_MODULE } from '@spinnaker/oracle';
 import { KAYENTA_MODULE } from '@spinnaker/kayenta';
 import { TITUS_MODULE } from '@spinnaker/titus';
@@ -23,6 +24,7 @@ module('netflix.spinnaker', [
   AZURE_MODULE,
   GOOGLE_MODULE,
   ECS_MODULE,
+  CLOUDRUN_MODULE,
   DOCKER_MODULE,
   ORACLE_MODULE,
   APPENGINE_MODULE,
