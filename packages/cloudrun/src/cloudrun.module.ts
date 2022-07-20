@@ -56,6 +56,7 @@ module(CLOUDRUN_MODULE, requires).config(() => {
       detailsController: 'cloudrunV2ServerGroupDetailsCtrl',
       detailsTemplateUrl: require('./serverGroup/details/details.html'),
       transformer: 'cloudrunV2ServerGroupTransformer',
+      skipUpstreamStageCheck: true,
     },
 
     loadBalancer: {
