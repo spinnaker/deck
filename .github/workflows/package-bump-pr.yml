@@ -51,32 +51,21 @@ jobs:
 
       - name: lerna - Bump packages
         run: |
-          # bump versions of packages
-          npx lerna version --yes --no-push --conventional-commits -m "chore(publish): publish packages"
-          if [[ $(git rev-list --count @{u}..HEAD) -ne 0 ]] ; then
-            # Synchronize @spinnaker/pluginsdk-peerdeps
-            cd packages/pluginsdk-peerdeps
-            yarn sync
-
-            # navigate back to root
-            cd ../..
-
-            # perform any updates to yarn.lock
-            yarn
-
-            # commit changes
-            git add yarn.lock packages/pluginsdk-peerdeps
-            git commit -m "feat(peerdep-sync): Synchronize peerdependencies"
-
-            # bump version of @spinnaker/pluginsdk-peerdeps
-            npx lerna version --yes --no-push --conventional-commits -m "chore(publish): publish packages"
-          fi
+          scripts/gha_bump_packages.sh
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
 
       - name: gha - get bumped packages
         id: bumps
         run: |
           scripts/gha_output_bumped_packages.sh
           scripts/gha_output_changelog.sh
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
 
       - name: Create Pull Request
         id: createpullrequest
