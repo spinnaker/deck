@@ -51,12 +51,25 @@ jobs:
 
       - name: lerna - Bump packages
         run: |
-          npx lerna version --yes --no-push --conventional-commits
+          # bump versions of packages
+          npx lerna version --yes --no-push --conventional-commits -m "chore(publish): publish packages"
           if [[ $(git rev-list --count @{u}..HEAD) -ne 0 ]] ; then
+            # Synchronize @spinnaker/pluginsdk-peerdeps
+            cd packages/pluginsdk-peerdeps
+            yarn sync
+
+            # navigate back to root
+            cd ../..
+
+            # perform any updates to yarn.lock
             yarn
-            git add yarn.lock
-            # Update yarn.lock and fix the lerna commit message (to use conventional commits itself)
-            git commit --amend -m "$(git log -1 --pretty=%B | sed -e 's/^Publish/chore(publish): publish packages/')" yarn.lock
+
+            # commit changes
+            git add yarn.lock packages/pluginsdk-peerdeps
+            git commit -m "feat(peerdep-sync): Synchronize peerdependencies"
+
+            # bump version of @spinnaker/pluginsdk-peerdeps
+            npx lerna version --yes --no-push --conventional-commits -m "chore(publish): publish packages"
           fi
 
       - name: gha - get bumped packages
