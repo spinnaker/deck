@@ -4,6 +4,9 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)
 
 . "$SCRIPT_DIR/gha_common.sh"
 
+# navigate to project directory root
+cd "$SCRIPT_DIR/.."
+
 # bump versions of packages
 npx lerna version --yes --no-push --conventional-commits -m $PACKAGE_BUMP_COMMIT_MSG
 if [[ $(git rev-list --count @{u}..HEAD) -ne 0 ]] ; then

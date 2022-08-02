@@ -4,6 +4,9 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)
 
 . "$SCRIPT_DIR/gha_common.sh"
 
+# navigate to project directory root
+cd "$SCRIPT_DIR/.."
+
 # Gets any updates to the HANGELOG.md files in packages/* from the last commit
 function changelog() {
   hash=$1
