@@ -3,6 +3,62 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.133](https://github.com/spinnaker/deck/compare/@spinnaker/docker@0.0.132...@spinnaker/docker@0.0.133) (2022-07-11)
+
+**Note:** Version bump only for package @spinnaker/docker
+
+
+
+
+
+## [0.0.132](https://github.com/spinnaker/deck/compare/@spinnaker/docker@0.0.131...@spinnaker/docker@0.0.132) (2022-07-01)
+
+**Note:** Version bump only for package @spinnaker/docker
+
+
+
+
+
+## [0.0.131](https://github.com/spinnaker/deck/compare/@spinnaker/docker@0.0.130...@spinnaker/docker@0.0.131) (2022-06-22)
+
+**Note:** Version bump only for package @spinnaker/docker
+
+
+
+
+
+## [0.0.130](https://github.com/spinnaker/deck/compare/@spinnaker/docker@0.0.129...@spinnaker/docker@0.0.130) (2022-05-05)
+
+**Note:** Version bump only for package @spinnaker/docker
+
+
+
+
+
+## [0.0.129](https://github.com/spinnaker/deck/compare/@spinnaker/docker@0.0.128...@spinnaker/docker@0.0.129) (2022-04-21)
+
+**Note:** Version bump only for package @spinnaker/docker
+
+
+
+
+
+## [0.0.128](https://github.com/spinnaker/deck/compare/@spinnaker/docker@0.0.127...@spinnaker/docker@0.0.128) (2022-04-09)
+
+**Note:** Version bump only for package @spinnaker/docker
+
+
+
+
+
+## [0.0.127](https://github.com/spinnaker/deck/compare/@spinnaker/docker@0.0.126...@spinnaker/docker@0.0.127) (2022-03-08)
+
+**Note:** Version bump only for package @spinnaker/docker
+
+
+
+
+
 ## [0.0.126](https://github.com/spinnaker/deck/compare/@spinnaker/docker@0.0.125...@spinnaker/docker@0.0.126) (2022-01-22)
 
 **Note:** Version bump only for package @spinnaker/docker

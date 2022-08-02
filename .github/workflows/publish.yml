@@ -7,8 +7,16 @@ on:
     paths:
       - 'packages/*/package.json'
 
+env:
+  NODE_VERSION: 12.16.0
+
+permissions:
+  contents: read
+
 jobs:
   publish:
+    permissions:
+      contents: none
     runs-on: ubuntu-latest
 
     steps:
@@ -17,10 +25,9 @@ jobs:
           fetch-depth: 0
           token: '${{ secrets.SPINNAKERBOT_PERSONAL_ACCESS_TOKEN }}'
 
-      - name: Use Node.js 12.16.0
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v1
         with:
-          node-version: 12.16.0
+          node-version: ${{ env.NODE_VERSION  }}
 
       - name: git - tag bumped packages
         id: tag
