@@ -21,7 +21,7 @@
     "@spinnaker/eslint-plugin": "^3.0.1",
     "@spinnaker/styleguide": "^2.0.0",
     "@svgr/rollup": "^6.3.1",
-    "autoprefixer": "^10.4.7",
+    "autoprefixer": "^10.4.8",
     "chalk": "^4.1.1",
     "comment-json": "^4.1.1",
     "esbuild": "^0.12.14",
