@@ -7,7 +7,7 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)
 # navigate to project directory root
 cd "$SCRIPT_DIR/.."
 
-# Gets any updates to the HANGELOG.md files in packages/* from the last commit
+# Gets any updates to the CHANGELOG.md files in packages/* from the last commit
 function changelog() {
   hash=$1
 
@@ -24,8 +24,6 @@ function changelog() {
     # Extract the package name and move it after the heading markdown (##)
     sed -e 's/^\+\+.*\/packages\/\(.*\)\/CHANGELOG.md\(#*\)/\2 \1/'
 }
-
-updateBumpHashes()
 
 if [ ! -z "$PACKAGE_BUMP_COMMIT_HASH" ]; then
   CHANGELOG=$(changelog "$PACKAGE_BUMP_COMMIT_HASH")
