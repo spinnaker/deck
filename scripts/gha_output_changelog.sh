@@ -2,8 +2,6 @@
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)
 
-. "$SCRIPT_DIR/gha_common.sh"
-
 # navigate to project directory root
 cd "$SCRIPT_DIR/.."
 
@@ -25,8 +23,6 @@ function changelog() {
     sed -e 's/^\+\+.*\/packages\/\(.*\)\/CHANGELOG.md\(#*\)/\2 \1/'
 }
 
-updateBumpHashes()
-
 if [ ! -z "$PACKAGE_BUMP_COMMIT_HASH" ]; then
   CHANGELOG=$(changelog "$PACKAGE_BUMP_COMMIT_HASH")
 
@@ -38,6 +34,7 @@ if [ ! -z "$PACKAGE_BUMP_COMMIT_HASH" ]; then
   CHANGELOG="${CHANGELOG//'%'/'%25'}"
   CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
   CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
+
 
   ## Github Action Step output variable: changelog
   echo ::set-output name=changelog::${CHANGELOG}
