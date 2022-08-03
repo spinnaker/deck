@@ -35,7 +35,6 @@ if [ ! -z "$PACKAGE_BUMP_COMMIT_HASH" ]; then
   CHANGELOG="${CHANGELOG//$'\n'/'%0A'}"
   CHANGELOG="${CHANGELOG//$'\r'/'%0D'}"
 
-
   ## Github Action Step output variable: changelog
   echo ::set-output name=changelog::${CHANGELOG}
 fi
