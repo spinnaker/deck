@@ -1,63 +1,87 @@
+queue_rules:
+  - name: default
+    conditions:
+      - status-success=build
+
 pull_request_rules:
   - name: Automatically merge on CI success and review
     conditions:
       - base=master
-      - status-success=Deck CI
-      - 'label=ready to merge'
-      - 'approved-reviews-by=@oss-approvers'
+      - status-success=build
+      - "label=ready to merge"
+      - "approved-reviews-by=@oss-approvers"
     actions:
-      merge:
+      queue:
         method: squash
-        strict: smart
+        name: default
+      label:
+        add: ["auto merged"]
+  - name: Automatically merge release branch changes on CI success and release manager review
+    conditions:
+      - base~=^release-
+      - status-success=build
+      - "label=ready to merge"
+      - "approved-reviews-by=@release-managers"
+    actions:
+      queue:
+        method: squash
+        name: default
+      label:
+        add: ["auto merged"]
   - name: Automatically self merge on CI success
     conditions:
       - base=master
-      - status-success=Deck CI
-      - 'label=ready to merge'
-      - 'label=self merge'
+      - status-success=build
+      - "label=ready to merge"
+      - "label=self merge"
     actions:
-      merge:
+      queue:
         method: squash
-        strict: smart
+        name: default
+      label:
+        add: ["auto merged"]
   - name: Automatically rebase and merge on CI success and review
     conditions:
       - base=master
-      - status-success=Deck CI
-      - 'label=ready to rebase'
-      - 'approved-reviews-by=@oss-approvers'
+      - status-success=build
+      - "label=ready to rebase"
+      - "approved-reviews-by=@oss-approvers"
     actions:
-      merge:
+      queue:
         method: rebase
-        strict: smart
+        name: default
+      label:
+        add: ["auto merged"]
   - name: Automatically rebase and self merge on CI success
     conditions:
+      - "label=ready to rebase"
+      - "label=self merge"
       - base=master
-      - status-success=Deck CI
-      - 'label=ready to rebase'
-      - 'label=self merge'
+      - status-success=build
     actions:
-      merge:
+      queue:
         method: rebase
-        strict: smart
-  - name: Automatically merge release branch changes on Travis CI success and release manager review
+        name: default
+      label:
+        add: ["auto merged"]
+  - name: Automatically merge autobump PRs on CI success
     conditions:
-      - base~=^release-
-      - status-success=Deck CI
-      - 'label=ready to merge'
-      - 'approved-reviews-by=@release-managers'
+      - base~=^(master|release-)
+      - status-success=build
+      - "label~=autobump-*"
+      - "author:spinnakerbot"
     actions:
-      merge:
+      queue:
         method: squash
-        strict: smart
-  # This rule exists to handle release branches that are still building using Travis CI instead of
-  # using Github actions. It can be deleted once all active release branches are running Github actions.
-  - name: Automatically merge release branch changes on Travis CI success and release manager review
+        name: default
+      label:
+        add: ["auto merged"]
+  - name: Request reviews for autobump PRs on CI failure
     conditions:
-      - base~=^release-
-      - status-success=continuous-integration/travis-ci/pr
-      - 'label=ready to merge'
-      - 'approved-reviews-by=@release-managers'
+      - base~=^(master|release-)
+      - status-failure=build
+      - "label~=autobump-*"
+      - base=master
     actions:
-      merge:
-        method: squash
-        strict: smart
+      request_reviews:
+        teams: ["oss-approvers"]
