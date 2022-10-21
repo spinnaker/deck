@@ -11,6 +11,7 @@
     </stage-config-field>
     <stage-config-field label="Base OS">
       <bake-stage-choose-os model="stage.baseOs" base-os-options="baseOsOptions"></bake-stage-choose-os>
+      <a href="" ng-click="bakeStageCtrl.getManagedImages()">Search Managed Images</a>
     </stage-config-field>
     <stage-config-field label="Base Label">
       <label class="radio-inline" ng-repeat="baseLabel in baseLabelOptions">

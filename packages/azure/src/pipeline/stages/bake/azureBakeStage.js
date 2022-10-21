@@ -13,10 +13,14 @@ import {
 } from '@spinnaker/core';
 
 import { AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './bakeExecutionDetails.controller';
+import { AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE } from './../../../serverGroup/configure/serverGroupCommandBuilder.service';
 
 export const AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE = 'spinnaker.azure.pipeline.stage.bakeStage';
 export const name = AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE; // for backwards compatibility
-module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER])
+module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
+  AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE,
+  AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER,
+])
   .config(function () {
     Registry.pipeline.registerStage({
       provides: 'bake',
@@ -50,8 +54,9 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [AZURE_PIPELINE_STAGES_BAKE_BA
   .controller('azureBakeStageCtrl', [
     '$scope',
     '$q',
+    'azureServerGroupCommandBuilder',
     '$uibModal',
-    function ($scope, $q, $uibModal) {
+    function ($scope, $q, azureServerGroupCommandBuilder, $uibModal) {
       $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
       $scope.stage.regions = $scope.stage.regions || [];
 
@@ -173,6 +178,30 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [AZURE_PIPELINE_STAGES_BAKE_BA
 
       this.showVarFileName = function () {
         return $scope.viewState.roscoMode || $scope.stage.varFileName;
+      };
+
+      this.getManagedImages = function () {
+        azureServerGroupCommandBuilder
+          .buildNewServerGroupCommand($scope.application, null)
+          .then(function (data) {
+            let baseOsOptions = [];
+            for (var i in data.images) {
+              var image = data.images[i];
+              let newImage = {
+                id: image.imageName,
+                osType: image.ostype,
+                shortDescription: '',
+                detailedDescription: '',
+                offer: image.offer,
+                sku: image.sku,
+                version: image.version,
+              };
+              baseOsOptions.push(newImage);
+            }
+            $scope.baseOsOptions = baseOsOptions;
+            $scope.stage.baseOs = $scope.baseOsOptions[0];
+          })
+          .catch(() => {});
       };
 
       $scope.$watch('stage', stageUpdated, true);

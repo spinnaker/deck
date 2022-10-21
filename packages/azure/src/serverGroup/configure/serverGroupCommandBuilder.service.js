@@ -26,7 +26,7 @@ angular
         const defaultCredentials = defaults.account || application.defaultCredentials.azure;
         const defaultRegion = defaults.region || application.defaultRegions.azure;
 
-        return azureImageReader.findImages({ provider: 'azure' }).then(function (images) {
+        return azureImageReader.findImages({ provider: 'azure', managedImages: true }).then(function (images) {
           return {
             application: application.name,
             credentials: defaultCredentials,
