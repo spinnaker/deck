@@ -12,14 +12,14 @@ import {
   SETTINGS,
 } from '@spinnaker/core';
 
-import { AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER } from './bakeExecutionDetails.controller';
+import { AZURE_IMAGE_IMAGE_READER } from '../../../image/image.reader';
 import { AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE } from './../../../serverGroup/configure/serverGroupCommandBuilder.service';
 
 export const AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE = 'spinnaker.azure.pipeline.stage.bakeStage';
 export const name = AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE; // for backwards compatibility
 module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
   AZURE_SERVERGROUP_CONFIGURE_SERVERGROUPCOMMANDBUILDER_SERVICE,
-  AZURE_PIPELINE_STAGES_BAKE_BAKEEXECUTIONDETAILS_CONTROLLER,
+  AZURE_IMAGE_IMAGE_READER,
 ])
   .config(function () {
     Registry.pipeline.registerStage({
@@ -54,9 +54,9 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
   .controller('azureBakeStageCtrl', [
     '$scope',
     '$q',
-    'azureServerGroupCommandBuilder',
+    'azureImageReader',
     '$uibModal',
-    function ($scope, $q, azureServerGroupCommandBuilder, $uibModal) {
+    function ($scope, $q, azureImageReader, $uibModal) {
       $scope.stage.extendedAttributes = $scope.stage.extendedAttributes || {};
       $scope.stage.regions = $scope.stage.regions || [];
 
@@ -107,6 +107,10 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
             (typeof SETTINGS.feature.roscoSelector === 'function' && SETTINGS.feature.roscoSelector($scope.stage));
           $scope.showAdvancedOptions = showAdvanced();
           $scope.viewState.loading = false;
+
+          $scope.managedImagesIsChoosed = false;
+          $scope.defaultImagesIsChoosed = true;
+          $scope.customImagesIsChoosed = false;
         });
       }
 
@@ -138,6 +142,30 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
             delete $scope.stage[key];
           }
         });
+      }
+
+      function setManagedImages() {
+        azureImageReader
+          .findImages({ provider: 'azure', managedImages: true })
+          .then(function (images) {
+            let managedImageOptions = [];
+            for (let i in images) {
+              let image = images[i];
+              let newImage = {
+                id: image.imageName,
+                osType: image.ostype,
+                shortDescription: image.imageName,
+                detailedDescription: image.imageName,
+                offer: image.offer,
+                sku: image.sku,
+                version: image.version,
+              };
+              managedImageOptions.push(newImage);
+            }
+            $scope.managedImageOptions = managedImageOptions;
+            $scope.stage.managedImage = $scope.managedImageOptions[0];
+          })
+          .catch(() => {});
       }
 
       this.addExtendedAttribute = function () {
@@ -182,28 +210,24 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
         return $scope.viewState.roscoMode || $scope.stage.varFileName;
       };
 
-      this.getManagedImages = function () {
-        azureServerGroupCommandBuilder
-          .buildNewServerGroupCommand($scope.application, null)
-          .then(function (data) {
-            let managedImageOptions = [];
-            for (var i in data.images) {
-              var image = data.images[i];
-              let newImage = {
-                id: image.imageName,
-                osType: image.ostype,
-                shortDescription: image.imageName,
-                detailedDescription: image.imageName,
-                offer: image.offer,
-                sku: image.sku,
-                version: image.version,
-              };
-              managedImageOptions.push(newImage);
-            }
-            $scope.managedImageOptions = managedImageOptions;
-            $scope.stage.managedImage = $scope.managedImageOptions[0];
-          })
-          .catch(() => {});
+      this.showDefaultImages = function () {
+        $scope.managedImagesIsChoosed = false;
+        $scope.defaultImagesIsChoosed = true;
+        $scope.customImagesIsChoosed = false;
+      };
+
+      this.showManagedImages = function () {
+        setManagedImages();
+
+        $scope.managedImagesIsChoosed = true;
+        $scope.defaultImagesIsChoosed = false;
+        $scope.customImagesIsChoosed = false;
+      };
+
+      this.showCustomImages = function () {
+        $scope.managedImagesIsChoosed = false;
+        $scope.defaultImagesIsChoosed = false;
+        $scope.customImagesIsChoosed = true;
       };
 
       $scope.$watch('stage', stageUpdated, true);

@@ -23,30 +23,33 @@
     <stage-config-field label="Package" help-key="pipeline.config.bake.package">
       <input type="text" class="form-control input-sm" ng-model="stage.package" />
     </stage-config-field>
-    <stage-config-field label="Base OS">
+
+    <stage-config-field label="Image type">
+      <button class="btn btn-secondary btn-sm" ng-click="bakeStageCtrl.showDefaultImages()">Default Images</button>
+      <button class="btn btn-secondary btn-sm" ng-click="bakeStageCtrl.showManagedImages()">Managed Images</button>
+      <button class="btn btn-secondary btn-sm" ng-click="bakeStageCtrl.showCustomImages()">Custom Image</button>
+    </stage-config-field>
+
+    <stage-config-field label="Base OS" ng-show="defaultImagesIsChoosed">
       <bake-stage-choose-os model="stage.baseOs" base-os-options="baseOsOptions"></bake-stage-choose-os>
     </stage-config-field>
 
-    <stage-config-field label="Managed Image">
+    <stage-config-field label="Managed Image" ng-show="managedImagesIsChoosed">
       <bake-stage-choose-managed-image
         model="stage.managedImage"
         managed-image-options="managedImageOptions"
       ></bake-stage-choose-managed-image>
     </stage-config-field>
 
-    <stage-config-field label="Publisher">
+    <stage-config-field label="Publisher" ng-show="customImagesIsChoosed">
       <input type="text" class="form-control input-sm" ng-model="stage.publisher" />
     </stage-config-field>
-    <stage-config-field label="Offer">
+    <stage-config-field label="Offer" ng-show="customImagesIsChoosed">
       <input type="text" class="form-control input-sm" ng-model="stage.offer" />
     </stage-config-field>
-    <stage-config-field label="SKU">
+    <stage-config-field label="SKU" ng-show="customImagesIsChoosed">
       <input type="text" class="form-control input-sm" ng-model="stage.sku" />
     </stage-config-field>
-
-    <button class="btn btn-secondary btn-sm" ng-click="">Default Images</button>
-    <button class="btn btn-secondary btn-sm" ng-click="bakeStageCtrl.getManagedImages()">Managed Images</button>
-    <button class="btn btn-secondary btn-sm" ng-click="">Custom Image</button>
 
     <stage-config-field label="OS Type">
       <label class="radio-inline" ng-repeat="osType in osTypeOptions">
