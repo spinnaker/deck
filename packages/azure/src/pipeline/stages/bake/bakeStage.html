@@ -3,6 +3,20 @@
     <loading-spinner size="'small'"></loading-spinner>
   </div>
   <div ng-if="!viewState.loading">
+    <div class="form-group">
+      <div class="col-md-3 sm-label-right">Account</div>
+      <div class="col-md-7">
+        <account-select-field
+          required
+          read-only="command.viewState.readOnlyFields.credentials"
+          component="command"
+          field="credentials"
+          accounts="command.backingData.accounts"
+          provider="'azure'"
+        ></account-select-field>
+      </div>
+    </div>
+
     <stage-config-field label="Regions">
       <checklist items="regions" model="stage.regions" inline="true" include-select-all-button="true"></checklist>
     </stage-config-field>
@@ -11,8 +25,43 @@
     </stage-config-field>
     <stage-config-field label="Base OS">
       <bake-stage-choose-os model="stage.baseOs" base-os-options="baseOsOptions"></bake-stage-choose-os>
-      <a href="" ng-click="bakeStageCtrl.getManagedImages()">Search Managed Images</a>
     </stage-config-field>
+
+    <stage-config-field label="Managed Image">
+      <bake-stage-choose-managed-image
+        model="stage.managedImage"
+        managed-image-options="managedImageOptions"
+      ></bake-stage-choose-managed-image>
+    </stage-config-field>
+
+    <stage-config-field label="Publisher">
+      <input type="text" class="form-control input-sm" ng-model="stage.publisher" />
+    </stage-config-field>
+    <stage-config-field label="Offer">
+      <input type="text" class="form-control input-sm" ng-model="stage.offer" />
+    </stage-config-field>
+    <stage-config-field label="SKU">
+      <input type="text" class="form-control input-sm" ng-model="stage.sku" />
+    </stage-config-field>
+
+    <button class="btn btn-secondary btn-sm" ng-click="">Default Images</button>
+    <button class="btn btn-secondary btn-sm" ng-click="bakeStageCtrl.getManagedImages()">Managed Images</button>
+    <button class="btn btn-secondary btn-sm" ng-click="">Custom Image</button>
+
+    <stage-config-field label="OS Type">
+      <label class="radio-inline" ng-repeat="osType in osTypeOptions">
+        <input type="radio" ng-model="stage.osType" ng-value="osType" />
+        {{osType}}
+      </label>
+    </stage-config-field>
+
+    <stage-config-field label="Package Type">
+      <label class="radio-inline" ng-repeat="packageType in packageTypeOptions">
+        <input type="radio" ng-model="stage.packageType" ng-value="packageType" />
+        {{packageType}}
+      </label>
+    </stage-config-field>
+
     <stage-config-field label="Base Label">
       <label class="radio-inline" ng-repeat="baseLabel in baseLabelOptions">
         <input type="radio" ng-model="stage.baseLabel" ng-value="baseLabel" />

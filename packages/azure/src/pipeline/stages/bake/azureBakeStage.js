@@ -92,6 +92,8 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
           }
 
           $scope.baseLabelOptions = baseLabelOptions;
+          $scope.osTypeOptions = ['linux', 'windows'];
+          $scope.packageTypeOptions = ['DEB', 'RPM'];
 
           if (!$scope.stage.baseOs && $scope.baseOsOptions && $scope.baseOsOptions.length) {
             $scope.stage.baseOs = $scope.baseOsOptions[0].id;
@@ -184,22 +186,22 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
         azureServerGroupCommandBuilder
           .buildNewServerGroupCommand($scope.application, null)
           .then(function (data) {
-            let baseOsOptions = [];
+            let managedImageOptions = [];
             for (var i in data.images) {
               var image = data.images[i];
               let newImage = {
                 id: image.imageName,
                 osType: image.ostype,
-                shortDescription: '',
-                detailedDescription: '',
+                shortDescription: image.imageName,
+                detailedDescription: image.imageName,
                 offer: image.offer,
                 sku: image.sku,
                 version: image.version,
               };
-              baseOsOptions.push(newImage);
+              managedImageOptions.push(newImage);
             }
-            $scope.baseOsOptions = baseOsOptions;
-            $scope.stage.baseOs = $scope.baseOsOptions[0];
+            $scope.managedImageOptions = managedImageOptions;
+            $scope.stage.managedImage = $scope.managedImageOptions[0];
           })
           .catch(() => {});
       };
