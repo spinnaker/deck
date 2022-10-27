@@ -4,6 +4,7 @@ import { module } from 'angular';
 import _ from 'lodash';
 
 import {
+  AccountService,
   AuthenticationService,
   BakeExecutionLabel,
   BakeryReader,
@@ -70,10 +71,12 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
 
       function initialize() {
         $q.all([
+          AccountService.getCredentialsKeyedByAccount('azure'),
           BakeryReader.getRegions('azure'),
           BakeryReader.getBaseOsOptions('azure'),
           BakeryReader.getBaseLabelOptions(),
-        ]).then(function ([regions, baseOsOptions, baseLabelOptions]) {
+        ]).then(function ([credentialsKeyedByAccount, regions, baseOsOptions, baseLabelOptions]) {
+          $scope.accounts = Object.keys(credentialsKeyedByAccount);
           $scope.regions = regions;
           if ($scope.regions.length === 1) {
             $scope.stage.region = $scope.regions[0];
@@ -87,9 +90,6 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
             $scope.stage.regions.push($scope.application.defaultRegions.azure);
           }
           $scope.baseOsOptions = baseOsOptions.baseImages;
-          if ($scope.baseOsOptions.length) {
-            $scope.stage.osType = baseOsOptions.baseImages[0].osType;
-          }
 
           $scope.baseLabelOptions = baseLabelOptions;
           $scope.osTypeOptions = ['linux', 'windows'];
@@ -154,16 +154,11 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
               let newImage = {
                 id: image.imageName,
                 osType: image.ostype,
-                shortDescription: image.imageName,
-                detailedDescription: image.imageName,
-                offer: image.offer,
-                sku: image.sku,
-                version: image.version,
+                name: image.imageName,
               };
               managedImageOptions.push(newImage);
             }
             $scope.managedImageOptions = managedImageOptions;
-            $scope.stage.managedImage = $scope.managedImageOptions[0];
           })
           .catch(() => {});
       }
@@ -214,6 +209,13 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
         $scope.managedImagesIsChoosed = false;
         $scope.defaultImagesIsChoosed = true;
         $scope.customImagesIsChoosed = false;
+
+        $scope.stage.managedImage = null;
+        $scope.stage.publisher = null;
+        $scope.stage.offer = null;
+        $scope.stage.sku = null;
+        $scope.stage.osType = null;
+        $scope.stage.packageType = null;
       };
 
       this.showManagedImages = function () {
@@ -222,12 +224,20 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
         $scope.managedImagesIsChoosed = true;
         $scope.defaultImagesIsChoosed = false;
         $scope.customImagesIsChoosed = false;
+
+        $scope.stage.baseOs = null;
+        $scope.stage.publisher = null;
+        $scope.stage.offer = null;
+        $scope.stage.sku = null;
       };
 
       this.showCustomImages = function () {
         $scope.managedImagesIsChoosed = false;
         $scope.defaultImagesIsChoosed = false;
         $scope.customImagesIsChoosed = true;
+
+        $scope.stage.baseOs = null;
+        $scope.stage.managedImage = null;
       };
 
       $scope.$watch('stage', stageUpdated, true);

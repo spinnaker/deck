@@ -3,66 +3,85 @@
     <loading-spinner size="'small'"></loading-spinner>
   </div>
   <div ng-if="!viewState.loading">
-    <div class="form-group">
-      <div class="col-md-3 sm-label-right">Account</div>
-      <div class="col-md-7">
-        <account-select-field
-          required
-          read-only="command.viewState.readOnlyFields.credentials"
-          component="command"
-          field="credentials"
-          accounts="command.backingData.accounts"
-          provider="'azure'"
-        ></account-select-field>
-      </div>
-    </div>
+    <stage-config-field label="Account">
+      <account-select-field required component="stage" field="account" accounts="accounts" provider="'azure'" />
+    </stage-config-field>
 
     <stage-config-field label="Regions">
       <checklist items="regions" model="stage.regions" inline="true" include-select-all-button="true"></checklist>
     </stage-config-field>
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <label class="col-md-3 sm-label-right"></label>
+        <div class="btn-group btn-group-xs" role="group" aria-label="Source Image">
+          <button
+            class="btn btn-default"
+            aria-pressed="true"
+            ng-click="bakeStageCtrl.showDefaultImages()"
+            ng-class="{active: defaultImagesIsChoosed}"
+          >
+            Default Images
+          </button>
+          <button
+            class="btn btn-default"
+            aria-pressed="true"
+            ng-click="bakeStageCtrl.showManagedImages()"
+            ng-class="{active: managedImagesIsChoosed}"
+          >
+            Managed Images
+          </button>
+          <button
+            class="btn btn-default"
+            aria-pressed="true"
+            ng-click="bakeStageCtrl.showCustomImages()"
+            ng-class="{active: customImagesIsChoosed}"
+          >
+            Custom Image
+          </button>
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <stage-config-field label="Base OS" ng-show="defaultImagesIsChoosed">
+          <bake-stage-choose-os model="stage.baseOs" base-os-options="baseOsOptions"></bake-stage-choose-os>
+        </stage-config-field>
+
+        <stage-config-field label="Managed Image" ng-show="managedImagesIsChoosed" ng-if="managedImagesIsChoosed">
+          <bake-stage-choose-managed-image
+            model="stage.managedImage"
+            managed-image-options="managedImageOptions"
+          ></bake-stage-choose-managed-image>
+        </stage-config-field>
+
+        <stage-config-field label="Publisher" ng-show="customImagesIsChoosed">
+          <input type="text" class="form-control input-sm" ng-model="stage.publisher" />
+        </stage-config-field>
+        <stage-config-field label="Offer" ng-show="customImagesIsChoosed">
+          <input type="text" class="form-control input-sm" ng-model="stage.offer" />
+        </stage-config-field>
+        <stage-config-field label="SKU" ng-show="customImagesIsChoosed">
+          <input type="text" class="form-control input-sm" ng-model="stage.sku" />
+        </stage-config-field>
+
+        <stage-config-field label="OS Type" ng-show="customImagesIsChoosed">
+          <label class="radio-inline" ng-repeat="osType in osTypeOptions">
+            <input type="radio" ng-model="stage.osType" ng-value="osType" name="osType" />
+            {{osType}}
+          </label>
+        </stage-config-field>
+
+        <stage-config-field label="Package Type" ng-show="stage.osType == 'linux'">
+          <label class="radio-inline" ng-repeat="packageType in packageTypeOptions">
+            <input type="radio" ng-model="stage.packageType" ng-value="packageType" name="packageType" />
+            {{packageType}}
+          </label>
+        </stage-config-field>
+      </div>
+    </div>
+
     <stage-config-field label="Package" help-key="pipeline.config.bake.package">
       <input type="text" class="form-control input-sm" ng-model="stage.package" />
-    </stage-config-field>
-
-    <stage-config-field label="Image type">
-      <button class="btn btn-secondary btn-sm" ng-click="bakeStageCtrl.showDefaultImages()">Default Images</button>
-      <button class="btn btn-secondary btn-sm" ng-click="bakeStageCtrl.showManagedImages()">Managed Images</button>
-      <button class="btn btn-secondary btn-sm" ng-click="bakeStageCtrl.showCustomImages()">Custom Image</button>
-    </stage-config-field>
-
-    <stage-config-field label="Base OS" ng-show="defaultImagesIsChoosed">
-      <bake-stage-choose-os model="stage.baseOs" base-os-options="baseOsOptions"></bake-stage-choose-os>
-    </stage-config-field>
-
-    <stage-config-field label="Managed Image" ng-show="managedImagesIsChoosed">
-      <bake-stage-choose-managed-image
-        model="stage.managedImage"
-        managed-image-options="managedImageOptions"
-      ></bake-stage-choose-managed-image>
-    </stage-config-field>
-
-    <stage-config-field label="Publisher" ng-show="customImagesIsChoosed">
-      <input type="text" class="form-control input-sm" ng-model="stage.publisher" />
-    </stage-config-field>
-    <stage-config-field label="Offer" ng-show="customImagesIsChoosed">
-      <input type="text" class="form-control input-sm" ng-model="stage.offer" />
-    </stage-config-field>
-    <stage-config-field label="SKU" ng-show="customImagesIsChoosed">
-      <input type="text" class="form-control input-sm" ng-model="stage.sku" />
-    </stage-config-field>
-
-    <stage-config-field label="OS Type">
-      <label class="radio-inline" ng-repeat="osType in osTypeOptions">
-        <input type="radio" ng-model="stage.osType" ng-value="osType" />
-        {{osType}}
-      </label>
-    </stage-config-field>
-
-    <stage-config-field label="Package Type">
-      <label class="radio-inline" ng-repeat="packageType in packageTypeOptions">
-        <input type="radio" ng-model="stage.packageType" ng-value="packageType" />
-        {{packageType}}
-      </label>
     </stage-config-field>
 
     <stage-config-field label="Base Label">

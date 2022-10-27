@@ -4,10 +4,8 @@ import { SETTINGS } from '../../../../config/settings';
 
 export interface IManagedImageOption {
   id: string;
-  shortDescription?: string;
-  detailedDescription: string;
-  isImageFamily?: boolean;
-  displayName?: string;
+  name: string;
+  osType: string;
 }
 
 export class BakeStageChooseManagedImageController implements IController {
@@ -22,14 +20,11 @@ export class BakeStageChooseManagedImageController implements IController {
   }
 
   public getManagedImageDescription(managedImageOption: IManagedImageOption): string {
-    const managedImageName = managedImageOption?.displayName || managedImageOption?.id || '';
-    if (managedImageOption?.shortDescription) {
-      return `${managedImageName} (${managedImageOption.shortDescription})`;
-    }
-    return managedImageName;
+    return managedImageOption.name;
   }
+
   public getManagedImageDetailedDescription(managedImageOption: IManagedImageOption): string {
-    return managedImageOption.detailedDescription + (managedImageOption.isImageFamily ? ' (family)' : '');
+    return `${managedImageOption.name} (${managedImageOption.osType})`;
   }
 
   public getManagedImageDisabled(managedImageOption: IManagedImageOption): boolean {
