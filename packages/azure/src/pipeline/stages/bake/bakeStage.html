@@ -47,7 +47,7 @@
           <bake-stage-choose-os model="stage.baseOs" base-os-options="baseOsOptions"></bake-stage-choose-os>
         </stage-config-field>
 
-        <stage-config-field label="Managed Image" ng-show="managedImagesIsChoosed" ng-if="managedImagesIsChoosed">
+        <stage-config-field label="Managed Image" ng-show="managedImagesIsChoosed">
           <bake-stage-choose-managed-image
             model="stage.managedImage"
             managed-image-options="managedImageOptions"
@@ -71,13 +71,14 @@
           </label>
         </stage-config-field>
 
-        <stage-config-field label="Package Type" ng-show="stage.osType == 'linux'">
+        <stage-config-field label="Package Type" ng-show="bakeStageCtrl.isPackageTypeShowable()">
           <label class="radio-inline" ng-repeat="packageType in packageTypeOptions">
             <input type="radio" ng-model="stage.packageType" ng-value="packageType" name="packageType" />
             {{packageType}}
           </label>
         </stage-config-field>
       </div>
+      showen
     </div>
 
     <stage-config-field label="Package" help-key="pipeline.config.bake.package">

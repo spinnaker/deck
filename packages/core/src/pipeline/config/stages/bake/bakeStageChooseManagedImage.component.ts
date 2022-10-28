@@ -24,7 +24,10 @@ export class BakeStageChooseManagedImageController implements IController {
   }
 
   public getManagedImageDetailedDescription(managedImageOption: IManagedImageOption): string {
-    return `${managedImageOption.name} (${managedImageOption.osType})`;
+    if (managedImageOption.osType != undefined) {
+      return `${managedImageOption.name} (${managedImageOption.osType})`;
+    }
+    return `${managedImageOption.name}`;
   }
 
   public getManagedImageDisabled(managedImageOption: IManagedImageOption): boolean {
