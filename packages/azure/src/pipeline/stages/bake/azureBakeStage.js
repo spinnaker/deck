@@ -154,20 +154,9 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
               managedImageOptions.push(newImage);
             }
             $scope.managedImageOptions = managedImageOptions;
-            $scope.stage.managedImage = managedImageOptions[0].id;
           })
           .catch(() => {});
       }
-
-      this.isPackageTypeShowable = function () {
-        if ($scope.customImagesIsChoosed && $scope.stage.osType === 'linux') return true;
-
-        for (let i in $scope.managedImageOptions) {
-          let image = $scope.managedImageOptions[i];
-          if (image.id === $scope.stage.managedImage) return image.osType === 'linux';
-        }
-        return false;
-      };
 
       this.addExtendedAttribute = function () {
         if (!$scope.stage.extendedAttributes) {
@@ -216,7 +205,6 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
         $scope.defaultImagesIsChoosed = true;
         $scope.customImagesIsChoosed = false;
 
-        $scope.stage.baseOs = $scope.baseOsOptions[0].id;
         $scope.stage.managedImage = null;
         $scope.stage.publisher = null;
         $scope.stage.offer = null;
@@ -247,6 +235,17 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
         $scope.stage.baseOs = null;
         $scope.stage.managedImage = null;
         $scope.stage.osType = null;
+        $scope.stage.packageType = null;
+      };
+
+      $scope.onChangeManagedImage = () => {
+        $scope.stage.packageType = null;
+        const selectedManagedImage = _.find($scope.managedImageOptions, { id: $scope.stage.managedImage });
+        $scope.stage.osType = selectedManagedImage.osType.toLowerCase();
+      };
+
+      this.onChangeOsType = function (e) {
+        $scope.stage.packageType = null;
       };
 
       $scope.$watch('stage', stageUpdated, true);
