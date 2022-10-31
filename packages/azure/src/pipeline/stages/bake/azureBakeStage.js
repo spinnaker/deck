@@ -111,6 +111,11 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
           $scope.managedImagesIsChoosed = false;
           $scope.defaultImagesIsChoosed = true;
           $scope.customImagesIsChoosed = false;
+          setManagedImages();
+          $scope.stage.managedImage = $scope.managedImageOptions[0];
+          $scope.stage.regions = [];
+          $scope.stage.region = '';
+          $scope.regions = [];
         });
       }
 
@@ -146,12 +151,14 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
             let managedImageOptions = [];
             for (let i in images) {
               let image = images[i];
-              let newImage = {
-                id: image.imageName,
-                osType: image.ostype,
-                name: image.imageName,
-              };
-              managedImageOptions.push(newImage);
+              if (image.account === getSelectedAccount()) {
+                let newImage = {
+                  id: image.imageName,
+                  osType: image.ostype,
+                  name: image.imageName,
+                };
+                managedImageOptions.push(newImage);
+              }
             }
             $scope.managedImageOptions = managedImageOptions;
           })
@@ -246,6 +253,15 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
 
       this.onChangeOsType = function (e) {
         $scope.stage.packageType = null;
+      };
+
+      function getSelectedAccount() {
+        return _.find($scope.accounts, { id: $scope.stage.account });
+      }
+
+      this.onAccountChange = () => {
+        const selectedAccount = getSelectedAccount();
+        $scope.stage.regions = BakeryReader.getRegionsForAccount(selectedAccount);
       };
 
       $scope.$watch('stage', stageUpdated, true);

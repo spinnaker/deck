@@ -4,7 +4,14 @@
   </div>
   <div ng-if="!viewState.loading">
     <stage-config-field label="Account">
-      <account-select-field required component="stage" field="account" accounts="accounts" provider="'azure'" />
+      <account-select-field
+        required
+        component="stage"
+        field="account"
+        accounts="accounts"
+        provider="'azure'"
+        ng-model="stage.account"
+      />
     </stage-config-field>
 
     <stage-config-field label="Regions">
