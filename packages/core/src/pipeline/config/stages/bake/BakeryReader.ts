@@ -1,7 +1,6 @@
 import { get, has } from 'lodash';
 import { $q } from 'ngimport';
 
-import type { IRegion } from '../../../../account/AccountService';
 import { AccountService } from '../../../../account/AccountService';
 import { REST } from '../../../../api/ApiService';
 import { SETTINGS } from '../../../../config/settings';
@@ -26,12 +25,6 @@ export class BakeryReader {
     }
     return AccountService.getUniqueAttributeForAllAccounts(provider, 'regions').then((regions: string[]) =>
       regions.sort(),
-    );
-  }
-
-  public static getRegionsForAccount(account: string): PromiseLike<string[]> {
-    return AccountService.getRegionsForAccount(account).then((regions: IRegion[]) =>
-      regions.map((region: IRegion) => region.name),
     );
   }
 
