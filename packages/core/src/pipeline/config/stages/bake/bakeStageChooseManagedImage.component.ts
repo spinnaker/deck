@@ -20,11 +20,11 @@ export class BakeStageChooseManagedImageController implements IController {
   }
 
   public getManagedImageDescription(managedImageOption: IManagedImageOption): string {
-    return managedImageOption.name;
+    return managedImageOption?.name || '';
   }
 
   public getManagedImageDetailedDescription(managedImageOption: IManagedImageOption): string {
-    if (managedImageOption.osType != undefined) {
+    if (managedImageOption?.osType) {
       return `${managedImageOption.name} (${managedImageOption.osType})`;
     }
     return `${managedImageOption.name}`;

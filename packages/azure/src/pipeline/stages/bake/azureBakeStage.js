@@ -95,22 +95,18 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
           $scope.osTypeOptions = ['linux', 'windows'];
           $scope.packageTypeOptions = ['DEB', 'RPM'];
 
-          if (!$scope.stage.baseOs && $scope.baseOsOptions && $scope.baseOsOptions.length) {
-            $scope.stage.baseOs = $scope.baseOsOptions[0].id;
-          }
-
-          if (!$scope.stage.baseLabel && $scope.baseLabelOptions && $scope.baseLabelOptions.length) {
-            $scope.stage.baseLabel = $scope.baseLabelOptions[0];
-          }
           $scope.viewState.roscoMode =
             SETTINGS.feature.roscoMode ||
             (typeof SETTINGS.feature.roscoSelector === 'function' && SETTINGS.feature.roscoSelector($scope.stage));
           $scope.showAdvancedOptions = showAdvanced();
           $scope.viewState.loading = false;
 
-          $scope.managedImagesIsChoosed = false;
-          $scope.defaultImagesIsChoosed = true;
-          $scope.customImagesIsChoosed = false;
+          if ($scope.stage.managedImage != null) {
+            $scope.managedImagesIsChoosed = true;
+            setManagedImages();
+          }
+          $scope.defaultImagesIsChoosed = $scope.stage.baseOs != null;
+          $scope.customImagesIsChoosed = $scope.stage.publisher != null;
         });
       }
 
@@ -141,7 +137,7 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
 
       function setManagedImages() {
         azureImageReader
-          .findImages({ provider: 'azure', managedImages: true })
+          .findImages({ provider: 'azure', managedImages: true, account: $scope.stage.account })
           .then(function (images) {
             let managedImageOptions = [];
             for (let i in images) {
@@ -154,6 +150,14 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
               managedImageOptions.push(newImage);
             }
             $scope.managedImageOptions = managedImageOptions;
+          })
+          .catch(() => {});
+      }
+
+      function setRegions() {
+        AccountService.getRegionsForAccount($scope.stage.account)
+          .then(function (regions) {
+            $scope.regions = regions.map((r) => r.name);
           })
           .catch(() => {});
       }
@@ -236,6 +240,20 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
         $scope.stage.managedImage = null;
         $scope.stage.osType = null;
         $scope.stage.packageType = null;
+      };
+
+      this.onChangeAccount = () => {
+        $scope.stage.osType = null;
+        $scope.stage.packageType = null;
+        $scope.stage.managedImage = null;
+
+        if ($scope.stage.account) {
+          setRegions();
+        }
+
+        if ($scope.managedImagesIsChoosed) {
+          setManagedImages();
+        }
       };
 
       $scope.onChangeManagedImage = () => {
