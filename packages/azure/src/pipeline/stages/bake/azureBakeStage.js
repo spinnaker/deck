@@ -229,6 +229,7 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
         $scope.stage.publisher = null;
         $scope.stage.offer = null;
         $scope.stage.sku = null;
+        $scope.stage.packageType = null;
       };
 
       this.showCustomImages = function () {
