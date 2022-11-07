@@ -52,20 +52,18 @@ export function InstanceTypeSelector(props: IInstanceTypeSelectorProps) {
         const dirtyMultipleInstanceTypesInProps = values.viewState.dirty.launchTemplateOverridesForInstanceType;
 
         if (multipleInstanceTypesInProps?.length) {
-          const highestPriorityNum = Math.min(...multipleInstanceTypesInProps.map((it) => it.priority));
-          const instanceTypeWithHighestPriority = multipleInstanceTypesInProps.find(
-            (it) => it.priority === highestPriorityNum,
-          ).instanceType;
+          const instanceTypeWithHighestPriority = multipleInstanceTypesInProps.reduce((prev, current) => {
+            return prev.priority < current.priority ? prev : current;
+          }).instanceType;
           setFieldValue('instanceType', instanceTypeWithHighestPriority);
           setFieldValue('launchTemplateOverridesForInstanceType', []);
           values.instanceTypeChanged(values);
         }
 
         if (dirtyMultipleInstanceTypesInProps?.length) {
-          const highestPriorityNumDirty = Math.min(...dirtyMultipleInstanceTypesInProps.map((it) => it.priority));
-          const instanceTypeWithHighestPriorityDirty = dirtyMultipleInstanceTypesInProps.find(
-            (it) => it.priority === highestPriorityNumDirty,
-          ).instanceType;
+          const instanceTypeWithHighestPriorityDirty = dirtyMultipleInstanceTypesInProps.reduce((prev, current) => {
+            return prev.priority < current.priority ? prev : current;
+          }).instanceType;
           setFieldValue('viewState.dirty.instanceType', instanceTypeWithHighestPriorityDirty);
           setFieldValue('viewState.dirty.launchTemplateOverridesForInstanceType', []);
         }
