@@ -13,11 +13,7 @@ export class BakeStageChooseManagedImageController implements IController {
   public managedImageOptions: IManagedImageOption[];
   public onChange: () => any;
 
-  public showRadioButtons = false;
-
-  public $onChanges(): void {
-    this.showRadioButtons = this.managedImageOptions && this.managedImageOptions.length <= 2;
-  }
+  public $onChanges(): void {}
 
   public getManagedImageDescription(managedImageOption: IManagedImageOption): string {
     return managedImageOption?.name || '';

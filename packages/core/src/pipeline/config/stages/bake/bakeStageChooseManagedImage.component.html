@@ -1,9 +1,4 @@
-<ui-select
-  ng-if="!$ctrl.showRadioButtons"
-  ng-model="$ctrl.model"
-  on-select="$ctrl.onChange()"
-  class="form-control input-sm"
->
+<ui-select ng-model="$ctrl.model" on-select="$ctrl.onChange()" class="form-control input-sm">
   <ui-select-match placeholder="Select a Managed Image">
     <span ng-bind-html="$ctrl.getManagedImageDescription($select.selected)"></span>
   </ui-select-match>
@@ -15,9 +10,3 @@
     <div ng-bind-html="$ctrl.getManagedImageDetailedDescription(managedImageOption)"></div>
   </ui-select-choices>
 </ui-select>
-
-<label ng-if="$ctrl.showRadioButtons" class="radio-inline" ng-repeat="managedImageOption in $ctrl.managedImageOptions">
-  <input type="radio" ng-model="$ctrl.model" ng-value="managedImageOption.id" />
-  {{ $ctrl.getManagedImageDescription(managedImageOption) }}
-  <help-field content="{{ $ctrl.getManagedImageDetailedDescription(managedImageOption) }}"></help-field>
-</label>
