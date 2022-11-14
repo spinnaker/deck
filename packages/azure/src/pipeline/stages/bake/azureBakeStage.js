@@ -105,8 +105,8 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
             $scope.managedImagesWasChosen = true;
             setManagedImages();
           }
-          $scope.defaultImagesIsChoosed = $scope.stage.baseOs != null;
-          $scope.customImagesIsChoosed = $scope.stage.publisher != null;
+          $scope.defaultImagesWasChosen = $scope.stage.baseOs != null;
+          $scope.customImagesWasChosen = $scope.stage.publisher != null;
         });
       }
 
@@ -205,9 +205,9 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
       };
 
       this.showDefaultImages = function () {
-        $scope.managedImagesIsChoosed = false;
-        $scope.defaultImagesIsChoosed = true;
-        $scope.customImagesIsChoosed = false;
+        $scope.managedImagesWasChosen = false;
+        $scope.defaultImagesWasChosen = true;
+        $scope.customImagesWasChosen = false;
 
         $scope.stage.managedImage = null;
         $scope.stage.publisher = null;
@@ -220,9 +220,9 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
       this.showManagedImages = function () {
         setManagedImages();
 
-        $scope.managedImagesIsChoosed = true;
-        $scope.defaultImagesIsChoosed = false;
-        $scope.customImagesIsChoosed = false;
+        $scope.managedImagesWasChosen = true;
+        $scope.defaultImagesWasChosen = false;
+        $scope.customImagesWasChosen = false;
 
         $scope.stage.osType = null;
         $scope.stage.baseOs = null;
@@ -233,9 +233,9 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
       };
 
       this.showCustomImages = function () {
-        $scope.managedImagesIsChoosed = false;
-        $scope.defaultImagesIsChoosed = false;
-        $scope.customImagesIsChoosed = true;
+        $scope.managedImagesWasChosen = false;
+        $scope.defaultImagesWasChosen = false;
+        $scope.customImagesWasChosen = true;
 
         $scope.stage.baseOs = null;
         $scope.stage.managedImage = null;
@@ -252,7 +252,7 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
           setRegions();
         }
 
-        if ($scope.managedImagesIsChoosed) {
+        if ($scope.managedImagesWasChosen) {
           setManagedImages();
         }
       };

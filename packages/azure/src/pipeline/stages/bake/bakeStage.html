@@ -25,7 +25,7 @@
             class="btn btn-default"
             aria-pressed="true"
             ng-click="bakeStageCtrl.showDefaultImages()"
-            ng-class="{active: defaultImagesIsChoosed}"
+            ng-class="{active: defaultImagesWasChosen}"
           >
             Default Images
           </button>
@@ -33,7 +33,7 @@
             class="btn btn-default"
             aria-pressed="true"
             ng-click="bakeStageCtrl.showManagedImages()"
-            ng-class="{active: managedImagesIsChoosed}"
+            ng-class="{active: managedImagesWasChosen}"
           >
             Managed Images
           </button>
@@ -41,7 +41,7 @@
             class="btn btn-default"
             aria-pressed="true"
             ng-click="bakeStageCtrl.showCustomImages()"
-            ng-class="{active: customImagesIsChoosed}"
+            ng-class="{active: customImagesWasChosen}"
           >
             Custom Image
           </button>
@@ -49,11 +49,11 @@
       </div>
 
       <div class="panel-body">
-        <stage-config-field label="Base OS" ng-show="defaultImagesIsChoosed">
+        <stage-config-field label="Base OS" ng-show="defaultImagesWasChosen">
           <bake-stage-choose-os model="stage.baseOs" base-os-options="baseOsOptions"></bake-stage-choose-os>
         </stage-config-field>
 
-        <stage-config-field label="Managed Image" ng-show="managedImagesIsChoosed">
+        <stage-config-field label="Managed Image" ng-show="managedImagesWasChosen">
           <bake-stage-choose-managed-image
             model="stage.managedImage"
             managed-image-options="managedImageOptions"
@@ -61,17 +61,17 @@
           ></bake-stage-choose-managed-image>
         </stage-config-field>
 
-        <stage-config-field label="Publisher" ng-show="customImagesIsChoosed">
+        <stage-config-field label="Publisher" ng-show="customImagesWasChosen">
           <input type="text" class="form-control input-sm" ng-model="stage.publisher" />
         </stage-config-field>
-        <stage-config-field label="Offer" ng-show="customImagesIsChoosed">
+        <stage-config-field label="Offer" ng-show="customImagesWasChosen">
           <input type="text" class="form-control input-sm" ng-model="stage.offer" />
         </stage-config-field>
-        <stage-config-field label="SKU" ng-show="customImagesIsChoosed">
+        <stage-config-field label="SKU" ng-show="customImagesWasChosen">
           <input type="text" class="form-control input-sm" ng-model="stage.sku" />
         </stage-config-field>
 
-        <stage-config-field label="OS Type" ng-show="customImagesIsChoosed">
+        <stage-config-field label="OS Type" ng-show="customImagesWasChosen">
           <label class="radio-inline" ng-repeat="osType in osTypeOptions">
             <input
               type="radio"
