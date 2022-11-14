@@ -102,7 +102,7 @@ module(AZURE_PIPELINE_STAGES_BAKE_AZUREBAKESTAGE, [
           $scope.viewState.loading = false;
 
           if ($scope.stage.managedImage != null) {
-            $scope.managedImagesIsChoosed = true;
+            $scope.managedImagesWasChosen = true;
             setManagedImages();
           }
           $scope.defaultImagesIsChoosed = $scope.stage.baseOs != null;
