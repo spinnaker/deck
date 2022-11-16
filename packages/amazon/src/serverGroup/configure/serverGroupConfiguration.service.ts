@@ -3,6 +3,7 @@ import {
   chain,
   clone,
   cloneDeep,
+  difference,
   extend,
   find,
   flatten,
@@ -54,12 +55,14 @@ import type {
   IScalingProcess,
 } from '../../domain';
 import { AMAZON_INSTANCE_AWSINSTANCETYPE_SERVICE } from '../../instance/awsInstanceType.service';
+import type { IAmazonInstanceType } from '../../instance/awsInstanceType.service';
 import { KeyPairsReader } from '../../keyPairs';
 
 export type IBlockDeviceMappingSource = 'source' | 'ami' | 'default';
 
 export interface IAmazonServerGroupCommandDirty extends IServerGroupCommandDirty {
   targetGroups?: string[];
+  launchTemplateOverridesForInstanceType?: IAmazonInstanceTypeOverride[];
 }
 
 export interface IAmazonServerGroupCommandResult extends IServerGroupCommandResult {
@@ -69,6 +72,7 @@ export interface IAmazonServerGroupCommandResult extends IServerGroupCommandResu
 export interface IAmazonServerGroupCommandBackingDataFiltered extends IServerGroupCommandBackingDataFiltered {
   keyPairs: string[];
   targetGroups: string[];
+  instanceTypesInfo: IAmazonInstanceType[];
 }
 
 export interface IAmazonServerGroupCommandBackingData extends IServerGroupCommandBackingData {
@@ -77,6 +81,7 @@ export interface IAmazonServerGroupCommandBackingData extends IServerGroupComman
   keyPairs: IKeyPair[];
   targetGroups: string[];
   scalingProcesses: IScalingProcess[];
+  instanceTypesInfo: IAmazonInstanceType[];
 }
 
 export interface IAmazonServerGroupCommandViewState extends IServerGroupCommandViewState {
@@ -145,6 +150,7 @@ export interface IAmazonServerGroupCommand extends IServerGroupCommand {
   spotAllocationStrategy?: string;
   spotInstancePools?: number;
   launchTemplateOverridesForInstanceType?: IAmazonInstanceTypeOverride[];
+  amiArchitecture: string;
 
   getBlockDeviceMappingsSource: (command: IServerGroupCommand) => IBlockDeviceMappingSource;
   selectBlockDeviceMappingsSource: (command: IServerGroupCommand, selection: string) => void;
@@ -274,7 +280,7 @@ export class AwsServerGroupConfigurationService {
           subnets,
           preferredZones,
           keyPairs,
-          instanceTypes,
+          instanceTypesInfo,
           enabledMetrics,
           healthCheckTypes,
           terminationPolicies,
@@ -285,7 +291,7 @@ export class AwsServerGroupConfigurationService {
             subnets,
             preferredZones,
             keyPairs,
-            instanceTypes,
+            instanceTypesInfo,
             enabledMetrics,
             healthCheckTypes,
             terminationPolicies,
@@ -372,25 +378,50 @@ export class AwsServerGroupConfigurationService {
 
   public configureInstanceTypes(command: IAmazonServerGroupCommand): IServerGroupCommandResult {
     const result: IAmazonServerGroupCommandResult = { dirty: {} };
+
     if (command.region && (command.virtualizationType || command.viewState.disableImageSelection)) {
-      let filtered = this.awsInstanceTypeService.getAvailableTypesForRegions(command.backingData.instanceTypes, [
-        command.region,
-      ]);
-      if (command.virtualizationType) {
-        filtered = this.awsInstanceTypeService.filterInstanceTypes(
-          filtered,
+      let filteredTypesInfo: IAmazonInstanceType[] = this.awsInstanceTypeService.getAvailableTypesForRegions(
+        command.backingData.instanceTypesInfo,
+        [command.region],
+      );
+
+      if (command.virtualizationType || command.amiArchitecture) {
+        filteredTypesInfo = this.awsInstanceTypeService.filterInstanceTypes(
+          filteredTypesInfo,
           command.virtualizationType,
           !!command.vpcId,
+          command.amiArchitecture,
         );
       }
-      if (command.instanceType && !filtered.includes(command.instanceType)) {
+      const filteredTypes: string[] = map(filteredTypesInfo, 'name');
+
+      // handle incompatibility for single instance type case
+      if (command.instanceType && !filteredTypes.includes(command.instanceType)) {
         result.dirty.instanceType = command.instanceType;
         command.instanceType = null;
       }
-      command.backingData.filtered.instanceTypes = filtered;
+
+      // handle incompatibility for multiple instance types case
+      const multipleInstanceTypes: string[] = map(command.launchTemplateOverridesForInstanceType, 'instanceType');
+      const validInstanceTypes: string[] = intersection(multipleInstanceTypes, filteredTypes);
+      const invalidInstanceTypes: string[] = difference(multipleInstanceTypes, validInstanceTypes);
+
+      if (command.launchTemplateOverridesForInstanceType && invalidInstanceTypes.length > 0) {
+        result.dirty.launchTemplateOverridesForInstanceType = command.launchTemplateOverridesForInstanceType.filter(
+          (it) => invalidInstanceTypes.includes(it.instanceType),
+        );
+        command.launchTemplateOverridesForInstanceType = command.launchTemplateOverridesForInstanceType.filter((it) =>
+          validInstanceTypes.includes(it.instanceType),
+        );
+      }
+
+      command.backingData.filtered.instanceTypes = filteredTypes;
+      command.backingData.filtered.instanceTypesInfo = filteredTypesInfo;
     } else {
       command.backingData.filtered.instanceTypes = [];
+      command.backingData.filtered.instanceTypesInfo = [];
     }
+
     extend(command.viewState.dirty, result.dirty);
     return result;
   }
@@ -399,6 +430,7 @@ export class AwsServerGroupConfigurationService {
     const result: IAmazonServerGroupCommandResult = { dirty: {} };
     if (!command.amiName) {
       command.virtualizationType = null;
+      command.amiArchitecture = null;
     }
     if (command.viewState.disableImageSelection) {
       return result;
@@ -602,6 +634,7 @@ export class AwsServerGroupConfigurationService {
       });
       command.vpcId = subnet ? subnet.vpcId : null;
     }
+
     extend(result.dirty, this.configureInstanceTypes(command).dirty);
     return result;
   }
