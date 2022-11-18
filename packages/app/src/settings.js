@@ -294,7 +294,6 @@ window.spinnakerSettings = {
     'pubsub',
     'travis',
     'webhook',
-    'wercker',
   ],
   useClassicFirewallLabels: useClassicFirewallLabels,
 };
