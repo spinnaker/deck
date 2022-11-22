@@ -97,7 +97,11 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
     let stageType = (stage.activeStageType || stage.type).toLowerCase(); // support groups
     if (SETTINGS.feature.manualJudgmentParentPipeline) {
       stage.stages.forEach((childStage: IStage) => {
-        if (childStage.type == 'pipeline' && application.executions.data != undefined) {
+        if (
+          childStage.type == 'pipeline' &&
+          application.executions != undefined &&
+          application.executions.data != undefined
+        ) {
           const childPipeline = application.executions.data.find((p: any) => p.id === childStage.context.executionId);
           if (childPipeline != undefined) {
             childPipeline.stages.forEach((stageToCheck: IStage) => {
