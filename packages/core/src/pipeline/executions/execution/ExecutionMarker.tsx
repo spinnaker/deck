@@ -7,7 +7,7 @@ import { OrchestratedItemRunningTime } from './OrchestratedItemRunningTime';
 import type { Application } from '../../../application/application.model';
 import { SETTINGS } from '../../../config/settings';
 import { ExecutionBarLabel } from '../../config/stages/common/ExecutionBarLabel';
-import type { IExecution, IExecutionStageSummary } from '../../../domain';
+import type { IExecution, IExecutionStageSummary, IStage } from '../../../domain';
 import { logger } from '../../../utils';
 import { duration } from '../../../utils/timeFormatters';
 
@@ -94,9 +94,6 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
 
   public render() {
     const { stage, application, execution, active, previousStageActive, width } = this.props;
-<<<<<<< HEAD
-    const stageType = (stage.activeStageType || stage.type).toLowerCase(); // support groups
-=======
     let stageType = (stage.activeStageType || stage.type).toLowerCase(); // support groups
     if (SETTINGS.feature.manualJudgmentParentPipeline) {
       stage.stages.forEach((childStage: IStage) => {
@@ -116,7 +113,6 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
         }
       });
     }
->>>>>>> 4b6fd53c46 (feat(pipeline): added feature flag for pipeline when mj stage child (#9914))
     const pipelineStatus = this.stageStatus(stage.status.toLowerCase());
     const markerClassName = [
       stage.type !== 'group' ? 'clickable' : '',
