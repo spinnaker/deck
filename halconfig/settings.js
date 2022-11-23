@@ -61,6 +61,11 @@ var cloudfoundry = {
     account: '{%cloudfoundry.default.account%}',
   },
 };
+var cloudrun = {
+  defaults: {
+    account: '{%cloudrun.default.account%}',
+  },
+};
 var dcos = {
   defaults: {
     account: '{%dcos.default.account%}',
@@ -142,6 +147,7 @@ window.spinnakerSettings = {
     aws: aws,
     azure: azure,
     cloudfoundry: cloudfoundry,
+    cloudrun: cloudrun,
     dcos: dcos,
     ecs: ecs,
     gce: gce,
