@@ -94,7 +94,29 @@ export class ExecutionMarker extends React.Component<IExecutionMarkerProps, IExe
 
   public render() {
     const { stage, application, execution, active, previousStageActive, width } = this.props;
+<<<<<<< HEAD
     const stageType = (stage.activeStageType || stage.type).toLowerCase(); // support groups
+=======
+    let stageType = (stage.activeStageType || stage.type).toLowerCase(); // support groups
+    if (SETTINGS.feature.manualJudgmentParentPipeline) {
+      stage.stages.forEach((childStage: IStage) => {
+        if (
+          childStage.type == 'pipeline' &&
+          application.executions != undefined &&
+          application.executions.data != undefined
+        ) {
+          const childPipeline = application.executions.data.find((p: any) => p.id === childStage.context.executionId);
+          if (childPipeline != undefined) {
+            childPipeline.stages.forEach((stageToCheck: IStage) => {
+              if (stageToCheck.type == 'manualJudgment' && stageToCheck.status == 'RUNNING') {
+                stageType = 'manualjudgment';
+              }
+            });
+          }
+        }
+      });
+    }
+>>>>>>> 4b6fd53c46 (feat(pipeline): added feature flag for pipeline when mj stage child (#9914))
     const pipelineStatus = this.stageStatus(stage.status.toLowerCase());
     const markerClassName = [
       stage.type !== 'group' ? 'clickable' : '',
