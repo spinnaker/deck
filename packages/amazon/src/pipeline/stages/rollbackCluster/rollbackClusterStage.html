@@ -1,5 +1,5 @@
 <div ng-controller="awsRollbackClusterStageCtrl as rollbackClusterStageCtrl" class="form-horizontal">
-  <div ng-if="!pipeline.strategy">
+  <div>
     <account-region-cluster-selector application="application" component="stage" accounts="accounts">
     </account-region-cluster-selector>
   </div>
@@ -27,6 +27,11 @@
         class="form-control input-sm inline-number"
       />
       percent of instances are healthy.
+    </div>
+    <div class="col-sm-10 col-sm-offset-2">
+      Rollback Timeout is
+      <input type="number" min="0" max="100" ng-model="stage.timeout" class="form-control input-sm inline-number" />
+      minutes.
     </div>
   </div>
 </div>
