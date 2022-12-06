@@ -84,7 +84,7 @@ describe('<ManifestDeploymentOptions />', () => {
       props.config.options.strategy = 'bluegreen';
       props.isDeploymentKind = false;
       wrapper = shallow(<ManifestDeploymentOptions {...props} />);
-      expect(wrapper.find('p[id="blueGreenWarning"]').exists()).toEqual(true);
+      expect(wrapper.find('p[id="blueGreenWarning"]').exists()).toEqual(false);
     });
   });
 });
