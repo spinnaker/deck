@@ -90,6 +90,7 @@ window.spinnakerSettings = {
     'aws',
     'azure',
     'cloudfoundry',
+    'cloudrun',
     'dcos',
     'ecs',
     'gce',
@@ -207,6 +208,11 @@ window.spinnakerSettings = {
     cloudfoundry: {
       defaults: {
         account: 'my-cloudfoundry-account',
+      },
+    },
+    cloudrun: {
+      defaults: {
+        account: 'my-cloudrun-account',
       },
     },
     dcos: {

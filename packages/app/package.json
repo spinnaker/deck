@@ -17,6 +17,7 @@
     "@spinnaker/amazon": "^0.13.3",
     "@spinnaker/appengine": "^0.1.2",
     "@spinnaker/cloudfoundry": "^0.1.2",
+    "@spinnaker/cloudrun": "^0.0.1",
     "@spinnaker/core": "^0.22.2",
     "@spinnaker/docker": "^0.0.136",
     "@spinnaker/ecs": "^0.0.353",
