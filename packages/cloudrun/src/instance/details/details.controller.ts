@@ -22,9 +22,9 @@ class CloudrunInstanceDetailsController implements IController {
   public state = { loading: true };
   public instance: ICloudrunInstance;
   public instanceIdNotFound: string;
-  public upToolTip = "An Cloudrun instance is 'Up' if a load balancer is directing traffic to its server group.";
+  public upToolTip = "A Cloud Run instance is 'Up' if a load balancer is directing traffic to its server group.";
   public outOfServiceToolTip = `
-    An Cloudrun instance is 'Out Of Service' if no load balancers are directing traffic to its server group.`;
+    A Cloud Run instance is 'Out Of Service' if no load balancers are directing traffic to its server group.`;
 
   public static $inject = ['$q', 'app', 'instance'];
 

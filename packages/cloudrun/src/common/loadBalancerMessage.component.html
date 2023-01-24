@@ -2,14 +2,9 @@
   <div class="col-md-offset-{{ $ctrl.columnOffset || 0 }} col-md-{{ $ctrl.columns || 12 }}">
     <div class="well">
       <p>
-        <span ng-if="$ctrl.showCreateMessage">Spinnaker cannot create a load balancer for Cloudrun.</span>
-        A Spinnaker load balancer maps to an Cloudrun service, which along with a Revision are created from Create
-        Server Group page using a yaml file.
-      </p>
-
-      <p>
-        If a service does not exist when a version is deployed, it will be created. It will then be editable as a load
-        balancer within Spinnaker.
+        <span ng-if="$ctrl.showCreateMessage">Spinnaker cannot create a load balancer for Cloud Run.</span>
+        A Spinnaker load balancer maps to an Cloud Run Service, which will be created automatically alongside a
+        Revision. Once created, the Service can be edited as a Load Balancer.
       </p>
     </div>
   </div>

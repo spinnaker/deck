@@ -1,3 +1,3 @@
 export class CloudrunHealth {
-  public static PLATFORM = 'Cloudrun Service';
+  public static PLATFORM = 'Cloud Run Service';
 }
