@@ -18,6 +18,7 @@ var mineCanaryEnabled = '{%features.mineCanary%}' === 'true';
 var pipelineTemplatesEnabled = '{%features.pipelineTemplates%}' === 'true';
 var reduxLoggerEnabled = '{%canary.reduxLogger%}' === 'true';
 var showAllConfigsEnabled = '{%canary.showAllCanaryConfigs%}' === 'true';
+var stageRollbackTimeoutEnabled = '{%features.stageRollbackTimeout%}' === 'true';
 var slack = {
   botName: '{%notifications.slack.botName%}',
   enabled: '{%notifications.slack.enabled%}' === 'true',
