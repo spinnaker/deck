@@ -63,7 +63,7 @@ const k8sRawResourcesEnabled =
   import.meta.env.VITE_K8S_RAW_RESOURCES_ENABLED === 'true' ||
   process.env.K8S_RAW_RESOURCES_ENABLED === 'true' ||
   false;
-const stageRollbackTimeoutEnabled = import.meta.env.STAGE_ROLLBACK_TIMEOUT_ENABLED === 'true' || false;
+const dynamicRollbackTimeoutEnabled = import.meta.env.DYNAMIC_ROLLBACK_TIMEOUT_ENABLED === 'true' || false;
 
 window.spinnakerSettings = {
   authEnabled: authEnabled,
@@ -120,7 +120,7 @@ window.spinnakerSettings = {
     managedServiceAccounts: managedServiceAccountsEnabled,
     managedResources: managedResourcesEnabled,
     manualJudgmentParentPipeline: manualJudgmentParentPipelineEnabled,
-    stageRollbackTimeout: stageRollbackTimeoutEnabled,
+    dynamicRollbackTimeout: dynamicRollbackTimeoutEnabled,
     notifications: false,
     pagerDuty: false,
     pipelineTemplates: false,
