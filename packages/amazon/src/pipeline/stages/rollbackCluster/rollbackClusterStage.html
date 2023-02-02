@@ -28,5 +28,19 @@
       />
       percent of instances are healthy.
     </div>
+<<<<<<< HEAD
+=======
+    <div class="col-sm-10 col-sm-offset-2" ng-if="viewState.dynamicRollbackTimeout">
+      Rollback Timeout is
+      <input
+        type="number"
+        min="0"
+        max="100"
+        ng-model="stage.rollbackTimeout"
+        class="form-control input-sm inline-number"
+      />
+      minutes.
+    </div>
+>>>>>>> e239be3dbf (fix(timeout): Added feature flag for rollback timeout ui input. (#9937))
   </div>
 </div>
