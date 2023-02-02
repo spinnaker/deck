@@ -59,6 +59,7 @@ const k8sRawResourcesEnabled =
   import.meta.env.VITE_K8S_RAW_RESOURCES_ENABLED === 'true' ||
   process.env.K8S_RAW_RESOURCES_ENABLED === 'true' ||
   false;
+const dynamicRollbackTimeoutEnabled = import.meta.env.DYNAMIC_ROLLBACK_TIMEOUT_ENABLED === 'true' || false;
 
 window.spinnakerSettings = {
   authEnabled: authEnabled,
@@ -112,6 +113,11 @@ window.spinnakerSettings = {
     managedDelivery: managedDeliveryEnabled,
     managedServiceAccounts: managedServiceAccountsEnabled,
     managedResources: managedResourcesEnabled,
+<<<<<<< HEAD:app/scripts/modules/app/src/settings.js
+=======
+    manualJudgmentParentPipeline: manualJudgmentParentPipelineEnabled,
+    dynamicRollbackTimeout: dynamicRollbackTimeoutEnabled,
+>>>>>>> e239be3dbf (fix(timeout): Added feature flag for rollback timeout ui input. (#9937)):packages/app/src/settings.js
     notifications: false,
     pagerDuty: false,
     pipelineTemplates: false,
