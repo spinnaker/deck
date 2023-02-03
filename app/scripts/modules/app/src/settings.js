@@ -59,6 +59,7 @@ const k8sRawResourcesEnabled =
   import.meta.env.VITE_K8S_RAW_RESOURCES_ENABLED === 'true' ||
   process.env.K8S_RAW_RESOURCES_ENABLED === 'true' ||
   false;
+const dynamicRollbackTimeoutEnabled = import.meta.env.DYNAMIC_ROLLBACK_TIMEOUT_ENABLED === 'true' || false;
 
 window.spinnakerSettings = {
   authEnabled: authEnabled,
@@ -112,6 +113,7 @@ window.spinnakerSettings = {
     managedDelivery: managedDeliveryEnabled,
     managedServiceAccounts: managedServiceAccountsEnabled,
     managedResources: managedResourcesEnabled,
+    dynamicRollbackTimeout: dynamicRollbackTimeoutEnabled,
     notifications: false,
     pagerDuty: false,
     pipelineTemplates: false,
