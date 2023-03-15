@@ -18,6 +18,7 @@ var mineCanaryEnabled = '{%features.mineCanary%}' === 'true';
 var pipelineTemplatesEnabled = '{%features.pipelineTemplates%}' === 'true';
 var reduxLoggerEnabled = '{%canary.reduxLogger%}' === 'true';
 var showAllConfigsEnabled = '{%canary.showAllCanaryConfigs%}' === 'true';
+var dynamicRollbackTimeoutEnabled = '{%feature.dynamicRollbackTimeout%}' === 'true';
 var slack = {
   botName: '{%notifications.slack.botName%}',
   enabled: '{%notifications.slack.enabled%}' === 'true',
@@ -60,6 +61,11 @@ var azure = {
 var cloudfoundry = {
   defaults: {
     account: '{%cloudfoundry.default.account%}',
+  },
+};
+var cloudrun = {
+  defaults: {
+    account: '{%cloudrun.default.account%}',
   },
 };
 var dcos = {
@@ -116,6 +122,7 @@ window.spinnakerSettings = {
     fiatEnabled: fiatEnabled,
     pipelineTemplates: pipelineTemplatesEnabled,
     roscoMode: true,
+    dynamicRollbackTimeout: dynamicRollbackTimeoutEnabled,
   },
   gateUrl: gateHost,
   notifications: {
@@ -143,6 +150,7 @@ window.spinnakerSettings = {
     aws: aws,
     azure: azure,
     cloudfoundry: cloudfoundry,
+    cloudrun: cloudrun,
     dcos: dcos,
     ecs: ecs,
     gce: gce,

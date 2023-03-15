@@ -63,6 +63,7 @@ const k8sRawResourcesEnabled =
   import.meta.env.VITE_K8S_RAW_RESOURCES_ENABLED === 'true' ||
   process.env.K8S_RAW_RESOURCES_ENABLED === 'true' ||
   false;
+const dynamicRollbackTimeoutEnabled = import.meta.env.DYNAMIC_ROLLBACK_TIMEOUT_ENABLED === 'true' || false;
 
 window.spinnakerSettings = {
   authEnabled: authEnabled,
@@ -90,6 +91,7 @@ window.spinnakerSettings = {
     'aws',
     'azure',
     'cloudfoundry',
+    'cloudrun',
     'dcos',
     'ecs',
     'gce',
@@ -119,6 +121,7 @@ window.spinnakerSettings = {
     managedServiceAccounts: managedServiceAccountsEnabled,
     managedResources: managedResourcesEnabled,
     manualJudgmentParentPipeline: manualJudgmentParentPipelineEnabled,
+    dynamicRollbackTimeout: dynamicRollbackTimeoutEnabled,
     notifications: false,
     pagerDuty: false,
     pipelineTemplates: false,
@@ -207,6 +210,11 @@ window.spinnakerSettings = {
     cloudfoundry: {
       defaults: {
         account: 'my-cloudfoundry-account',
+      },
+    },
+    cloudrun: {
+      defaults: {
+        account: 'my-cloudrun-account',
       },
     },
     dcos: {
