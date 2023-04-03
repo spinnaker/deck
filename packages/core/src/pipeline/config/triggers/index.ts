@@ -13,3 +13,4 @@ import './pubsub/pubsub.trigger';
 import './travis/travis.trigger';
 import './webhook/webhook.trigger';
 import './wercker/wercker.trigger';
+import './cdevents/cdevents.trigger';
