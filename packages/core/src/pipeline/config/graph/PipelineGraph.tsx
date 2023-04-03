@@ -113,7 +113,30 @@ export class PipelineGraph extends React.Component<IPipelineGraphProps, IPipelin
     if (!node.children.length) {
       return node.phase;
     }
+<<<<<<< HEAD
     return max(node.children.map((n) => this.getLastPhase(n)));
+=======
+    const checkedNodeIds = new Set<string | number>();
+    const result: number[] = [];
+    this.collect(node.children, result, checkedNodeIds);
+    return max(result);
+  }
+
+  private collect(nodes: IPipelineGraphNode[], result: number[], checkedNodeIds: Set<string | number>) {
+    nodes.forEach((node) => {
+      if (checkedNodeIds.has(node.id)) {
+        return;
+      } else {
+        checkedNodeIds.add(node.id);
+      }
+
+      if (node.children.length) {
+        this.collect(node.children, result, checkedNodeIds);
+      } else {
+        result.push(node.phase);
+      }
+    });
+>>>>>>> 8d84d27377 (fix: UI crashes when running pipeline(s) with many stages. (#9960))
   }
 
   private createNodes(props: IPipelineGraphProps): IPipelineGraphNode[] {
