@@ -94,6 +94,7 @@ export interface IWebhookTrigger extends ITrigger {
 export interface ICDEventsTrigger extends ITrigger {
   source: string;
   payloadConstraints: { [key: string]: string };
+  attributeConstraints: { [key: string]: string };
 }
 
 export interface IWerckerTrigger extends IBuildTrigger {
