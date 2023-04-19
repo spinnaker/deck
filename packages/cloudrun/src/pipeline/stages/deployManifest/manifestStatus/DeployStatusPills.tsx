@@ -39,7 +39,7 @@ export class DeployManifestStatusPills extends React.Component<IDeployManifestSt
               {statusKey}
             </span>
           )}
-          {(isStable || isUnstableWithMessage) && <span>&nbsp;</span>}
+          <span>&nbsp;</span>
         </span>
       );
     });
