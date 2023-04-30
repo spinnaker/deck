@@ -6,9 +6,11 @@ import { CpuCreditsToggle } from '../CpuCreditsToggle';
 import { InstanceTypeTableBody } from './InstanceTypeTableBody';
 import { Header, Heading } from './InstanceTypeTableParts';
 import { Footer } from './InstanceTypeTableParts';
+import { InstanceTypeWarning } from '../InstanceTypeWarning';
 import { AWSProviderSettings } from '../../../../../aws.settings';
 import type { IAmazonInstanceTypeCategory } from '../../../../../instance/awsInstanceType.service';
 import type { IAmazonInstanceTypeOverride } from '../../../serverGroupConfiguration.service';
+import type { IAmazonServerGroupCommandViewState } from '../../../serverGroupConfiguration.service';
 
 import './advancedMode.less';
 
@@ -20,6 +22,8 @@ export interface IInstanceTypeTableProps {
   availableInstanceTypesList: string[];
   handleInstanceTypesChange: (instanceTypes: IAmazonInstanceTypeOverride[]) => void;
   setUnlimitedCpuCredits: (unlimitedCpuCredits: boolean | undefined) => void;
+  viewState: IAmazonServerGroupCommandViewState;
+  clearWarnings: () => void;
 }
 
 export function InstanceTypeTable(props: IInstanceTypeTableProps) {
@@ -95,6 +99,7 @@ export function InstanceTypeTable(props: IInstanceTypeTableProps) {
           profileLabel={label}
           profileDescriptionArr={descriptionListOverride ? descriptionListOverride : families.map((f) => f.description)}
         />
+        <InstanceTypeWarning dirty={props.viewState.dirty} clearWarnings={props.clearWarnings} />
         {isCpuCreditsEnabled && cpuCreditsToggle}
         <table className="table table-hover">
           <Header isCustom={isCustom} showCpuCredits={showCpuCredits} />
@@ -114,6 +119,7 @@ export function InstanceTypeTable(props: IInstanceTypeTableProps) {
     return (
       <div className={'row sub-section'}>
         <Heading isCustom={isCustom} />
+        <InstanceTypeWarning dirty={props.viewState.dirty} clearWarnings={props.clearWarnings} />
         {isCpuCreditsEnabled && cpuCreditsToggle}
         <table className="table table-hover">
           <Header isCustom={isCustom} />
