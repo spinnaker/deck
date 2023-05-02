@@ -48,8 +48,27 @@ import { AWS_SECURITY_GROUP_MODULE } from './securityGroup/securityGroup.module'
 import { AmazonCloneServerGroupModal } from './serverGroup/configure/wizard/AmazonCloneServerGroupModal';
 import { AmazonServerGroupActions } from './serverGroup/details/AmazonServerGroupActions';
 import { amazonServerGroupDetailsGetter } from './serverGroup/details/amazonServerGroupDetailsGetter';
-import { AmazonUpsertScalingPolicyModal, AmazonUpsertTargetTrackingModal, TargetTrackingChart } from './serverGroup/details/scalingPolicy';
-import { AdvancedSettingsDetailsSection, AmazonCapacityDetailsSection, AmazonInfoDetailsSection, HealthDetailsSection, InstancesDistributionDetailsSection, LaunchConfigDetailsSection, LaunchTemplateDetailsSection, LogsDetailsSection, PackageDetailsSection, ScalingPoliciesDetailsSection, ScalingProcessesDetailsSection, ScheduledActionsDetailsSection, SecurityGroupsDetailsSection, TagsDetailsSection } from './serverGroup/details/sections';
+import {
+  AmazonUpsertScalingPolicyModal,
+  AmazonUpsertTargetTrackingModal,
+  TargetTrackingChart,
+} from './serverGroup/details/scalingPolicy';
+import {
+  AdvancedSettingsDetailsSection,
+  AmazonCapacityDetailsSection,
+  AmazonInfoDetailsSection,
+  HealthDetailsSection,
+  InstancesDistributionDetailsSection,
+  LaunchConfigDetailsSection,
+  LaunchTemplateDetailsSection,
+  LogsDetailsSection,
+  PackageDetailsSection,
+  ScalingPoliciesDetailsSection,
+  ScalingProcessesDetailsSection,
+  ScheduledActionsDetailsSection,
+  SecurityGroupsDetailsSection,
+  TagsDetailsSection,
+} from './serverGroup/details/sections';
 import { SERVER_GROUP_DETAILS_MODULE } from './serverGroup/details/serverGroupDetails.module';
 import { AWS_SERVER_GROUP_TRANSFORMER } from './serverGroup/serverGroup.transformer';
 import { SUBNET_RENDERER } from './subnet/subnet.renderer';

@@ -21,6 +21,8 @@ export const availableRuntimes = [
 ];
 
 export const lambdaHelpFields = {
-  stack: "(Optional) Stack is naming components of a function, used to create vertical stacks of dependent services for integration testing.",
-  detail: "(Optional) Detail is a string of free-form alphanumeric characters to describe any other variables in naming a function.",
-}
+  stack:
+    '(Optional) Stack is naming components of a function, used to create vertical stacks of dependent services for integration testing.',
+  detail:
+    '(Optional) Detail is a string of free-form alphanumeric characters to describe any other variables in naming a function.',
+};

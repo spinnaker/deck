@@ -3,11 +3,17 @@
 
 import React from 'react';
 
-import type { IArtifact, IExpectedArtifact, IFormikStageConfigInjectedProps} from '@spinnaker/core';
-import { ArtifactTypePatterns, excludeAllTypesExcept, FormikFormField, IFormInputProps, NumberInput, StageArtifactSelectorDelegate } from '@spinnaker/core';
+import type { IArtifact, IExpectedArtifact, IFormikStageConfigInjectedProps } from '@spinnaker/core';
+import {
+  ArtifactTypePatterns,
+  excludeAllTypesExcept,
+  FormikFormField,
+  NumberInput,
+  StageArtifactSelectorDelegate,
+} from '@spinnaker/core';
 
 export function InvokeLambdaOperation(props: IFormikStageConfigInjectedProps) {
-  const { values, errors } = props.formik;
+  const { values } = props.formik;
 
   const excludedArtifactTypes = excludeAllTypesExcept(
     ArtifactTypePatterns.BITBUCKET_FILE,
@@ -19,14 +25,6 @@ export function InvokeLambdaOperation(props: IFormikStageConfigInjectedProps) {
     ArtifactTypePatterns.S3_OBJECT,
     ArtifactTypePatterns.HTTP_FILE,
   );
-
-  const onPayloadChange = ( fieldValue: any): void => {
-    props.formik.setFieldValue("lambdaPayload", fieldValue);
-  };
-
-  const onOutputChange = ( fieldValue: any): void => {
-    props.formik.setFieldValue("lambdaOutput", fieldValue);
-  };
 
   const onTemplateArtifactEdited = (artifact: IArtifact, name: string) => {
     props.formik.setFieldValue(`${name}.id`, null);
@@ -52,15 +50,11 @@ export function InvokeLambdaOperation(props: IFormikStageConfigInjectedProps) {
 
   return (
     <div>
-      <FormikFormField
-        name="timeout"
-        label="Timeout"
-        input={props => <NumberInput {...props} min={0} max={900} />}
-      />
+      <FormikFormField name="timeout" label="Timeout" input={(props) => <NumberInput {...props} min={0} max={900} />} />
       <FormikFormField
         name="executionCount"
         label="Execution Count"
-        input={props => <NumberInput {...props} min={0} max={100} />}
+        input={(props) => <NumberInput {...props} min={0} max={100} />}
       />
 
       <StageArtifactSelectorDelegate
@@ -68,7 +62,7 @@ export function InvokeLambdaOperation(props: IFormikStageConfigInjectedProps) {
         excludedArtifactTypePatterns={excludedArtifactTypes}
         expectedArtifactId={getInputArtifact(values, 'payloadArtifact').id}
         label="Payload Artifact"
-        onArtifactEdited={artifact => {
+        onArtifactEdited={(artifact: any) => {
           onTemplateArtifactEdited(artifact, 'payloadArtifact');
         }}
         helpKey={''}
@@ -79,5 +73,5 @@ export function InvokeLambdaOperation(props: IFormikStageConfigInjectedProps) {
         stage={values}
       />
     </div>
-  )
+  );
 }

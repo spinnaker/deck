@@ -1,10 +1,10 @@
 // Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
-import {isNil, isString} from 'lodash';
+import { isNil, isString } from 'lodash';
 
 function isEmptyString(val: any) {
   if (isString(val)) {
-    if ((isNil(val)) || (val === "")) {
+    if (isNil(val) || val === '') {
       return true;
     }
   }
@@ -16,6 +16,6 @@ export function upsertDefaults(initialValues: any, defaultValues: any) {
     if (!initialValues[key] && !isEmptyString(value)) {
       initialValues[key] = value;
     }
-  })
+  });
   return initialValues;
 }

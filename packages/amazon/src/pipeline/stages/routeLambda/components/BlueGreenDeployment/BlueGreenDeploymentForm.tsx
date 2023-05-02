@@ -3,7 +3,7 @@
 
 import React from 'react';
 
-import type { IFormikStageConfigInjectedProps, IFormInputProps} from '@spinnaker/core';
+import type { IFormikStageConfigInjectedProps, IFormInputProps } from '@spinnaker/core';
 import { FormikFormField, ReactSelectInput } from '@spinnaker/core';
 
 import { retrieveHealthCheck } from './HealthCheckStrategy';
@@ -18,18 +18,10 @@ export function BlueGreenDeploymentForm(props: IFormikStageConfigInjectedProps) 
         label="Health Check Type"
         name="healthCheckType"
         input={(inputProps: IFormInputProps) => (
-          <ReactSelectInput
-            {...inputProps}
-            clearable={false}
-            options={
-              HealthCheckList
-            }
-          />
+          <ReactSelectInput {...inputProps} clearable={false} options={HealthCheckList} />
         )}
       />
-      {  values.healthCheckType ?
-        retrieveHealthCheck(values.healthCheckType, props) : null
-      }
+      {values.healthCheckType ? retrieveHealthCheck(values.healthCheckType, props) : null}
     </div>
-  )
+  );
 }

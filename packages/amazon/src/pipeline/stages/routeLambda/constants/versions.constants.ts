@@ -27,5 +27,5 @@ export const VersionList: IVersionConstant[] = [
     label: 'Provide Version Number',
     value: '$PROVIDED',
     description: 'Provide a specific version number to destroy.',
-  }
-]
+  },
+];

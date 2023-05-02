@@ -23,16 +23,11 @@ export function WeightedDeploymentForm(props: IFormikStageConfigInjectedProps) {
             {...inputProps}
             clearable={false}
             options={VersionList}
-            optionRenderer={option => (
-              < VersionPicker
-                value={(option.value as any)}
-                showingDetails={true}
-              />
-            )}
+            optionRenderer={(option) => <VersionPicker value={option.value as any} showingDetails={true} />}
           />
         )}
       />
-      { values.versionNameA === '$PROVIDED' ?
+      {values.versionNameA === '$PROVIDED' ? (
         <FormikFormField
           label="Version Number"
           name="versionNumberA"
@@ -40,24 +35,24 @@ export function WeightedDeploymentForm(props: IFormikStageConfigInjectedProps) {
             <ReactSelectInput
               {...inputProps}
               clearable={false}
-              stringOptions={
-                functions.data
-                  .filter((f: IAmazonFunctionSourceData) => f.account === values.account )
-                  .filter((f: IAmazonFunctionSourceData) => f.region === values.region )
-                  .filter((f: IAmazonFunctionSourceData) => f.functionName === values.functionName )
-                  .flatMap((f: IAmazonFunctionSourceData) => Object.values(f.revisions).sort(function(a: number, b: number){return b-a}) )
-                  .filter((r: any) => r !== "$LATEST")
-              }
+              stringOptions={functions.data
+                .filter((f: IAmazonFunctionSourceData) => f.account === values.account)
+                .filter((f: IAmazonFunctionSourceData) => f.region === values.region)
+                .filter((f: IAmazonFunctionSourceData) => f.functionName === values.functionName)
+                .flatMap((f: IAmazonFunctionSourceData) =>
+                  Object.values(f.revisions).sort(function (a: number, b: number) {
+                    return b - a;
+                  }),
+                )
+                .filter((r: any) => r !== '$LATEST')}
             />
           )}
-        /> :
-
-        null
-      }
+        />
+      ) : null}
       <FormikFormField
         name="trafficPercentA"
         label="Traffic %"
-        input={props =>  <NumberInput {...props} min={0} max={100} /> }
+        input={(props) => <NumberInput {...props} min={0} max={100} />}
       />
 
       <FormikFormField
@@ -68,16 +63,11 @@ export function WeightedDeploymentForm(props: IFormikStageConfigInjectedProps) {
             {...inputProps}
             clearable={false}
             options={VersionList}
-            optionRenderer={option => (
-              < VersionPicker
-                value={(option.value as any)}
-                showingDetails={true}
-              />
-            )}
+            optionRenderer={(option) => <VersionPicker value={option.value as any} showingDetails={true} />}
           />
         )}
       />
-      { values.versionNameB === '$PROVIDED' ?
+      {values.versionNameB === '$PROVIDED' ? (
         <FormikFormField
           label="Version Number"
           name="versionNumberB"
@@ -85,26 +75,33 @@ export function WeightedDeploymentForm(props: IFormikStageConfigInjectedProps) {
             <ReactSelectInput
               {...inputProps}
               clearable={false}
-              stringOptions={
-                functions.data
-                  .filter((f: IAmazonFunctionSourceData) => f.account === values.account )
-                  .filter((f: IAmazonFunctionSourceData) => f.region === values.region )
-                  .filter((f: IAmazonFunctionSourceData) => f.functionName === values.functionName )
-                  .flatMap((f: IAmazonFunctionSourceData) => Object.values(f.revisions).sort(function(a: number, b: number){return b-a}) )
-                  .filter((r: any) => r !== "$LATEST")
-              }
+              stringOptions={functions.data
+                .filter((f: IAmazonFunctionSourceData) => f.account === values.account)
+                .filter((f: IAmazonFunctionSourceData) => f.region === values.region)
+                .filter((f: IAmazonFunctionSourceData) => f.functionName === values.functionName)
+                .flatMap((f: IAmazonFunctionSourceData) =>
+                  Object.values(f.revisions).sort(function (a: number, b: number) {
+                    return b - a;
+                  }),
+                )
+                .filter((r: any) => r !== '$LATEST')}
             />
           )}
-        /> :
-
-        null
-      }
+        />
+      ) : null}
       <FormikFormField
         name="trafficPercentB"
         label="Traffic %"
-        input={props =>  <NumberInput {...props} min={0} max={100} disabled={true} value={values.trafficPercentA || values.trafficPercentA === 0 ? 100-values.trafficPercentA : null}/> }
+        input={(props) => (
+          <NumberInput
+            {...props}
+            min={0}
+            max={100}
+            disabled={true}
+            value={values.trafficPercentA || values.trafficPercentA === 0 ? 100 - values.trafficPercentA : null}
+          />
+        )}
       />
-
     </div>
   );
 }

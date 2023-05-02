@@ -7,7 +7,7 @@ export interface IDeleteVersionConstant {
   value: string;
 }
 
-export const DeleteVersionList: IDeleteVersionConstant[] = [ 
+export const DeleteVersionList: IDeleteVersionConstant[] = [
   {
     label: 'Newest Function Version',
     value: '$LATEST',
@@ -21,7 +21,7 @@ export const DeleteVersionList: IDeleteVersionConstant[] = [
   {
     label: 'Older Than N',
     value: '$MOVING',
-    description: 'Delete all version but the N most recent versions.', 
+    description: 'Delete all version but the N most recent versions.',
   },
   {
     label: 'Provide Version Number',
@@ -31,6 +31,7 @@ export const DeleteVersionList: IDeleteVersionConstant[] = [
   {
     label: 'All Function Versions',
     value: '$ALL',
-    description: 'Delete all function versions and function infrastructure. This will completely delete the Lambda function.',
+    description:
+      'Delete all function versions and function infrastructure. This will completely delete the Lambda function.',
   },
-]
+];

@@ -21,7 +21,6 @@ export const DeploymentStrategyList: IStrategyConstant[] = [
   {
     label: 'Blue/Green',
     value: '$BLUEGREEN',
-    description: 'Disable all previous versions once the latest version passes health checks.', 
-  }, 
-]
-
+    description: 'Disable all previous versions once the latest version passes health checks.',
+  },
+];
