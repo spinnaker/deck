@@ -3,8 +3,15 @@
 
 import React from 'react';
 
-import type { IArtifact, IExpectedArtifact, IFormikStageConfigInjectedProps} from '@spinnaker/core';
-import { ArtifactTypePatterns, CheckboxInput, excludeAllTypesExcept, FormikFormField, NumberInput, StageArtifactSelectorDelegate } from '@spinnaker/core';
+import type { IArtifact, IExpectedArtifact, IFormikStageConfigInjectedProps } from '@spinnaker/core';
+import {
+  ArtifactTypePatterns,
+  CheckboxInput,
+  excludeAllTypesExcept,
+  FormikFormField,
+  NumberInput,
+  StageArtifactSelectorDelegate,
+} from '@spinnaker/core';
 
 export function InvokeLambdaHealthCheck(props: IFormikStageConfigInjectedProps) {
   const { values } = props.formik;
@@ -47,22 +54,16 @@ export function InvokeLambdaHealthCheck(props: IFormikStageConfigInjectedProps) 
       <FormikFormField
         name="destroyOnFail"
         label="On Fail"
-        input={props =>
-          <CheckboxInput text={"Destroy latest lambda version on fail."} {...props} />
-        }
+        input={(props) => <CheckboxInput text={'Destroy latest lambda version on fail.'} {...props} />}
       />
-      <FormikFormField
-        name="timeout"
-        label="Timeout"
-        input={props => <NumberInput {...props} min={0} max={900} />}
-      />
+      <FormikFormField name="timeout" label="Timeout" input={(props) => <NumberInput {...props} min={0} max={900} />} />
 
       <StageArtifactSelectorDelegate
         artifact={getInputArtifact(values, 'payloadArtifact').artifact}
         excludedArtifactTypePatterns={excludedArtifactTypes}
         expectedArtifactId={getInputArtifact(values, 'payloadArtifact').id}
         label="Payload Artifact"
-        onArtifactEdited={artifact => {
+        onArtifactEdited={(artifact) => {
           onTemplateArtifactEdited(artifact, 'payloadArtifact');
         }}
         helpKey={''}
@@ -77,7 +78,7 @@ export function InvokeLambdaHealthCheck(props: IFormikStageConfigInjectedProps) 
         excludedArtifactTypePatterns={excludedArtifactTypes}
         expectedArtifactId={getInputArtifact(values, 'outputArtifact').id}
         label="Output Artifact"
-        onArtifactEdited={artifact => {
+        onArtifactEdited={(artifact) => {
           onTemplateArtifactEdited(artifact, 'outputArtifact');
         }}
         helpKey={''}
@@ -87,7 +88,6 @@ export function InvokeLambdaHealthCheck(props: IFormikStageConfigInjectedProps) 
         pipeline={props.pipeline}
         stage={values}
       />
-
     </div>
-  )
+  );
 }

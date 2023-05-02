@@ -3,26 +3,21 @@
 
 import React from 'react';
 
-import {
-  FormikFormField,
-  HelpField,
-  MapEditorInput,
-  TextInput,
-} from '@spinnaker/core';
+import { FormikFormField, HelpField, MapEditorInput, TextInput } from '@spinnaker/core';
 
 export function ExecutionRoleForm() {
-  return(
+  return (
     <div>
       <FormikFormField
         name="envVariables"
         label="Env Variables"
-        input={props => <MapEditorInput {...props} allowEmptyValues={true} addButtonLabel="Add" />}
+        input={(props) => <MapEditorInput {...props} allowEmptyValues={true} addButtonLabel="Add" />}
       />
       <FormikFormField
         name="KMSKeyArn"
         label="Key ARN"
         help={<HelpField id="aws.function.kmsKeyArn" />}
-        input={props => <TextInput {...props} />}
+        input={(props) => <TextInput {...props} />}
       />
     </div>
   );

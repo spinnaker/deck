@@ -6,11 +6,14 @@ import type { IFormikStageConfigInjectedProps, IStage, IStageConfigProps } from 
 import { FormikStageConfig, FormValidator } from '@spinnaker/core';
 
 import { upsertDefaults } from './UpsertDefaults';
-import { awsArnValidator, iamRoleValidator, s3BucketNameValidator } from '../../../../aws.validators';
+import {
+  awsArnValidator,
+  iamRoleValidator,
+  s3BucketNameValidator,
+  simpleStringValidator,
+} from '../../../../aws.validators';
 import { AwsLambdaFunctionStageForm } from '../components/AwsLambdaFunctionStageForm';
 import { constructNewAwsFunctionTemplate } from './function.defaults';
-
-import './LambdaDeploymentStage.less';
 
 export function LambdaDeploymentConfig(props: IStageConfigProps) {
   const defaultFunction = constructNewAwsFunctionTemplate();
@@ -19,7 +22,7 @@ export function LambdaDeploymentConfig(props: IStageConfigProps) {
     <div className="LambdaDeploymentConfig">
       <FormikStageConfig
         {...props}
-        stage={upsertDefaults(props.stage,defaultFunction)}
+        stage={upsertDefaults(props.stage, defaultFunction)}
         validate={validate}
         onChange={props.updateStage}
         render={(props: IFormikStageConfigInjectedProps) => <AwsLambdaFunctionStageForm {...props} />}
@@ -36,36 +39,26 @@ export function validate(stageConfig: IStage) {
   validator.field('handler', 'Handler').required();
   validator.field('functionUid', 'Function Name').required();
 
-  validator
-    .field('stackName', 'Stack Name')
-    .optional()
-    .withValidators(simpleStringValidator);
+  validator.field('stackName', 'Stack Name').optional().withValidators(simpleStringValidator);
 
-  validator
-    .field('detailName', 'Detail Name')
-    .optional()
-    .withValidators(simpleStringValidator);
+  validator.field('detailName', 'Detail Name').optional().withValidators(simpleStringValidator);
 
-  validator
-    .field('s3bucket', 'S3 Bucket Name')
-    .required()
-    .withValidators(s3BucketNameValidator);
+  validator.field('s3bucket', 'S3 Bucket Name').required().withValidators(s3BucketNameValidator);
 
-  validator
-    .field('role', 'Role ARN')
-    .required()
-    .withValidators(iamRoleValidator);
+  validator.field('role', 'Role ARN').required().withValidators(iamRoleValidator);
 
   validator
     .field('triggerArns', 'Trigger ARNs')
     .optional()
-    .withValidators((value:any, label: string) => {
-        const tmp: any[]  = value.map((arn: string) => {
-          return awsArnValidator(arn, arn);
-        })
-        const ret: boolean = tmp.every((el) => el === undefined);
-        return ret ? undefined : "Invalid ARN. Event ARN must match regular expression: /^arn:aws[a-zA-Z-]?:[a-zA-Z_0-9.-]+:./";
-      })
+    .withValidators((value: any, _: string) => {
+      const tmp: any[] = value.map((arn: string) => {
+        return awsArnValidator(arn, arn);
+      });
+      const ret: boolean = tmp.every((el) => el === undefined);
+      return ret
+        ? undefined
+        : 'Invalid ARN. Event ARN must match regular expression: /^arn:aws[a-zA-Z-]?:[a-zA-Z_0-9.-]+:./';
+    });
 
   return validator.validateForm();
 }

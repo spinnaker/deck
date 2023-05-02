@@ -11,4 +11,4 @@ export const HealthCheckList: IHealthConstant[] = [
     label: 'Lambda Invocation',
     value: '$LAMBDA',
   },
-]
+];
