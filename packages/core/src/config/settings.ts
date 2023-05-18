@@ -21,6 +21,7 @@ export interface INotificationSettings {
   pubsub: { enabled: boolean };
   slack: { botName: string; enabled: boolean };
   sms: { enabled: boolean };
+  cdevents: { enabled: boolean };
 }
 
 export interface IFeatures {

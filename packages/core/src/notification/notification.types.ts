@@ -13,6 +13,7 @@ import { microsoftTeamsNotification } from './selector/types/microsoftteams/micr
 import { pubsubNotification } from './selector/types/pubsub/pubsub.notification';
 import { slackNotification } from './selector/types/slack/slack.notification';
 import { smsNotification } from './selector/types/sms/sms.notification';
+import { cdEventsNotification } from './selector/types/cdevents/cdevents.notification';
 
 [
   bearyChatNotification,
@@ -23,6 +24,7 @@ import { smsNotification } from './selector/types/sms/sms.notification';
   pubsubNotification,
   slackNotification,
   smsNotification,
+  cdEventsNotification,
 ].forEach((config: INotificationTypeConfig) => {
   if (SETTINGS.notifications) {
     const notificationSetting: { enabled: boolean; botName?: string } =
