@@ -5,7 +5,8 @@ import { iconsByName } from './iconsByName';
 export type IconNames = keyof typeof iconsByName;
 
 export type IIconProps = {
-  name: IconNames;
+  name?: IconNames;
+  reactComponent?: ReactComponent;
   appearance?: 'light' | 'neutral' | 'dark';
   size?: 'extraSmall' | 'small' | 'medium' | 'large' | 'extraLarge' | string;
   color?: string;
@@ -27,11 +28,15 @@ const throwInvalidIconError = (name: string) => {
   throw new Error(`No icon with the name ${name} exists`);
 };
 
-export const Icon = memo(({ name, appearance, size, color, className }: IIconProps) => {
-  const Component = iconsByName[name];
-
-  if (!Component) {
-    throwInvalidIconError(name);
+export const Icon = memo(({ name, reactComponent, appearance, size, color, className }: IIconProps) => {
+  let Component;
+  if (reactComponent) {
+    Component = reactComponent;
+  } else {
+    Component = iconsByName[name];
+    if (!Component) {
+      throwInvalidIconError(name);
+    }
   }
 
   const width = size ? pxDimensionsBySize[size] || size : pxDimensionsBySize[DEFAULT_SIZE];
