@@ -25,12 +25,24 @@ const pxDimensionsBySize: { [size: string]: string } = {
   extraLarge: '40px',
 };
 
-const throwInvalidIconError = (name: string | undefined) => {
+const throwInvalidIconError = (name: string) => {
   throw new Error(`No icon with the name ${name} exists`);
 };
 
+const throwInvalidIconComponentError = () => {
+  throw new Error('No name or reactComponent provided in Icon props');
+};
+
 export const Icon = memo(({ name, reactComponent, appearance, size, color, className }: IIconProps) => {
-  const Component = name ? iconsByName[name] : reactComponent || throwInvalidIconError(name);
+  let Component;
+  if (name) {
+    Component = iconsByName[name];
+    if (!Component) {
+      throwInvalidIconError(name);
+    }
+  } else {
+    Component = reactComponent || throwInvalidIconComponentError();
+  }
 
   const width = size ? pxDimensionsBySize[size] || size : pxDimensionsBySize[DEFAULT_SIZE];
   const fill = color ? `var(--color-${color})` : `var(--color-icon-${appearance || DEFAULT_APPEARANCE})`;
