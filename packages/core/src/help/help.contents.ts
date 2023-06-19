@@ -174,22 +174,15 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.trigger.webhook.source': `
       <p>Determines the target URL required to trigger this pipeline, as well as how the payload can be transformed into artifacts.</p>
   `,
-  'pipeline.config.trigger.cdevents.source': `
-        <p>Determines the target URL required to trigger this pipeline, as well as how the payload can be transformed into artifacts.</p>
-    `,
   'pipeline.config.trigger.webhook.payloadConstraints': `
       <p>When provided, only a webhook with a payload containing at least the specified key/value pairs will be allowed to trigger this pipeline. For example, if you wanted to lock down the systems/users that can trigger this pipeline via this webhook, you could require the key "secret" and value "something-secret" as a constraint.</p>
       <p>The constraint values may be supplied as regex.</p>
   `,
-  'pipeline.config.trigger.cdevents.payloadConstraints': `
-        <p>When provided, only a webhook with a payload containing at least the specified key/value pairs will be allowed to trigger this pipeline. For example, if you wanted to lock down the systems/users that can trigger this pipeline via this webhook, you could require the key "secret" and value "something-secret" as a constraint.</p>
-        <p>The constraint values may be supplied as regex.</p>
-    `,
-    'pipeline.config.trigger.cdevents.attributeConstraints': `
-          <p>CDEvents messages will have mandatory headers id, source, specversion, type accompanying the payload called <b>attributes</b>.</p>
-          <p>When provided, only a CDEvents message with attributes containing at least the specified key/value pairs will be allowed to trigger this pipeline.</p>
-          <p>The constraint value is a java regex string.</p>
-      `,
+  'pipeline.config.trigger.cdevents.attributeConstraints': `
+      <p>CDEvents messages will have mandatory headers id, source, specversion, type accompanying the payload called <b>attributes</b>.</p>
+      <p>When provided, only a CDEvents message with attributes containing at least the specified key/value pairs will be allowed to trigger this pipeline.</p>
+      <p>The constraint value is a java regex string.</p>
+  `,
   'pipeline.config.trigger.pubsub.attributeConstraints': `
       <p>Pubsub messages can have system-specific metadata accompanying the payload called <b>attributes</b>.</p>
       <p>When provided, only a pubsub message with attributes containing at least the specified key/value pairs will be allowed to trigger this pipeline.</p>

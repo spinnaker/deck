@@ -21,7 +21,7 @@ export function CDEventsTrigger(cdeventsTriggerProps: ICDEventsTriggerProps) {
       <FormikFormField
         name="source"
         label="Source"
-        help={<HelpField id="pipeline.config.trigger.cdevents.source" />}
+        help={<HelpField id="pipeline.config.trigger.webhook.source" />}
         input={(props) => (
           <div className="flex-container-v">
             <TextInput {...props} />
@@ -33,7 +33,7 @@ export function CDEventsTrigger(cdeventsTriggerProps: ICDEventsTriggerProps) {
       <FormikFormField
         name="payloadConstraints"
         label="Payload Constraints"
-        help={<HelpField id="pipeline.config.trigger.cdevents.payloadConstraints" />}
+        help={<HelpField id="pipeline.config.trigger.webhook.payloadConstraints" />}
         input={(props) => <MapEditorInput {...props} addButtonLabel="Add payload constraint" />}
       />
 
