@@ -185,7 +185,7 @@ export class CreatePipelineModal extends React.Component<ICreatePipelineModalPro
       const configs: IPipeline[] = config.strategy
         ? application.strategyConfigs.data
         : application.pipelineConfigs.data;
-      const newPipeline = configs.find((_config) => _config.name === config.name);
+      const newPipeline = configs.find((_config) => _config.name === config.name.trim());
 
       if (!newPipeline) {
         $log.warn('Could not find new pipeline after save succeeded.');
