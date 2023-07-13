@@ -11,7 +11,7 @@ export class RolloutRestartStatus extends DeployStatus {
 const STAGE_NAME = 'Rollout Restart (Manifest)';
 Registry.pipeline.registerStage({
   label: STAGE_NAME,
-  description: 'Restart the rollout of a manifest.',
+  description: 'Perform a rolling restart of a manifest.',
   key: 'rollingRestartManifest',
   cloudProvider: 'kubernetes',
   component: RolloutRestartManifestStageConfig,
