@@ -3,6 +3,78 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.39](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.38...@spinnaker/titus@0.5.39) (2023-07-20)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.38](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.37...@spinnaker/titus@0.5.38) (2023-06-02)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.37](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.36...@spinnaker/titus@0.5.37) (2023-05-11)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.36](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.35...@spinnaker/titus@0.5.36) (2023-05-03)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.35](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.34...@spinnaker/titus@0.5.35) (2023-04-03)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.34](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.33...@spinnaker/titus@0.5.34) (2023-02-02)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.33](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.32...@spinnaker/titus@0.5.33) (2023-02-01)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.32](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.31...@spinnaker/titus@0.5.32) (2022-10-21)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
+## [0.5.31](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.30...@spinnaker/titus@0.5.31) (2022-10-06)
+
+**Note:** Version bump only for package @spinnaker/titus
+
+
+
+
+
 ## [0.5.30](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.29...@spinnaker/titus@0.5.30) (2022-08-25)
 
 **Note:** Version bump only for package @spinnaker/titus

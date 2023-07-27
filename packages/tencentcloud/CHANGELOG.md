@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.79](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.78...@spinnaker/tencentcloud@0.0.79) (2023-07-20)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.78](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.77...@spinnaker/tencentcloud@0.0.78) (2023-06-02)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.77](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.76...@spinnaker/tencentcloud@0.0.77) (2023-05-11)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.76](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.75...@spinnaker/tencentcloud@0.0.76) (2023-05-03)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.75](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.74...@spinnaker/tencentcloud@0.0.75) (2023-04-03)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.74](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.73...@spinnaker/tencentcloud@0.0.74) (2023-02-01)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.73](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.72...@spinnaker/tencentcloud@0.0.73) (2022-10-21)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
+## [0.0.72](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.71...@spinnaker/tencentcloud@0.0.72) (2022-10-06)
+
+**Note:** Version bump only for package @spinnaker/tencentcloud
+
+
+
+
+
 ## [0.0.71](https://github.com/spinnaker/deck/compare/@spinnaker/tencentcloud@0.0.70...@spinnaker/tencentcloud@0.0.71) (2022-08-03)
 
 **Note:** Version bump only for package @spinnaker/tencentcloud

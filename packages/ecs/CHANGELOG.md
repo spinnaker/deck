@@ -3,6 +3,92 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.361](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.360...@spinnaker/ecs@0.0.361) (2023-07-20)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.360](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.359...@spinnaker/ecs@0.0.360) (2023-06-02)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.359](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.358...@spinnaker/ecs@0.0.359) (2023-05-11)
+
+
+### Bug Fixes
+
+* **ecs:** VPC Subnet dropdown fix in ecs server group creation. ([10abc99](https://github.com/spinnaker/deck/commit/10abc99641a35803cc3c729d3ccc037ea19a9ed2))
+
+
+
+
+
+## [0.0.358](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.357...@spinnaker/ecs@0.0.358) (2023-05-03)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.357](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.356...@spinnaker/ecs@0.0.357) (2023-04-03)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.356](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.355...@spinnaker/ecs@0.0.356) (2023-02-07)
+
+
+### Bug Fixes
+
+* **ecs:** skip checking for upstream stages for ECS deploy ([#9945](https://github.com/spinnaker/deck/issues/9945)) ([898a595](https://github.com/spinnaker/deck/commit/898a59504ea58a456baf19e0a21a4cace683feb7))
+
+
+
+
+
+## [0.0.355](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.354...@spinnaker/ecs@0.0.355) (2023-02-02)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.354](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.353...@spinnaker/ecs@0.0.354) (2023-02-01)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.353](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.352...@spinnaker/ecs@0.0.353) (2022-10-21)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.352](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.351...@spinnaker/ecs@0.0.352) (2022-10-06)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
 ## [0.0.351](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.350...@spinnaker/ecs@0.0.351) (2022-08-25)
 
 **Note:** Version bump only for package @spinnaker/ecs
