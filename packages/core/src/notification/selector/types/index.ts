@@ -1,9 +1,9 @@
 export * from './bearychat/BearychatNotificationType';
+export * from './cdevents/CDEventsNotificationType';
 export * from './email/EmailNotificationType';
 export * from './googlechat/GooglechatNotificationType';
 export * from './microsoftteams/MicrosoftTeamsNotificationType';
 export * from './pubsub/PubsubNotificationType';
-export * from './cdevents/CDEventsNotificationType';
 export * from './slack/SlackNotificationType';
 export * from './sms/SmsNotificationType';
 

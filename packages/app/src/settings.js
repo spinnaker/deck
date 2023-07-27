@@ -171,8 +171,8 @@ window.spinnakerSettings = {
       enabled: true,
     },
     cdevents: {
-          enabled: true,
-        },
+      enabled: true,
+    },
   },
   onDemandClusterThreshold: Number(onDemandClusterThreshold),
   pollSchedule: 30000,
