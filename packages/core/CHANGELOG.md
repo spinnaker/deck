@@ -3,6 +3,121 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.25.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.24.1...@spinnaker/core@0.25.0) (2023-07-20)
+
+
+### Bug Fixes
+
+* **core/pipeline:** Resolved issue getting during pipeline save with spaces in pipeline name. ([#10009](https://github.com/spinnaker/deck/issues/10009)) ([ec8d2bb](https://github.com/spinnaker/deck/commit/ec8d2bbada0192673cfede4401e5c18d884dec59))
+
+
+### Features
+
+* **artifacts:** Add support for artifact store views and calls ([#10011](https://github.com/spinnaker/deck/issues/10011)) ([b520bae](https://github.com/spinnaker/deck/commit/b520bae8296c85ed096ea6aaee022e114bb6a52f))
+* **lambda:** Migrate Lambda plugin to OSS ([#9988](https://github.com/spinnaker/deck/issues/9988)) ([11f1cab](https://github.com/spinnaker/deck/commit/11f1cabb8efe8d7e034faf06ae3cb455eef6369a)), closes [#9984](https://github.com/spinnaker/deck/issues/9984)
+* **stages/bakeManifests:** add helmfile support ([#9998](https://github.com/spinnaker/deck/issues/9998)) ([a4a0f33](https://github.com/spinnaker/deck/commit/a4a0f331d181b74d7c3a8c1b46724757be17a9f0))
+
+
+
+
+
+## [0.24.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.24.0...@spinnaker/core@0.24.1) (2023-06-02)
+
+
+### Bug Fixes
+
+* **core/pipeline:** Pipeline builder-pipeline action dropdown closing not properly ([#9999](https://github.com/spinnaker/deck/issues/9999)) ([a672a20](https://github.com/spinnaker/deck/commit/a672a208625d2551ec38f5179cf519fec4a40280))
+
+
+
+
+
+# [0.24.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.23.2...@spinnaker/core@0.24.0) (2023-05-11)
+
+
+### Features
+
+* **deck:** make StageFailureMessage component overridable ([#9994](https://github.com/spinnaker/deck/issues/9994)) ([39f70cc](https://github.com/spinnaker/deck/commit/39f70ccae0ce2027a63da60a7e6f2f08fe8f7240))
+
+
+
+
+
+## [0.23.2](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.23.1...@spinnaker/core@0.23.2) (2023-05-03)
+
+
+### Bug Fixes
+
+* **angular:** fix missed AngularJS bindings ([#9989](https://github.com/spinnaker/deck/issues/9989)) ([f947bf9](https://github.com/spinnaker/deck/commit/f947bf997a03dee2f600fc72415bf141320978e4))
+
+
+
+
+
+## [0.23.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.23.0...@spinnaker/core@0.23.1) (2023-04-03)
+
+
+### Bug Fixes
+
+* **6755:** Resolved issue regarding warning reporting when cloning a server group in AWS ([#9948](https://github.com/spinnaker/deck/issues/9948)) ([6b36cb6](https://github.com/spinnaker/deck/commit/6b36cb68112361587bfb8e3fb5c31024d10d7072))
+* UI crashes when running pipeline(s) with many stages. ([#9960](https://github.com/spinnaker/deck/issues/9960)) ([8d84d27](https://github.com/spinnaker/deck/commit/8d84d2737729d364a74c34468c874f4613d68801))
+
+
+
+
+
+# [0.23.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.22.2...@spinnaker/core@0.23.0) (2023-02-01)
+
+
+### Bug Fixes
+
+* **core:** Missing config elements after Angular 1.8 update ([#9936](https://github.com/spinnaker/deck/issues/9936)) ([884665a](https://github.com/spinnaker/deck/commit/884665a78cb91bb01e533fdd8be65a3a5de19019))
+* **helm:** update tooltip to not include Chart.yaml ([#9934](https://github.com/spinnaker/deck/issues/9934)) ([a55f6f3](https://github.com/spinnaker/deck/commit/a55f6f335b51f76f3a8a79ac698884253d7b1076))
+
+
+### Features
+
+* **Azure:** Update UI to handle custom and managed images. ([#9910](https://github.com/spinnaker/deck/issues/9910)) ([a9057b4](https://github.com/spinnaker/deck/commit/a9057b44f035fc76a7eb461cd2c28c420791457c))
+* **core/bake:** support include crds flag in Helm3 ([#9903](https://github.com/spinnaker/deck/issues/9903)) ([a10f11d](https://github.com/spinnaker/deck/commit/a10f11d33f3135963786083003e33db40f3e0b18))
+* **core/pipeline:** Add missing flag `skipDownstreamOutput` in pipeline stage ([#9930](https://github.com/spinnaker/deck/issues/9930)) ([deba01e](https://github.com/spinnaker/deck/commit/deba01ed7ba275194f51bcc0cbf414bbf3266562))
+* **pipeline:** added feature flag for pipeline when mj stage child ([#9914](https://github.com/spinnaker/deck/issues/9914)) ([4b6fd53](https://github.com/spinnaker/deck/commit/4b6fd53c4674b37c1c9742b9a9fdedb8e1fda5ca))
+
+
+
+
+
+## [0.22.2](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.22.1...@spinnaker/core@0.22.2) (2022-10-21)
+
+
+### Bug Fixes
+
+* **links:** update link to spinnaker release changelog ([#9897](https://github.com/spinnaker/deck/issues/9897)) ([1591513](https://github.com/spinnaker/deck/commit/159151368e99da0e990d607039268e20b8b1a8b2))
+
+
+
+
+
+## [0.22.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.22.0...@spinnaker/core@0.22.1) (2022-10-06)
+
+
+### Bug Fixes
+
+* **core:** Do not set static document base URL ([#9890](https://github.com/spinnaker/deck/issues/9890)) ([5ac7516](https://github.com/spinnaker/deck/commit/5ac75160cf8b6099aaea8b31874ebbbb13409b2a)), closes [#9802](https://github.com/spinnaker/deck/issues/9802) [spinnaker/spinnaker#6723](https://github.com/spinnaker/spinnaker/issues/6723)
+* **search:** Error thrown when search version 2 is enabled ([#9888](https://github.com/spinnaker/deck/issues/9888)) ([af0b585](https://github.com/spinnaker/deck/commit/af0b5854dc2a35d643c06baa25a07bfc425fc154))
+
+
+
+# 3.12.0 (2022-09-09)
+
+
+### Bug Fixes
+
+* **notifications:** Added space in Google Chat notification. ([#9884](https://github.com/spinnaker/deck/issues/9884)) ([ed1d5f8](https://github.com/spinnaker/deck/commit/ed1d5f8691f7155c5c346916ad871c9993ea8363))
+
+
+
+
+
 # [0.22.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.21.0...@spinnaker/core@0.22.0) (2022-08-03)
 
 

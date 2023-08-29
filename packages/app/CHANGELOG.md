@@ -3,6 +3,122 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.5.6](https://github.com/spinnaker/deck/compare/deck-app@2.5.5...deck-app@2.5.6) (2023-07-20)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+## [2.5.5](https://github.com/spinnaker/deck/compare/deck-app@2.5.4...deck-app@2.5.5) (2023-06-02)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+## [2.5.4](https://github.com/spinnaker/deck/compare/deck-app@2.5.3...deck-app@2.5.4) (2023-05-11)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+## [2.5.3](https://github.com/spinnaker/deck/compare/deck-app@2.5.2...deck-app@2.5.3) (2023-05-03)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+## [2.5.2](https://github.com/spinnaker/deck/compare/deck-app@2.5.1...deck-app@2.5.2) (2023-05-01)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+## [2.5.1](https://github.com/spinnaker/deck/compare/deck-app@2.5.0...deck-app@2.5.1) (2023-04-03)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+# [2.5.0](https://github.com/spinnaker/deck/compare/deck-app@2.4.3...deck-app@2.5.0) (2023-03-15)
+
+
+### Features
+
+* **provider/cloudrun:** Added cloudrun functionality to deck ([#9931](https://github.com/spinnaker/deck/issues/9931)) ([3611e95](https://github.com/spinnaker/deck/commit/3611e9520b2294454a8b5dddc85cb3190722ffc7))
+
+
+
+
+
+## [2.4.3](https://github.com/spinnaker/deck/compare/deck-app@2.4.2...deck-app@2.4.3) (2023-02-20)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+## [2.4.2](https://github.com/spinnaker/deck/compare/deck-app@2.4.1...deck-app@2.4.2) (2023-02-07)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+## [2.4.1](https://github.com/spinnaker/deck/compare/deck-app@2.4.0...deck-app@2.4.1) (2023-02-02)
+
+
+### Bug Fixes
+
+* **timeout:** Added feature flag for rollback timeout ui input. ([#9937](https://github.com/spinnaker/deck/issues/9937)) ([e239be3](https://github.com/spinnaker/deck/commit/e239be3dbf63dacca84de25901eec708353d3490))
+
+
+
+
+
+# [2.4.0](https://github.com/spinnaker/deck/compare/deck-app@2.3.3...deck-app@2.4.0) (2023-02-01)
+
+
+### Features
+
+* **pipeline:** added feature flag for pipeline when mj stage child ([#9914](https://github.com/spinnaker/deck/issues/9914)) ([4b6fd53](https://github.com/spinnaker/deck/commit/4b6fd53c4674b37c1c9742b9a9fdedb8e1fda5ca))
+
+
+
+
+
+## [2.3.3](https://github.com/spinnaker/deck/compare/deck-app@2.3.2...deck-app@2.3.3) (2022-10-21)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+## [2.3.2](https://github.com/spinnaker/deck/compare/deck-app@2.3.1...deck-app@2.3.2) (2022-10-06)
+
+
+### Bug Fixes
+
+* **core:** Do not set static document base URL ([#9890](https://github.com/spinnaker/deck/issues/9890)) ([5ac7516](https://github.com/spinnaker/deck/commit/5ac75160cf8b6099aaea8b31874ebbbb13409b2a)), closes [#9802](https://github.com/spinnaker/deck/issues/9802) [spinnaker/spinnaker#6723](https://github.com/spinnaker/spinnaker/issues/6723)
+
+
+
+
+
 ## [2.3.1](https://github.com/spinnaker/deck/compare/deck-app@2.3.0...deck-app@2.3.1) (2022-08-25)
 
 **Note:** Version bump only for package deck-app

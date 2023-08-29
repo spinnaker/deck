@@ -3,6 +3,84 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.9](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.8...@spinnaker/google@0.2.9) (2023-07-20)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.2.8](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.7...@spinnaker/google@0.2.8) (2023-06-02)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.2.7](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.6...@spinnaker/google@0.2.7) (2023-05-11)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.2.6](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.5...@spinnaker/google@0.2.6) (2023-05-03)
+
+
+### Bug Fixes
+
+* **angular:** fix missed AngularJS bindings ([#9989](https://github.com/spinnaker/deck/issues/9989)) ([f947bf9](https://github.com/spinnaker/deck/commit/f947bf997a03dee2f600fc72415bf141320978e4))
+
+
+
+
+
+## [0.2.5](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.4...@spinnaker/google@0.2.5) (2023-04-03)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.2.4](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.3...@spinnaker/google@0.2.4) (2023-02-20)
+
+
+### Bug Fixes
+
+* **google:** Resolved typo errors in GCE Autoscaler feature ([#9947](https://github.com/spinnaker/deck/issues/9947)) ([2250a47](https://github.com/spinnaker/deck/commit/2250a477dd51cfd3695e28ad04e8c8466b5bcfe2))
+
+
+
+
+
+## [0.2.3](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.2...@spinnaker/google@0.2.3) (2023-02-01)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.2.2](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.1...@spinnaker/google@0.2.2) (2022-10-21)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
+## [0.2.1](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.0...@spinnaker/google@0.2.1) (2022-10-06)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
 # [0.2.0](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.1.13...@spinnaker/google@0.2.0) (2022-08-03)
 
 
