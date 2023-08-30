@@ -12,7 +12,7 @@ on:
       - '@spinnaker/*'
 
 env:
-  NODE_VERSION: 12.16.0
+  NODE_VERSION: 14.21.3
 
 jobs:
   build:
@@ -65,7 +65,7 @@ jobs:
           PEERDEP_BUMP_COMMIT_HASH: ${{ steps.lerna_bump.outputs.peerdepBumpCommitHash }}
       - name: Create Pull Request
         id: createpullrequest
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         with:
           token: '${{ secrets.SPINNAKERBOT_PERSONAL_ACCESS_TOKEN }}'
           commit-message: 'chore(package): Publish ${{ steps.bumps.outputs.bumps }}'
@@ -92,17 +92,17 @@ jobs:
 
       - name: Close package bump due to no changes
         if: ${{ steps.lerna_bump.outputs.packageBumpCommitHash == '' && steps.createpullrequest.outputs.pull-request-number != '' }}
-        uses: actions/github-script@v6.4.0
+        uses: actions/github-script@v6.4.1
         with:
           github-token: '${{ secrets.SPINNAKERBOT_PERSONAL_ACCESS_TOKEN }}'
           script: |
             const { owner, repo } = context.repo;
             const pull_number = ${{ steps.createpullrequest.outputs.pull-request-number }};
-            await github.pulls.update({ owner, repo, pull_number, state: 'closed' });
+            await github.rest.pulls.update({ owner, repo, pull_number, state: 'closed' });
 
       - name: Approve package bump
         if: ${{ steps.lerna_bump.outputs.packageBumpCommitHash != '' && steps.createpullrequest.outputs.pull-request-number != '' }}
-        uses: actions/github-script@v6.4.0
+        uses: actions/github-script@v6.4.1
         with:
           github-token: '${{ secrets.SPINNAKERBOT_TOKEN }}'
           script: |
@@ -110,9 +110,9 @@ jobs:
             const pull_number = ${{ steps.createpullrequest.outputs.pull-request-number }};
             const users = ['spinnakerbot', 'spinnakerbot2'];
 
-            const reviews = await github.pulls.listReviews({ owner, repo, pull_number });
+            const reviews = await github.rest.pulls.listReviews({ owner, repo, pull_number });
             const approved = reviews.data.some((review) => users.includes(review.user.login) && review.state == 'APPROVED');
 
             if (!approved) {
-              await github.pulls.createReview({ owner, repo, pull_number, event: 'APPROVE' });
+              await github.rest.pulls.createReview({ owner, repo, pull_number, event: 'APPROVE' });
             }
