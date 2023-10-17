@@ -15,14 +15,14 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION  }}
@@ -94,7 +94,7 @@ jobs:
       - name: Login to GAR
         # Only run this on repositories in the 'spinnaker' org, not on forks.
         if: startsWith(github.repository, 'spinnaker/')
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         # use service account flow defined at: https://github.com/docker/login-action#service-account-based-authentication-1
         with:
           registry: us-docker.pkg.dev
@@ -103,7 +103,7 @@ jobs:
       - name: Build and publish slim container image
         # Only run this on repositories in the 'spinnaker' org, not on forks.
         if: startsWith(github.repository, 'spinnaker/')
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile.slim
@@ -116,7 +116,7 @@ jobs:
       - name: Build and publish ubuntu container image
         # Only run this on repositories in the 'spinnaker' org, not on forks.
         if: startsWith(github.repository, 'spinnaker/')
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: Dockerfile.ubuntu
