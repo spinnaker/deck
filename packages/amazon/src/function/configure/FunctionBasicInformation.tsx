@@ -19,7 +19,7 @@ import { s3BucketNameValidator } from '../../aws.validators';
 import type { IAmazonFunction } from '../../domain';
 import type { IAmazonFunctionUpsertCommand } from '../../index';
 
-import {availableRuntimes} from "../../pipeline/stages/deployLambda/components/function.constants";
+import { availableRuntimes } from '../../pipeline/stages/deployLambda/components/function.constants';
 
 export interface IFunctionProps {
   app: Application;
