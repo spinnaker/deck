@@ -1,6 +1,6 @@
 FROM alpine:3.18
 RUN apk add --update \
-    openjdk11 \
+    openjdk17-jre-headless \
 
 RUN apt-get update && apt-get install -y \
   git
