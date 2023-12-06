@@ -3,6 +3,110 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.27.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.26.0...@spinnaker/core@0.27.0) (2023-10-16)
+
+
+### Bug Fixes
+
+* **publish:** set access config in deck libraries ([#10049](https://github.com/spinnaker/deck/issues/10049)) ([2a5ebe2](https://github.com/spinnaker/deck/commit/2a5ebe25662eeb9d41b5071749266bf9d6d51104))
+
+
+### Features
+
+* **helm/bake:** Add additional input fields where we can fill in details of the APIs versions ([#10036](https://github.com/spinnaker/deck/issues/10036)) ([d968183](https://github.com/spinnaker/deck/commit/d9681830244ecd1c70cc02459f148d0822b7187e))
+
+
+
+
+
+# [0.26.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.25.0...@spinnaker/core@0.26.0) (2023-09-06)
+
+
+### Features
+
+* **core:** Add ability to set Default Tag filters for an application in application config ([#10020](https://github.com/spinnaker/deck/issues/10020)) ([c768e88](https://github.com/spinnaker/deck/commit/c768e88fbc893d0bd5dc86959320a7b7d67443e5))
+
+
+### Reverts
+
+* Revert "fix(core): conditionally hide expression evaluation warning messages (#9771)" (#10021) ([62033d0](https://github.com/spinnaker/deck/commit/62033d0fc6f0a953bd3f01e4452664b92fd02dfb)), closes [#9771](https://github.com/spinnaker/deck/issues/9771) [#10021](https://github.com/spinnaker/deck/issues/10021)
+
+
+
+# 3.15.0 (2023-07-27)
+
+
+### Features
+
+* **core:** set Cancellation Reason to be expanded by default ([#10018](https://github.com/spinnaker/deck/issues/10018)) ([db06e88](https://github.com/spinnaker/deck/commit/db06e88bada70fa4065f56fc33af7207943415c5))
+
+
+
+
+
+# [0.25.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.24.1...@spinnaker/core@0.25.0) (2023-07-20)
+
+
+### Bug Fixes
+
+* **core/pipeline:** Resolved issue getting during pipeline save with spaces in pipeline name. ([#10009](https://github.com/spinnaker/deck/issues/10009)) ([ec8d2bb](https://github.com/spinnaker/deck/commit/ec8d2bbada0192673cfede4401e5c18d884dec59))
+
+
+### Features
+
+* **artifacts:** Add support for artifact store views and calls ([#10011](https://github.com/spinnaker/deck/issues/10011)) ([b520bae](https://github.com/spinnaker/deck/commit/b520bae8296c85ed096ea6aaee022e114bb6a52f))
+* **lambda:** Migrate Lambda plugin to OSS ([#9988](https://github.com/spinnaker/deck/issues/9988)) ([11f1cab](https://github.com/spinnaker/deck/commit/11f1cabb8efe8d7e034faf06ae3cb455eef6369a)), closes [#9984](https://github.com/spinnaker/deck/issues/9984)
+* **stages/bakeManifests:** add helmfile support ([#9998](https://github.com/spinnaker/deck/issues/9998)) ([a4a0f33](https://github.com/spinnaker/deck/commit/a4a0f331d181b74d7c3a8c1b46724757be17a9f0))
+
+
+
+
+
+## [0.24.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.24.0...@spinnaker/core@0.24.1) (2023-06-02)
+
+
+### Bug Fixes
+
+* **core/pipeline:** Pipeline builder-pipeline action dropdown closing not properly ([#9999](https://github.com/spinnaker/deck/issues/9999)) ([a672a20](https://github.com/spinnaker/deck/commit/a672a208625d2551ec38f5179cf519fec4a40280))
+
+
+
+
+
+# [0.24.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.23.2...@spinnaker/core@0.24.0) (2023-05-11)
+
+
+### Features
+
+* **deck:** make StageFailureMessage component overridable ([#9994](https://github.com/spinnaker/deck/issues/9994)) ([39f70cc](https://github.com/spinnaker/deck/commit/39f70ccae0ce2027a63da60a7e6f2f08fe8f7240))
+
+
+
+
+
+## [0.23.2](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.23.1...@spinnaker/core@0.23.2) (2023-05-03)
+
+
+### Bug Fixes
+
+* **angular:** fix missed AngularJS bindings ([#9989](https://github.com/spinnaker/deck/issues/9989)) ([f947bf9](https://github.com/spinnaker/deck/commit/f947bf997a03dee2f600fc72415bf141320978e4))
+
+
+
+
+
+## [0.23.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.23.0...@spinnaker/core@0.23.1) (2023-04-03)
+
+
+### Bug Fixes
+
+* **6755:** Resolved issue regarding warning reporting when cloning a server group in AWS ([#9948](https://github.com/spinnaker/deck/issues/9948)) ([6b36cb6](https://github.com/spinnaker/deck/commit/6b36cb68112361587bfb8e3fb5c31024d10d7072))
+* UI crashes when running pipeline(s) with many stages. ([#9960](https://github.com/spinnaker/deck/issues/9960)) ([8d84d27](https://github.com/spinnaker/deck/commit/8d84d2737729d364a74c34468c874f4613d68801))
+
+
+
+
+
 # [0.23.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.22.2...@spinnaker/core@0.23.0) (2023-02-01)
 
 

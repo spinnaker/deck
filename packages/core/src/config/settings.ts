@@ -34,10 +34,12 @@ export interface IFeatures {
   executionMarkerInformationModal?: boolean;
   fiatEnabled?: boolean;
   iapRefresherEnabled?: boolean;
+  lambdaAdditionalStages?: boolean;
   managedDelivery?: boolean;
   mdGitIntegration?: boolean;
   managedServiceAccounts?: boolean;
   managedResources?: boolean;
+  multiBlockFailureMessages?: boolean;
   notifications?: boolean;
   pagerDuty?: boolean;
   pipelines?: boolean;

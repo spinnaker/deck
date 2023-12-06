@@ -178,6 +178,11 @@ const helpContents: { [key: string]: string } = {
       <p>When provided, only a webhook with a payload containing at least the specified key/value pairs will be allowed to trigger this pipeline. For example, if you wanted to lock down the systems/users that can trigger this pipeline via this webhook, you could require the key "secret" and value "something-secret" as a constraint.</p>
       <p>The constraint values may be supplied as regex.</p>
   `,
+  'pipeline.config.trigger.cdevents.attributeConstraints': `
+      <p>CDEvents messages will have mandatory headers id, source, specversion, type accompanying the payload called <b>attributes</b>.</p>
+      <p>When provided, only a CDEvents message with attributes containing at least the specified key/value pairs will be allowed to trigger this pipeline.</p>
+      <p>The constraint value is a java regex string.</p>
+  `,
   'pipeline.config.trigger.pubsub.attributeConstraints': `
       <p>Pubsub messages can have system-specific metadata accompanying the payload called <b>attributes</b>.</p>
       <p>When provided, only a pubsub message with attributes containing at least the specified key/value pairs will be allowed to trigger this pipeline.</p>
@@ -307,6 +312,11 @@ const helpContents: { [key: string]: string } = {
   'pipeline.config.bake.manifest.kustomize.filePath': `
     <p>This is the relative path to the kustomization.yaml file within your Git repo.</p>
     <p>e.g.: <b>examples/wordpress/mysql/kustomization.yaml</b></p>`,
+  'pipeline.config.bake.manifest.helmfile.filePath': `
+    <p>This is the relative path to the directory containing the helmfile.yaml file within your Git repo.</p>
+    <p>e.g.: <b>chart/helmfile.yml</b></p>`,
+  'pipeline.config.bake.manifest.helmfile.name':
+    '<p> Name is used to set the expected artifact in the Produces Artifact section. </p>',
   'pipeline.config.bake.cf.manifest.name':
     '<p> Name should be the same as the expected artifact in the Produces Artifact section. </p>',
   'pipeline.config.bake.cf.manifest.templateArtifact': `

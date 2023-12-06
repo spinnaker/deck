@@ -3,6 +3,71 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.363](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.362...@spinnaker/ecs@0.0.363) (2023-10-16)
+
+
+### Bug Fixes
+
+* **publish:** set access config in deck libraries ([#10049](https://github.com/spinnaker/deck/issues/10049)) ([2a5ebe2](https://github.com/spinnaker/deck/commit/2a5ebe25662eeb9d41b5071749266bf9d6d51104))
+
+
+
+
+
+## [0.0.362](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.361...@spinnaker/ecs@0.0.362) (2023-09-06)
+
+
+### Bug Fixes
+
+* Scaling bounds should parse float not int ([#10026](https://github.com/spinnaker/deck/issues/10026)) ([b763cae](https://github.com/spinnaker/deck/commit/b763cae826039df46b8dbe019689316ff5034e33))
+
+
+
+
+
+## [0.0.361](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.360...@spinnaker/ecs@0.0.361) (2023-07-20)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.360](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.359...@spinnaker/ecs@0.0.360) (2023-06-02)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.359](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.358...@spinnaker/ecs@0.0.359) (2023-05-11)
+
+
+### Bug Fixes
+
+* **ecs:** VPC Subnet dropdown fix in ecs server group creation. ([10abc99](https://github.com/spinnaker/deck/commit/10abc99641a35803cc3c729d3ccc037ea19a9ed2))
+
+
+
+
+
+## [0.0.358](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.357...@spinnaker/ecs@0.0.358) (2023-05-03)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.357](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.356...@spinnaker/ecs@0.0.357) (2023-04-03)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
 ## [0.0.356](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.355...@spinnaker/ecs@0.0.356) (2023-02-07)
 
 
