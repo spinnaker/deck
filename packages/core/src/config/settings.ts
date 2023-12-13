@@ -153,6 +153,11 @@ export interface ISpinnakerSettings {
   useClassicFirewallLabels: boolean;
   kubernetesAdHocInfraWritesEnabled: boolean;
   changelogUrl: string;
+  cdevents?: {
+      validUrlPattern: string;
+      validCDEvent: string;
+    };
+
 }
 
 export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings || {};

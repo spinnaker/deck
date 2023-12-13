@@ -16,7 +16,7 @@ export class CDEventsNotificationType extends React.Component<INotificationTypeC
             <TextInput
               inputClassName={'form-control input-sm'}
               {...props}
-              placeholder="URL starts with https://events-broker-address/default/events-broker/"
+              placeholder="Enter an events message broker URL"
             />
           )}
           required={true}
@@ -29,7 +29,7 @@ export class CDEventsNotificationType extends React.Component<INotificationTypeC
             <TextInput
               inputClassName={'form-control input-sm'}
               {...props}
-              placeholder="CDEvents Type starts with dev.cdevents.<subject>.<predicate>"
+              placeholder="Enter a CDEvents type"
             />
           )}
           required={true}

@@ -1,5 +1,6 @@
 import { isNumber } from 'lodash';
 import { robotToHuman } from '../../robotToHumanFilter/robotToHuman.filter';
+import { SETTINGS } from '../../../config/settings';
 
 import type { IValidator } from './validation';
 
@@ -9,9 +10,11 @@ const VALID_EMAIL_REGEX = new RegExp(
   '^(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$',
 );
 
-const VALID_URL = new RegExp('^https?://.+$');
+const urlPattern = SETTINGS.cdevents?.validUrlPattern ?? '^https?://.+$';
+const VALID_URL = new RegExp(urlPattern);
 
-const VALID_CDEVENT_REGEX = new RegExp('^dev\\.cdevents\\.[^.]+\\.[^.]+$');
+const cdeventPattern = SETTINGS.cdevents?.validCDEvent ?? '^dev\\.cdevents\\.[^.]+\\.[^.]+$';
+const VALID_CDEVENT_REGEX = new RegExp(cdeventPattern);
 
 const emailValue = (message?: string): IValidator => {
   return function emailValue(val: string, label = THIS_FIELD) {
