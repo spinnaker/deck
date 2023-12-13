@@ -26,11 +26,7 @@ export class CDEventsNotificationType extends React.Component<INotificationTypeC
           name={fieldName ? `${fieldName}.cdEventsType` : 'cdEventsType'}
           validate={Validators.skipIfSpel(Validators.cdeventsTypeValue('Please enter a valid CDEvents Type'))}
           input={(props) => (
-            <TextInput
-              inputClassName={'form-control input-sm'}
-              {...props}
-              placeholder="Enter a CDEvents type"
-            />
+            <TextInput inputClassName={'form-control input-sm'} {...props} placeholder="Enter a CDEvents type" />
           )}
           required={true}
         />

@@ -154,10 +154,9 @@ export interface ISpinnakerSettings {
   kubernetesAdHocInfraWritesEnabled: boolean;
   changelogUrl: string;
   cdevents?: {
-      validUrlPattern: string;
-      validCDEvent: string;
-    };
-
+    validUrlPattern: string;
+    validCDEvent: string;
+  };
 }
 
 export const SETTINGS: ISpinnakerSettings = (window as any).spinnakerSettings || {};
