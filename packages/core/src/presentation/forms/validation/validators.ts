@@ -1,7 +1,7 @@
 import { isNumber } from 'lodash';
-import { robotToHuman } from '../../robotToHumanFilter/robotToHuman.filter';
-import { SETTINGS } from '../../../config/settings';
 
+import { SETTINGS } from '../../../config/settings';
+import { robotToHuman } from '../../robotToHumanFilter/robotToHuman.filter';
 import type { IValidator } from './validation';
 
 const THIS_FIELD = 'This field';
