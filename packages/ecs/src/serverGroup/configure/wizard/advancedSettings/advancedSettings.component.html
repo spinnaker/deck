@@ -79,6 +79,16 @@
   </div>
 
   <div class="form-group">
+    <div class="col-md-12 checkbox">
+      <label>
+        <input type="checkbox" ng-model="$ctrl.command.enableDeploymentCircuitBreaker" />
+        <b>Enable Deployment Circuit Breaker for the ECS service.</b>
+      </label>
+      <help-field key="ecs.enableDeploymentCircuitBreaker"></help-field>
+    </div>
+  </div>
+
+  <div class="form-group">
     <div class="col-md-5 sm-label-right">
       <b>Placement Strategy</b> <help-field key="ecs.placementStrategy"></help-field>
     </div>
