@@ -1,0 +1,36 @@
+[
+  {
+    "account": "aws-cy-test",
+    "aliasConfigurations": [],
+    "code": {
+      "location": "https://awslambda-us-west-2-tasks.s3.us-west-2.amazonaws.com/",
+      "repositoryType": "S3"
+    },
+    "codeSha256": "1IEet62p1BQ6LOxzRc6lqd1QkRxVRlx5+qe12eqe1+B0=",
+    "codeSize": 713959,
+    "description": "",
+    "environment": { "variables": {} },
+    "eventSourceMappings": [],
+    "fileSystemConfigs": [],
+    "functionArn": "arn:aws:lambda:us-west-2:123456789012:function:lambdait-java-integration-test",
+    "functionName": "lambdait-java-integration-test",
+    "handler": "io.armory.lambda.WelcomeLambda::handleRequest",
+    "lastModified": "2021-10-14T05:26:12.183+0000",
+    "lastUpdateStatus": "Successful",
+    "layers": [],
+    "memorySize": 128,
+    "packageType": "Zip",
+    "region": "us-west-2",
+    "revisionId": "412adcc7-000a-4d6c-ba56-1e25bbd18f89",
+    "revisions": { "412adcc7-000a-4d6c-ba56-1e25bbd18f89": "$LATEST", "faebbe11-7658-4fbf-b1d1-ae0538db1fd3": "14" },
+    "role": "arn:aws:iam::123456789012:role/CypressLambda",
+    "runtime": "java8",
+    "state": "Active",
+    "tags": {},
+    "targetGroups": [],
+    "timeout": 3,
+    "tracingConfig": { "mode": "PassThrough" },
+    "version": "$LATEST",
+    "vpcConfig": { "securityGroupIds": [], "subnetIds": [], "vpcId": "" }
+  }
+]
