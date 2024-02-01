@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.29.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.28.0...@spinnaker/core@0.29.0) (2024-02-01)
+
+
+### Features
+
+* **cdevents-notification:** CDEvents notification to produce CDEvents ([#9997](https://github.com/spinnaker/deck/issues/9997)) ([fc96adb](https://github.com/spinnaker/deck/commit/fc96adb17b5051f655e1d651b28c8eb0efd7e11e))
+* **wait-stage:** Make Wait Stage restartable. ([#10073](https://github.com/spinnaker/deck/issues/10073)) ([f3df056](https://github.com/spinnaker/deck/commit/f3df0561d891e928a14c32a3544fc331ebf1d981))
+
+
+
+
+
 # [0.28.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.27.0...@spinnaker/core@0.28.0) (2023-12-07)
 
 
