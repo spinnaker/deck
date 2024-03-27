@@ -1,11 +1,12 @@
 name: Publish packages to NPM
 
 on:
-  push:
-    branches:
-      - 'master'
-    paths:
-      - 'packages/*/package.json'
+  workflow_call:
+  #push:
+  #  branches:
+  #    - 'master'
+  #  paths:
+  #    - 'packages/*/package.json'
 
 env:
   NODE_VERSION: 12.16.0

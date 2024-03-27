@@ -1,6 +1,7 @@
 name: PR Build
 
-on: [ pull_request ]
+#on: [ pull_request ]
+on: workflow_call
 
 env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Xmx2g -Xms2g

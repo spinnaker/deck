@@ -1,10 +1,11 @@
 name: Release
 
 on:
-  push:
-    tags:
-    - "v[0-9]+.[0-9]+.[0-9]+"
-    - "v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+"
+  #push:
+  #  tags:
+  #  - "v[0-9]+.[0-9]+.[0-9]+"
+  #  - "v[0-9]+.[0-9]+.[0-9]+-rc.[0-9]+"
+  workflow_call:
 
 env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Xmx2g -Xms2g

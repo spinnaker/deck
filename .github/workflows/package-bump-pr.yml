@@ -5,11 +5,12 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  push:
-    branches:
-      - 'master'
-    tags:
-      - '@spinnaker/*'
+  #push:
+  #  branches:
+  #    - 'master'
+  #  tags:
+  #    - '@spinnaker/*'
+  workflow_call:
 
 env:
   NODE_VERSION: 12.16.0
