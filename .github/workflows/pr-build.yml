@@ -1,0 +1,14 @@
+name: Release
+
+on:
+    pull_request:
+        branches:
+            - 'master'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+
+  docker:
+    needs: build
+    uses: ./.github/workflows/docker-push.yml
