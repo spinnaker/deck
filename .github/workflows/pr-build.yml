@@ -7,8 +7,8 @@ on:
 
 jobs:
   build:
-    uses: ./build.yml
+    uses: ./.github/workflows/build.yml
 
   docker:
     needs: build
-    uses: ./docker-push.yml
+    uses: ./.github/workflows/docker-build.yml
