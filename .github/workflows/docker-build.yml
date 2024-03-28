@@ -24,7 +24,7 @@ jobs:
         run: |
           #ls -lth /home/runner/work/deck/deck
           mkdir -p build/webpack
-          #mv deck/ build/webpack/
+          mv deck/* build/webpack/
           #chmod +x deck
 
       - name: Set release info
