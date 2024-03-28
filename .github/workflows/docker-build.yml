@@ -22,7 +22,7 @@ jobs:
       - name: Add executable permissions
         working-directory: ${{ github.workspace }}
         run: |
-          ls -lth /home/runner/work/deck/deck
+          #ls -lth /home/runner/work/deck/deck
           mkdir build/webpack
           mv deck/* build/webpack
           #chmod +x deck
