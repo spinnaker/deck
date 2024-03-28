@@ -23,9 +23,10 @@ jobs:
         working-directory: ${{ github.workspace }}
         run: |
           #ls -lth /home/runner/work/deck/deck
-          ls -lht /home/runner/work/deck/deck/build
-          #mkdir -p build/webpack
-          #mv /home/runner/work/deck/deck/* build/webpack/
+          #ls -lht /home/runner/work/deck/deck/build
+          mkdir -p build/webpack
+          ls -lth /home/runner/work/deck/
+          #mv /home/runner/work/deck/deck/* /home/runner/work/deck/build/webpack/
           #chmod +x deck
 
       - name: Set release info
