@@ -28,7 +28,8 @@ jobs:
       - name: Set release info
         run: |
           event_type=${{ github.event.action }}
-          release_version=$(echo ${{ github.ref_name }} | sed 's/v//g' | sed 's/+/-/g')
+          # release_version=$(echo ${{ github.ref_name }} | sed 's/v//g' | sed 's/+/-/g')
+          release_version="0.0.0"
           echo "RELEASE_VERSION=$release_version" >> $GITHUB_ENV
           if [[ $event_type == "released" ]]; then
             echo "TAGS=${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:$release_version,${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_ENV
