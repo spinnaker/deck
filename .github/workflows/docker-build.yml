@@ -25,7 +25,8 @@ jobs:
           #ls -lth /home/runner/work/deck/deck
           #ls -lht /home/runner/work/deck/deck/build
           mkdir -p build/webpack
-          ls -lth /home/runner/work/deck/
+          echo $GITHUB_WORKSPACE
+          ls -lth $GITHUB_WORKSPACE
           #mv /home/runner/work/deck/deck/* /home/runner/work/deck/build/webpack/
           #chmod +x deck
 
