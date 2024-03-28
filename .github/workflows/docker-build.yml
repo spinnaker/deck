@@ -15,13 +15,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/download-artifact@v3
-        with:
-          name: build
+      #- uses: actions/download-artifact@v3
+      #  with:
+      #    name: build
 
-      - name: Add executable permissions
-        run: |
-          chmod +x clouddriver
+      #- name: Add executable permissions
+      #  run: |
+      #    chmod +x clouddriver
 
       - name: Set release info
         run: |
