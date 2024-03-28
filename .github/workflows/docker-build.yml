@@ -11,25 +11,14 @@ jobs:
   push:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      #- uses: actions/checkout@v4
+      #  with:
+      #    fetch-depth: 0
 
       - uses: actions/download-artifact@v3
         with:
           name: build
           path: build/webpack
-
-      #- name: Add executable permissions
-      #  working-directory: ${{ github.workspace }}
-      #  run: |
-      #    #ls -lth /home/runner/work/deck/deck
-      #    #ls -lht /home/runner/work/deck/deck/build
-      #    #mkdir -p build/webpack
-      #    #echo $GITHUB_WORKSPACE
-      #    #ls -lth $GITHUB_WORKSPACE
-      #    #mv /home/runner/work/deck/deck/* /home/runner/work/deck/build/webpack/
-      #    #chmod +x deck
 
       - name: Set release info
         run: |
