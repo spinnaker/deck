@@ -64,9 +64,9 @@ jobs:
         run: ./gradlew build --stacktrace
 
       - uses: actions/upload-artifact@v3
-      with:
-        name: build
-        path: build/webpack
+        with:
+          name: build
+          path: build/webpack
 
       #- name: Login to GAR
         # Only run this on repositories in the 'spinnaker' org, not on forks.
