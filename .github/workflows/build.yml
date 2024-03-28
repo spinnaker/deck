@@ -61,7 +61,7 @@ jobs:
       - name: Build
         env:
           ORG_GRADLE_PROJECT_version: ${{ steps.build_variables.outputs.VERSION }}
-        run: ./gradlew build --stacktrace
+        run: ./gradlew build #--stacktrace
 
       - uses: actions/upload-artifact@v3
         with:
