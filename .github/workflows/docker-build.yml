@@ -5,12 +5,12 @@ on:
         inputs:
             IMAGE_VERSION:
                 description: "Version to use for image tag"
-                required: false
+                required: true
                 default: "0.0.0"
                 type: string
             BRANCH:
                 description: "Git branch to fetch code from"
-                required: false
+                required: true
                 default: "master"
                 type: string
 
