@@ -12,7 +12,7 @@ on:
 env:
   GRADLE_OPTS: -Dorg.gradle.daemon=false -Xmx2g -Xms2g
   CONTAINER_REGISTRY: us-docker.pkg.dev/spinnaker-community/docker
-  NODE_VERSION: 12.16.0
+  NODE_VERSION: 16.20.2
 
 permissions:
   contents: read
@@ -49,10 +49,10 @@ jobs:
       #    distribution: 'zulu'
       #    cache: 'gradle'
 
-      - name: Set Node.js 16.x
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.x
+      #- name: Set Node.js 16.x
+      #  uses: actions/setup-node@v3
+      #  with:
+      #    node-version: 16.x
 
       - name: NPM install
         run: npm install
