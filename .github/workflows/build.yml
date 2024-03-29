@@ -67,7 +67,7 @@ jobs:
       - name: Run install
         uses: borales/actions-yarn@v4
         with:
-          cmd: modules # will run `yarn install` command
+          cmd: install # will run `yarn install` command
       
       - name: Run modules
         uses: borales/actions-yarn@v4
