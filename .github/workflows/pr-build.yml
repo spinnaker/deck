@@ -4,6 +4,19 @@ on:
     pull_request:
         branches:
             - 'master'
+
+    workflow_dispatch:
+        inputs:
+            BRANCH:
+                description: 'Git branch to fetch code from'
+                required: true
+                default: 'master'
+                type: string
+            THD_DECK_VERSION:
+                description: 'Version of THD Deck'
+                required: true
+                default: "0.0.0"
+                type: string
     
     #release:
     #    types: [prereleased, released]

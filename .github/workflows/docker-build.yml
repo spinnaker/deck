@@ -1,7 +1,18 @@
-name: "Build Docker image for Deck"
+name: "Build Docker image for Deck and push it to GitHub Container Registry"
 
 on:
     workflow_call:
+        inputs:
+            IMAGE_VERSION:
+                description: "Version to use for image tag"
+                required: false
+                default: "0.0.0"
+                type: string
+            BRANCH:
+                description: "Git branch to fetch code from"
+                required: false
+                default: "master"
+                type: string
 
 env:
   CONTAINER_REGISTRY: ghcr.io
@@ -14,6 +25,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ inputs.BRANCH }}
 
       - uses: actions/download-artifact@v4
         with:
@@ -22,15 +34,9 @@ jobs:
 
       - name: Set release info
         run: |
-          event_type=${{ github.event.action }}
-          # release_version=$(echo ${{ github.ref_name }} | sed 's/v//g' | sed 's/+/-/g')
-          release_version="0.0.0"
+          release_version=${{ inputs.IMAGE_VERSION }}
           echo "RELEASE_VERSION=$release_version" >> $GITHUB_ENV
-          if [[ $event_type == "released" ]]; then
-            echo "TAGS=${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:$release_version,${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_ENV
-          else
-            echo "TAGS=${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:$release_version" >> $GITHUB_ENV
-          fi
+          echo "TAGS=${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:$release_version" >> $GITHUB_ENV
 
       - name: Print release info
         run: |
@@ -70,4 +76,4 @@ jobs:
           tags: ${{ env.TAGS }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ env.IMAGE_NAME }}
-      #      org.opencontainers.image.version=${{ env.RELEASE_VERSION }}
+            org.opencontainers.image.version=${{ env.RELEASE_VERSION }}
