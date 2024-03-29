@@ -54,8 +54,8 @@ jobs:
       #  with:
       #    node-version: 16.x
 
-      - name: NPM install
-        run: npm install
+      #- name: NPM install
+      #  run: npm install
 
       #- uses: mskelton/setup-yarn@v1
 
