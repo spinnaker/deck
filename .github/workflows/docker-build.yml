@@ -66,6 +66,7 @@ jobs:
           context: .
           push: true
           file: "./Dockerfile.ubuntu"
+          platforms: linux/amd64
           tags: ${{ env.TAGS }}
           labels: |
             org.opencontainers.image.source=https://github.com/${{ env.IMAGE_NAME }}
