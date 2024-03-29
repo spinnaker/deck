@@ -35,4 +35,4 @@ jobs:
         #BRANCH: ${{ inputs.BRANCH }}
         #IMAGE_VERSION: ${{ inputs.THD_DECK_VERSION }}
         BRANCH: master
-        THD_DECK_VERSION: "0.0.0"
+        IMAGE_VERSION: "0.0.0"
