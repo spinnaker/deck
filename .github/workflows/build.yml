@@ -49,6 +49,8 @@ jobs:
           distribution: 'zulu'
           cache: 'gradle'
 
+      - uses: mskelton/setup-yarn@v1
+
       - name: Prepare build variables
         id: build_variables
         run: |
