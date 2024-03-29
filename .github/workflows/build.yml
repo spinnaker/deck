@@ -54,11 +54,25 @@ jobs:
         run: |
           echo "VERSION=$(git describe --tags --abbrev=0 --match="v[0-9]*" | cut -c2-)-dev-${GITHUB_REF_NAME}-$(git rev-parse --short HEAD)-$(date --utc +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
 
+      - name: Run install
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: modules # will run `yarn install` command
+      
+      - name: Run modules
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: modules # will run `yarn install` command
 
-      - name: Build
-        env:
-          ORG_GRADLE_PROJECT_version: ${{ steps.build_variables.outputs.VERSION }}
-        run: ./gradlew build
+      - name: Run build
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: build # will run `yarn install` command
+
+      #- name: Build
+      #  env:
+      #    ORG_GRADLE_PROJECT_version: ${{ steps.build_variables.outputs.VERSION }}
+      #  run: ./gradlew build
 
       - uses: actions/upload-artifact@v4
         with:
