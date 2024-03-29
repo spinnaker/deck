@@ -1,11 +1,5 @@
 name: Branch Build
 
-#on:
-#  push:
-#    branches:
-#    - master
-#    - release-*
-
 on:
   workflow_call:
     inputs:
@@ -16,11 +10,7 @@ on:
         type: string
 
 env:
-  CONTAINER_REGISTRY: us-docker.pkg.dev/spinnaker-community/docker
   NODE_VERSION: 16.20.2
-
-#permissions:
-#  contents: read
 
 jobs:
   branch-build:
@@ -49,27 +39,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      #- uses: actions/setup-java@v4
-      #  with:
-      #    java-version: 11
-      #    distribution: 'zulu'
-      #    cache: 'gradle'
-
-      #- name: Set Node.js 16.x
-      #  uses: actions/setup-node@v3
-      #  with:
-      #    node-version: 16.x
-
-      #- name: NPM install
-      #  run: npm install
-
-      #- uses: mskelton/setup-yarn@v1
-
-      #- name: Prepare build variables
-      #  id: build_variables
-      #  run: |
-      #    echo "VERSION=$(git describe --tags --abbrev=0 --match="v[0-9]*" | cut -c2-)-dev-${GITHUB_REF_NAME}-$(git rev-parse --short HEAD)-$(date --utc +'%Y%m%d%H%M')" >> $GITHUB_OUTPUT
-
       - name: Run install
         uses: borales/actions-yarn@v4
         with:
@@ -78,17 +47,12 @@ jobs:
       - name: Run modules
         uses: borales/actions-yarn@v4
         with:
-          cmd: modules # will run `yarn install` command
+          cmd: modules # will run `yarn modules` command
 
       - name: Run build
         uses: borales/actions-yarn@v4
         with:
-          cmd: build # will run `yarn install` command
-
-      #- name: Build
-      #  env:
-      #    ORG_GRADLE_PROJECT_version: ${{ steps.build_variables.outputs.VERSION }}
-      #  run: ./gradlew build
+          cmd: build # will run `yarn build` command
 
       - uses: actions/upload-artifact@v4
         with:

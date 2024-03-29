@@ -24,7 +24,12 @@ on:
 jobs:
   build:
     uses: ./.github/workflows/build.yml
+    with:
+        BRANCH: ${{ inputs.BRANCH }}
 
   docker:
     needs: build
     uses: ./.github/workflows/docker-build.yml
+    with:
+        BRANCH: ${{ inputs.BRANCH }}
+        IMAGE_VERSION: ${{ inputs.THD_DECK_VERSION }}
