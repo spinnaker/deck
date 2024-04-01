@@ -1,10 +1,6 @@
 name: Release
 
 on:
-    pull_request:
-        branches:
-            - 'master'
-
     workflow_dispatch:
         inputs:
             BRANCH:
@@ -17,16 +13,12 @@ on:
                 required: true
                 default: "0.0.0"
                 type: string
-    
-    #release:
-    #    types: [prereleased, released]
 
 jobs:
   build:
     uses: ./.github/workflows/build.yml
     with:
         BRANCH: ${{ inputs.BRANCH }}
-        #BRANCH: "master"
 
   docker:
     needs: build
@@ -34,5 +26,3 @@ jobs:
     with:
         BRANCH: ${{ inputs.BRANCH }}
         IMAGE_VERSION: ${{ inputs.THD_DECK_VERSION }}
-        #BRANCH: master
-        #IMAGE_VERSION: "0.0.0"
