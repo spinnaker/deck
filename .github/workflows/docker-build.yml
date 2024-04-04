@@ -16,7 +16,7 @@ on:
 
 env:
   CONTAINER_REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/thd-${{ github.event.repository.name }} # ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository_owner }}/thd-${{ github.event.repository.name }}
 
 jobs:
   push:
@@ -37,11 +37,6 @@ jobs:
           release_version=${{ inputs.IMAGE_VERSION }}
           echo "RELEASE_VERSION=$release_version" >> $GITHUB_ENV
           echo "TAGS=${{ env.CONTAINER_REGISTRY }}/${{ env.IMAGE_NAME }}:$release_version" >> $GITHUB_ENV
-
-      - name: Print release info
-        run: |
-            echo "$GITHUB_ENV.RELEASE_VERSION"
-            echo "GITHUB_ENV.TAGS"
 
       - name: Login
         uses: docker/login-action@v3
