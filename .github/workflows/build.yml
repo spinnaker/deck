@@ -5,7 +5,7 @@ on:
     inputs:
       BRANCH:
         description: "Git branch to fetch code from"
-        required: false
+        required: true
         default: "master"
         type: string
 
