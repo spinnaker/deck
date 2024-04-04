@@ -16,7 +16,7 @@ on:
 
 env:
   CONTAINER_REGISTRY: ghcr.io
-  IMAGE_NAME: thd-${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository_owner }}/thd-${{ github.event.repository.name }} # ${{ github.repository }}
 
 jobs:
   push:
