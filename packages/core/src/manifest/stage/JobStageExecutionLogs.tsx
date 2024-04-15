@@ -1,4 +1,4 @@
-import { isEmpty, template } from 'lodash';
+import { template } from 'lodash';
 import React from 'react';
 import { from as observableFrom, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
