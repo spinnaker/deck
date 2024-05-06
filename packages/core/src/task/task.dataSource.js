@@ -15,17 +15,22 @@ angular.module(CORE_TASK_TASK_DATASOURCE, [CLUSTER_SERVICE]).run([
       return $q.when(angular.isArray(tasks) ? tasks : []);
     };
 
-    const loadTasks = async (application, page = 1) => {
+    const loadPaginatedTasks = async (application, page = 1) => {
+      let limitPerPage = SETTINGS.tasksViewLimitPerPage;
+      const tasks = await TaskReader.getTasks(application.name, [], limitPerPage, page);
+      if (tasks.length === limitPerPage) {
+        return tasks.concat(await loadPaginatedTasks(application, page + 1));
+      } else {
+        return tasks;
+      }
+    };
+
+    const loadTasks = (application, page = 1) => {
       let limitPerPage = SETTINGS.tasksViewLimitPerPage;
       if (limitPerPage === undefined) {
         return TaskReader.getTasks(application.name);
       } else {
-        const tasks = await TaskReader.getTasks(application.name, [], limitPerPage, page);
-        if (tasks.length === limitPerPage) {
-          return tasks.concat(await loadTasks(application, page + 1));
-        } else {
-          return tasks;
-        }
+        return loadPaginatedTasks(application, page);
       }
     };
 
