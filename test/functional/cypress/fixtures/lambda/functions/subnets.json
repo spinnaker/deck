@@ -1,0 +1,16 @@
+[
+  {
+    "account": "aws-cy-test",
+    "accountId": "123456789012",
+    "availabilityZone": "us-west-2a",
+    "availableIpAddressCount": 250,
+    "cidrBlock": "10.0.60.0/24",
+    "deprecated": false,
+    "id": "subnet-123456789012",
+    "purpose": "cypress-subnet",
+    "region": "us-west-2",
+    "state": "available",
+    "type": "aws",
+    "vpcId": "vpc-123456789012"
+  }
+]
