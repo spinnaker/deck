@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 import type { IDeploymentStrategyAdditionalFieldsProps } from '../../deploymentStrategy.registry';
 import { HelpField } from '../../../help/HelpField';
 import type { IRedBlackCommand } from './redblack.strategy';
@@ -35,16 +34,17 @@ export class AdditionalFields extends React.Component<IRedBlackStrategyAdditiona
     this.forceUpdate();
   };
 
-
-
-
   public render() {
     const { command } = this.props;
     return (
       <div className="form-group">
         <div className="col-md-12 checkbox" style={{ marginTop: 0 }}>
           <label>
-            <input type="checkbox" checked={command.rollback?.onFailure ?? false} onChange={this.rollbackOnFailureChange} />
+            <input
+              type="checkbox"
+              checked={command.rollback?.onFailure ?? false}
+              onChange={this.rollbackOnFailureChange}
+            />
             Rollback to previous server group if deployment fails <HelpField id="strategy.redblack.rollback" />
           </label>
         </div>
