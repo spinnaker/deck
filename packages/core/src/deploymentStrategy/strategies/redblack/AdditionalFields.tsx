@@ -1,5 +1,5 @@
 import React from 'react';
-import { set } from 'lodash';
+
 
 import type { IDeploymentStrategyAdditionalFieldsProps } from '../../deploymentStrategy.registry';
 import { HelpField } from '../../../help/HelpField';
