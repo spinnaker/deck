@@ -1,7 +1,6 @@
 import React from 'react';
 import { set } from 'lodash';
 
-import { PipelineSelector } from '../PipelineSelector';
 import type { IDeploymentStrategyAdditionalFieldsProps } from '../../deploymentStrategy.registry';
 import { HelpField } from '../../../help/HelpField';
 import type { IRedBlackCommand } from './redblack.strategy';
@@ -22,28 +21,25 @@ export class AdditionalFields extends React.Component<IRedBlackStrategyAdditiona
   };
 
   private maxRemainingAsgsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.props.command.maxRemainingAsgs = e.target.value;
+    this.props.command.maxRemainingAsgs = parseInt(e.target.value, 10);
     this.forceUpdate();
   };
 
   private delayBeforeDisableSecChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.props.command.delayBeforeDisableSec = e.target.value;
+    this.props.command.delayBeforeDisableSec = parseInt(e.target.value, 10);
     this.forceUpdate();
   };
 
   private delayBeforeScaleDownSecChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    this.props.command.delayBeforeScaleDownSec = e.target.value;
+    this.props.command.delayBeforeScaleDownSec = parseInt(e.target.value, 10);
     this.forceUpdate();
   };
 
-  private handleChange = (key: string, value: string) => {
-    set(this.props.command, key, value);
-    this.forceUpdate();
-  };
+
 
 
   public render() {
-    const { command, onChange } = this.props;
+    const { command } = this.props;
     return (
       <div className="form-group">
         <div className="col-md-12 checkbox" style={{ marginTop: 0 }}>
