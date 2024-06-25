@@ -26,8 +26,10 @@ const packageJson = JSON.parse(fs.readFileSync('package.json', 'UTF-8'));
 
 const DEV_PROXY_HOST = process.env.DEV_PROXY_HOST || (packageJson.devProxy && packageJson.devProxy.host);
 
-const DEV_PROXY_HTTP_PORT = parseInt(process.env.DEV_PROXY_HTTP_PORT || (packageJson.devProxy && packageJson.devProxy.httpPort)) || 9000;
-const DEV_PROXY_HTTPS_PORT = parseInt(process.env.DEV_PROXY_HTTPS_PORT || (packageJson.devProxy && packageJson.devProxy.httpsPort)) || 9443;
+const DEV_PROXY_HTTP_PORT =
+  parseInt(process.env.DEV_PROXY_HTTP_PORT || (packageJson.devProxy && packageJson.devProxy.httpPort)) || 9000;
+const DEV_PROXY_HTTPS_PORT =
+  parseInt(process.env.DEV_PROXY_HTTPS_PORT || (packageJson.devProxy && packageJson.devProxy.httpsPort)) || 9443;
 
 if (!DEV_PROXY_HOST) {
   console.error();
