@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.15](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.14...@spinnaker/google@0.2.15) (2024-08-08)
+
+**Note:** Version bump only for package @spinnaker/google
+
+
+
+
+
 ## [0.2.14](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.13...@spinnaker/google@0.2.14) (2024-06-10)
 
 **Note:** Version bump only for package @spinnaker/google
