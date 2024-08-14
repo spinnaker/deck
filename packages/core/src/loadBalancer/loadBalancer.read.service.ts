@@ -22,7 +22,11 @@ export class LoadBalancerReader {
   public static $inject = ['$q', 'loadBalancerTransformer'];
   public constructor(private $q: IQService, private loadBalancerTransformer: any) {}
 
-  public loadLoadBalancers(applicationName: string): PromiseLike<ILoadBalancerSourceData[]> {
+  public loadLoadBalancers(applicationName: string, activeState:object): PromiseLike<ILoadBalancerSourceData[]> {
+    if((window.location.href==="executions" || window.location.href==="search") && activeState==null){
+      return Promise.resolve([]);
+    }
+    
     return REST('/applications')
       .path(applicationName, 'loadBalancers')
       .get()
