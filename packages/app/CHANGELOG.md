@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.5.0](https://github.com/spinnaker/deck/compare/deck-app@2.4.3...deck-app@2.5.0) (2023-03-15)
+
+
+### Features
+
+* **provider/cloudrun:** Added cloudrun functionality to deck ([#9931](https://github.com/spinnaker/deck/issues/9931)) ([3611e95](https://github.com/spinnaker/deck/commit/3611e9520b2294454a8b5dddc85cb3190722ffc7))
+
+
+
+
+
+## [2.4.3](https://github.com/spinnaker/deck/compare/deck-app@2.4.2...deck-app@2.4.3) (2023-02-20)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
 ## [2.4.2](https://github.com/spinnaker/deck/compare/deck-app@2.4.1...deck-app@2.4.2) (2023-02-07)
 
 **Note:** Version bump only for package deck-app
