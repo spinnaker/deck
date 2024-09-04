@@ -1,17 +1,17 @@
-name: "Build Docker image for Deck and push it to GitHub Container Registry"
+name: Build Docker image for Deck and push it to GitHub Container Registry
 
 on:
     workflow_call:
         inputs:
             IMAGE_VERSION:
-                description: "Version to use for image tag"
+                description: Version to use for image tag
                 required: true
                 default: "0.0.0"
                 type: string
             BRANCH:
-                description: "Git branch to fetch code from"
+                description: Git branch to fetch code from
                 required: true
-                default: "master"
+                default: main
                 type: string
 
 env:

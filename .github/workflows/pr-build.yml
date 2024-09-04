@@ -4,12 +4,12 @@ on:
     workflow_dispatch:
         inputs:
             BRANCH:
-                description: 'Git branch to fetch code from'
+                description: Git branch to fetch code from
                 required: true
-                default: 'master'
+                default: main
                 type: string
             THD_DECK_VERSION:
-                description: 'Version of THD Deck'
+                description: Version of THD Deck
                 required: true
                 default: "0.0.0"
                 type: string
