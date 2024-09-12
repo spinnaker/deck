@@ -26,7 +26,7 @@ export function ExecutionAndStagePicker(props: IExecutionAndStagePickerProps) {
   const fetchExecutions = useData(
     () =>
       executionService.getExecutionsForConfigIds([pipeline.id], {
-        limit: SETTINGS.maxFetchHistoryOnEvaluateVariables
+        limit: SETTINGS.maxFetchHistoryOnEvaluateVariables,
       }),
     [],
     [],
