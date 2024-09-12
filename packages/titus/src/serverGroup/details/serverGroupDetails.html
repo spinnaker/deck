@@ -46,7 +46,7 @@
             <li><a href ng-if="!serverGroup.isDisabled" ng-click="ctrl.disableServerGroup()">Disable</a></li>
             <li><a href ng-if="serverGroup.isDisabled" ng-click="ctrl.enableServerGroup()">Enable</a></li>
             <li><a href ng-click="ctrl.destroyServerGroup()">Destroy</a></li>
-            <li><a href ng-click="ctrl.cloneServerGroup()">Clone</a></li>
+            <li class="disabled"><a>Clone</a></li>
             <add-entity-tag-links
               component="serverGroup"
               application="ctrl.application"

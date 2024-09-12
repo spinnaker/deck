@@ -43,8 +43,8 @@
           {{ctrl.serverGroup.kind | robotToHuman}} Actions <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
-          <li ng-if="ctrl.canEditServerGroup()">
-            <a href ng-click="ctrl.editServerGroup()"> Edit </a>
+          <li class="disabled">
+            <a> Edit </a>
           </li>
           <li ng-if="ctrl.canScaleServerGroup()">
             <a href ng-click="ctrl.scaleServerGroup()"> Scale </a>

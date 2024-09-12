@@ -39,6 +39,10 @@ The following external resources can be specified with environment variables:
 
 For example, `API_HOST=http://spinnaker.prod.netflix.net yarn start` will run Deck with `http://spinnaker.prod.netflix.net` as the API host.
 
+## Development
+
+Deck has a combination of Angular and React, but is moving to React only. New changes made to the Deck project should use React wherever possible.
+
 ## Testing
 
 To run the tests within the application, run `yarn test`.
@@ -77,3 +81,46 @@ those existing conventions if you need an integration point that doesn't already
 
 Interested in sharing feedback on Spinnaker's UI or contributing to Deck?
 Please join us at the [Spinnaker UI SIG](https://github.com/spinnaker/governance/tree/master/sig-ui-ux)!
+
+<hr>
+
+# THD-DECK Docs
+
+<hr>
+
+## THD-Deck Sandbox Installation Instructions
+
+### Build a local image
+- `yarn`
+- `yarn modules`
+- `yarn build`
+
+
+### Push the local image to Artifactory
+Once you build a local image, run the following commands:
+
+```shell
+THD_DECK_VERSION={new image number}
+```
+```shell
+docker build --platform linux/amd64 -f Dockerfile.ubuntu -t docker.artifactory.homedepot.com/cd/thd-deck:${THD_DECK_VERSION} .
+```
+```shell
+docker tag docker.artifactory.homedepot.com/cd/thd-deck:${THD_DECK_VERSION} us.gcr.io/np-te-cd-tools/cd/thd-deck:${THD_DECK_VERSION}
+```
+```shell
+docker push docker.artifactory.homedepot.com/cd/thd-deck:${THD_DECK_VERSION}
+```
+
+### Push the image from Artifactory to GCR
+Once the image is pushed to docker.artifactory a Slingshot stage needs to be used
+to move the image from Artifactory to GCR.
+
+Example [pipeline](https://sandbox.spinnaker.homedepot.com/#/applications/cd-thd-deck/executions?pipeline=Push%20Deck%20Image)
+
+### Update Deck image in spin-operator repository
+In spin-operator-np-te-cd-tools repository:
+1. Create branch named for new Deck version"
+2. In deploy/spinnaker/np-te-cd-tools/overlays/us-dev1/service-settings.yml
+3. Update artifactId with new `THD_DECK_VERSION`
+   1. `artifactId: us.gcr.io/np-te-cd-tools/cd/thd-deck:${THD_DECK_VERSION}`
