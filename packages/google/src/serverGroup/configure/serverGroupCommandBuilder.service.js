@@ -369,7 +369,7 @@ angular
           instanceMetadata: {},
           tags: [],
           labels: {},
-          resourceManagerTags: [],
+          resourceManagerTags: {},
           enableSecureBoot: false,
           enableVtpm: false,
           enableIntegrityMonitoring: false,
@@ -448,7 +448,7 @@ angular
           instanceMetadata: {},
           tags: [],
           labels: {},
-          resourceManagerTags: [],
+          resourceManagerTags: {},
           availabilityZones: [],
           enableSecureBoot: serverGroup.enableSecureBoot,
           enableVtpm: serverGroup.enableVtpm,
@@ -582,8 +582,8 @@ angular
               extendedCommand.tags = [];
               populateTags(instanceTemplateTags, extendedCommand);
 
-              const resourceManagerTags = extendedCommand.resourceManagerTags
-              populateResourceManagerTags(resourceManagerTags, extendedCommand)
+              const resourceManagerTags = extendedCommand.resourceManagerTags;
+              populateResourceManagerTags(resourceManagerTags, extendedCommand);
 
               return extendedCommand;
             });
