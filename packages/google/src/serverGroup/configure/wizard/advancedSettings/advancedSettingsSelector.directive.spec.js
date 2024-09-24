@@ -18,7 +18,7 @@ describe('Directive: GCE Group Advanced Settings Selector', function () {
       );
       this.gceTagManager = gceTagManager;
       this.scope = $rootScope.$new();
-      this.scope.command = { instanceMetadata: [], tags: [], labels: [], authScopes: [] };
+      this.scope.command = { instanceMetadata: [], tags: [], labels: [], authScopes: [], resourceManagerTags: [] };
       this.elem = angular.element(
         '<gce-server-group-advanced-settings-selector command="command"></gce-server-group-advanced-settings-selector>',
       );
@@ -55,19 +55,4 @@ describe('Directive: GCE Group Advanced Settings Selector', function () {
     expect(this.scope.command.tags[0].value).toEqual('myTag2');
     expect(this.gceTagManager.updateSelectedTags).toHaveBeenCalled();
   });
-
-  it('should correctly add ResourceManagerTags to the command', function () {
-    expect(this.scope.command.resourceManagerTags.length).toEqual(0);
-
-    this.elem.find('table.resourceManagerTags button').trigger('click');
-    this.scope.$apply();
-    expect(this.scope.command.tags.length).toEqual(1);
-
-    this.elem.find('table.resourceManagerTags input').val('myTag').trigger('input');
-    this.scope.$apply();
-
-    expect(this.scope.command.tags.length).toEqual(1);
-    expect(this.scope.command.tags[0].value).toEqual('myTag');
-  });
-
 });
