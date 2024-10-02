@@ -78,7 +78,7 @@ export const GCE_INSTANCE_TYPE_DISK_DEFAULTS = Object.freeze([
     supportsLocalSSD: false,
     disks: [
       {
-        type: 'hyperdisk-balanced',
+        type: 'pd-standard',
         sizeGb: 10,
       },
     ],
