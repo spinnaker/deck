@@ -22,16 +22,10 @@ class GceDiskConfigurerController implements IComponentController {
   constructor(public $scope: IScope) {}
 
   public $onInit(): void {
-    /* eslint-disable no-console */
-    console.log('init persistDisk component');
-    /* eslint-enable no-console */
     this.setLocalSSDCount();
     this.setPersistentDisks();
 
     if (this.getLocalSSDDisks().length && !this.command?.viewState?.instanceTypeDetails?.storage?.localSSDSupported) {
-      /* eslint-disable no-console */
-      console.log('updating disks on init ', this.sortDisks(this.getPersistentDisks()));
-      /* eslint-enable no-console */
       this.updateDisks({ disks: this.sortDisks(this.getPersistentDisks()) });
     }
 
@@ -59,13 +53,7 @@ class GceDiskConfigurerController implements IComponentController {
 
   public handlePersistentDiskChange(): void {
     let disks = this.persistentDisks.concat(this.getLocalSSDDisks());
-    /* eslint-disable no-console */
-    console.log('handle persist disk change, before sort', disks);
-    /* eslint-enable no-console */
     disks = this.sortDisks(disks);
-    /* eslint-disable no-console */
-    console.log('handle persist disk change, after sort', disks);
-    /* eslint-enable no-console */
     this.updateDisks({ disks });
   }
 
@@ -99,9 +87,6 @@ class GceDiskConfigurerController implements IComponentController {
     const diskWithoutImage = disks.find(
       (disk) => (disk.type.startsWith('pd-') || disk.type.startsWith('hyperdisk-')) && disk.sourceImage === undefined,
     );
-    /* eslint-disable no-console */
-    console.log('in sort,', disks, diskWithoutImage);
-    /* eslint-enable no-console */
     return [diskWithoutImage].concat(without(disks, diskWithoutImage));
   }
 
@@ -110,9 +95,6 @@ class GceDiskConfigurerController implements IComponentController {
   }
 
   private getPersistentDisks(): IGceDisk[] {
-    /* eslint-disable no-console */
-    console.log('getting persist disks ', this.command.disks);
-    /* eslint-enable no-console */
     return (this.command.disks || []).filter(
       (disk: IGceDisk) => disk.type.startsWith('pd-') || disk.type.startsWith('hyperdisk-'),
     );
