@@ -151,7 +151,9 @@ angular
       }
 
       function getPersistentDisks(command) {
-        return (command.disks || []).filter((disk) => disk.type.startsWith('pd-'));
+        return (command.disks || []).filter(
+          (disk) => disk.type.startsWith('pd-') || disk.type.startsWith('hyperdisk-'),
+        );
       }
 
       function calculatePersistentDiskOverriddenStorageDescription(command) {
