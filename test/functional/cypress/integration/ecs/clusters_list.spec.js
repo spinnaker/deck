@@ -11,6 +11,7 @@ describe('Amazon ECS: aws-prod-ecsdemo cluster', () => {
     );
     cy.route('/instances/ecs-my-aws-devel-acct/us-west-2/f8757e00-184d-4288-b535-4124a739e7be',
       'fixture:ecs/clusters/serverGroups.json');
+    cy.route('/applications/ecsapp/functions', []);
   });
 
   it('shows stored ECS cluster with their sequences', () => {
