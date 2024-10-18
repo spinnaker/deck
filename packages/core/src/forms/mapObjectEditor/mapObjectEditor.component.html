@@ -30,10 +30,12 @@
           <b>{{ $ctrl.valueLabel }}</b>
         </td>
         <td>
-          <textarea class="form-control input input-sm" ng-model="pair.value" rows="4">
-          {{ $ctrl.formatValueForDisplay(pair.value) }}
-        </textarea
-          >
+          <textarea
+            class="form-control input input-sm"
+            ng-model="$ctrl.formatValueForDisplay[$index]"
+            rows="4"
+            ng-change="$ctrl.onValueChange($index)"
+          ></textarea>
         </td>
         <td>
           <div class="form-control-static">

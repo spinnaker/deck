@@ -41,11 +41,22 @@ angular
           this.onChange();
         };
 
-        this.formatValueForDisplay = (value) => {
-          if (typeof value === 'object') {
-            return JSON.stringify(value, null, 2);
+        this.onValueChange = (index) => {
+          const formattedValue = this.formattedValues[index];
+
+          // Parse the JSON if it looks like an object or array, otherwise leave it as a string
+          try {
+            this.backingModel[index].value = JSON.parse(formattedValue);
+          } catch (e) {
+            this.backingModel[index].value = formattedValue; // Not JSON, so treat it as a string
           }
-          return value;
+
+          // Sync changes with the model
+          this.synchronize();
+        };
+
+        this.formatValueForDisplay = (value) => {
+          return typeof value === 'object' ? JSON.stringify(value, null, 2) : value;
         };
 
         // Clears existing values from model, then replaces them
@@ -95,6 +106,8 @@ angular
               this.backingModel.push({ key: key, value: this.model[key] });
             });
           }
+
+          this.formattedValues = this.backingModel.map((pair) => this.formatValueForDisplay(pair.value));
         };
 
         $scope.$watch(() => JSON.stringify(this.backingModel), this.synchronize);
