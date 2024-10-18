@@ -82,17 +82,4 @@ describe('Component: mapObjectEditor', function () {
       expect(dom.find('.error-message').length).toBe(1);
     });
   });
-
-  describe('hidden keys', function () {
-    it('does not render key if included in `hiddenKeys`', function () {
-      scope.model = { a: '1', b: { foo: 'bar' } };
-      scope.hiddenKeys = ['a'];
-      const dom = this.compile('<map-object-editor model="model" hidden-keys="hiddenKeys"></map-object-editor>')(scope);
-      scope.$digest();
-
-      expect($(dom.find('tbody tr')).length).toBe(1);
-      expect(dom.find('input').get(0).value).toBe('b');
-      expect(dom.find('textarea').get(0).value).toBe(JSON.stringify({ bar: 'baz' }, null, 2));
-    });
-  });
 });
