@@ -11,6 +11,22 @@ export const CORE_FORMS_MAPOBJECTEDITOR_MAPOBJECTEDITOR_COMPONENT = 'spinnaker.c
 export const name = CORE_FORMS_MAPOBJECTEDITOR_MAPOBJECTEDITOR_COMPONENT; // for backwards compatibility
 angular
   .module(CORE_FORMS_MAPOBJECTEDITOR_MAPOBJECTEDITOR_COMPONENT, [CORE_VALIDATION_VALIDATEUNIQUE_DIRECTIVE])
+  .directive('jsonText', function () {
+    return {
+      restrict: 'A',
+      require: 'ngModel',
+      link: function (scope, element, attr, ngModel) {
+        function into(input) {
+          return JSON.parse(input);
+        }
+        function out(data) {
+          return JSON.stringify(data);
+        }
+        ngModel.$parsers.push(into);
+        ngModel.$formatters.push(out);
+      },
+    };
+  })
   .component('mapObjectEditor', {
     bindings: {
       model: '=',
@@ -39,24 +55,6 @@ angular
           this.backingModel.splice(index, 1);
           this.synchronize();
           this.onChange();
-        };
-
-        this.onValueChange = (index) => {
-          const formattedValue = this.formattedValues[index];
-
-          // Parse the JSON if it looks like an object or array, otherwise leave it as a string
-          try {
-            this.backingModel[index].value = JSON.parse(formattedValue);
-          } catch (e) {
-            this.backingModel[index].value = formattedValue; // Not JSON, so treat it as a string
-          }
-
-          // Sync changes with the model
-          this.synchronize();
-        };
-
-        this.formatValueForDisplay = (value) => {
-          return typeof value === 'object' ? JSON.stringify(value, null, 2) : value;
         };
 
         // Clears existing values from model, then replaces them
@@ -106,8 +104,6 @@ angular
               this.backingModel.push({ key: key, value: this.model[key] });
             });
           }
-
-          this.formattedValues = this.backingModel.map((pair) => this.formatValueForDisplay(pair.value));
         };
 
         $scope.$watch(() => JSON.stringify(this.backingModel), this.synchronize);
