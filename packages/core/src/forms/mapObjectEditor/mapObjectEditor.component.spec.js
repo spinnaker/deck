@@ -21,7 +21,7 @@ describe('Component: mapObjectEditor', function () {
     expect(dom.find('textarea').length).toBe(2);
 
     expect(dom.find('input').get(0).value).toBe('foo');
-    expect(dom.find('textarea').get(0).value).toBe(JSON.stringify({ bar: 'baz' }));
+    expect(dom.find('textarea').get(0).value).toBe({ bar: 'baz' });
     expect(dom.find('input').get(1).value).toBe('bah');
     expect(dom.find('textarea').get(1).value).toBe('11');
   });
@@ -118,7 +118,7 @@ describe('Component: mapObjectEditor', function () {
 
       expect($(dom.find('tbody tr')).length).toBe(1);
       expect(dom.find('input').get(0).value).toBe('b');
-      expect(dom.find('textarea').get(0).value).toBe(JSON.stringify({ foo: 'bar' }));
+      expect(dom.find('textarea').get(0).value).toBe({ foo: 'bar' });
     });
   });
 });
