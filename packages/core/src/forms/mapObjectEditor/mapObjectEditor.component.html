@@ -29,9 +29,12 @@
         <td class="table-label" ng-if="$ctrl.labelsLeft">
           <b>{{ $ctrl.valueLabel }}</b>
         </td>
-        <td><textarea class="form-control input input-sm" ng-model="pair.value" rows="4">
+        <td>
+          <textarea class="form-control input input-sm" ng-model="pair.value" rows="4">
           {{ typeof pair.value === 'object' ? JSON.stringify(pair.value, null, 2) : pair.value }}
-        </textarea></td>
+        </textarea
+          >
+        </td>
         <td>
           <div class="form-control-static">
             <a href ng-click="$ctrl.removeField($index)">
