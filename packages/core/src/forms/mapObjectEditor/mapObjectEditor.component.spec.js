@@ -57,9 +57,9 @@ describe('Component: mapObjectEditor', function () {
 
     it('can override "Key" and "Value"', function () {
       scope.model = {};
-      let dom = this.compile('<map-object-editor model="model" key-label="some key" value-label="the value"></map-object-editor>')(
-        scope,
-      );
+      let dom = this.compile(
+        '<map-object-editor model="model" key-label="some key" value-label="the value"></map-object-editor>',
+      )(scope);
       scope.$digest();
       expect(dom.find('th')[0].innerText).toBe('some key');
       expect(dom.find('th')[1].innerText).toBe('the value');
