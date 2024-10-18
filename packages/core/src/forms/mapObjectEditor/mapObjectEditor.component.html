@@ -31,7 +31,7 @@
         </td>
         <td>
           <textarea class="form-control input input-sm" ng-model="pair.value" rows="4">
-          {{ typeof pair.value === 'object' ? JSON.stringify(pair.value, null, 2) : pair.value }}
+          {{ $ctrl.formatValueForDisplay(pair.value) }}
         </textarea
           >
         </td>

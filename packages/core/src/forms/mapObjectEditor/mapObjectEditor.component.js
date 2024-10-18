@@ -41,13 +41,11 @@ angular
           this.onChange();
         };
 
-        this.isInvalidJson = (value) => {
-          try {
-            JSON.parse(value);
-            return false;
-          } catch {
-            return true;
+        this.formatValueForDisplay = (value) => {
+          if (typeof value === 'object') {
+            return JSON.stringify(value, null, 2);
           }
+          return value;
         };
 
         // Clears existing values from model, then replaces them
