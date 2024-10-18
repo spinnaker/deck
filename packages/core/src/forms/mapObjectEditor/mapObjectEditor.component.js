@@ -20,7 +20,7 @@ angular
           return JSON.parse(input);
         }
         function out(data) {
-          return JSON.stringify(data);
+          return JSON.stringify(data, null, 2);
         }
         ngModel.$parsers.push(into);
         ngModel.$formatters.push(out);
@@ -47,7 +47,7 @@ angular
         const modelKeys = () => Object.keys(this.model);
 
         this.addField = () => {
-          this.backingModel.push({ key: '', value: '', checkUnique: modelKeys() });
+          this.backingModel.push({ key: '', value: {}, checkUnique: modelKeys() });
           // do not fire the onChange event, since no values have been committed to the object
         };
 

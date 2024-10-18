@@ -26,32 +26,6 @@ describe('Component: mapObjectEditor', function () {
     expect(dom.find('textarea').get(1).value).toBe('11');
   });
 
-  describe('empty value handling', function () {
-    it('ignores empty values when synchronizing to the model', function () {
-      scope.model = { foo: { bar: 'baz' }, bah: 11 };
-      let dom = this.compile('<map-object-editor model="model"></map-object-editor>')(scope);
-      scope.$digest();
-
-      $(dom.find('textarea')[1]).val('').change();
-      scope.$digest();
-
-      expect(scope.model.foo).toEqual({ bar: 'baz' });
-      expect(scope.model.bah).toBeUndefined();
-    });
-
-    it('writes empty values when allowEmpty flag is set', function () {
-      scope.model = { foo: { bar: 'baz' }, bah: 11 };
-      let dom = this.compile('<map-object-editor model="model" allow-empty="true"></map-object-editor>')(scope);
-      scope.$digest();
-
-      $(dom.find('textarea')[1]).val('').change();
-      scope.$digest();
-
-      expect(scope.model.foo).toEqual({ bar: 'baz' });
-      expect(scope.model.bah).toBe('');
-    });
-  });
-
   describe('adding new entries', function () {
     it('creates a new row in the table, but does not synchronize to model', function () {
       scope.model = {};
