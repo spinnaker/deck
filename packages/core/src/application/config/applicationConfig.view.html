@@ -64,7 +64,10 @@
       </default-tag-filter-config>
     </page-section>
     <page-section key="delete" label="Delete Application">
-      <delete-application-section application="config.application"></delete-application-section>
+      <delete-application-section
+        application="config.application"
+        server-groups-exist="config.application.serverGroups.data.length"
+      ></delete-application-section>
     </page-section>
   </page-navigator>
 </div>
