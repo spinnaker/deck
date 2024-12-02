@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.6.2...@spinnaker/kubernetes@0.7.0) (2024-12-02)
+
+
+### Features
+
+* **deployManifest:** Adding Label Selectors feature support ([#10154](https://github.com/spinnaker/deck/issues/10154)) ([45bf17d](https://github.com/spinnaker/deck/commit/45bf17d8ea467ecc1aae3b0c85caf42e55103902))
+
+
+
+# 3.19.0 (2024-11-12)
+
+
+### Features
+
+* **deployManifest:** Adding skipSpecTemplateLabels option ([#10152](https://github.com/spinnaker/deck/issues/10152)) ([ee3a32b](https://github.com/spinnaker/deck/commit/ee3a32be598e216cd9c4b49d9f0427230dfa15ba))
+
+
+
+
+
 ## [0.6.2](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.6.1...@spinnaker/kubernetes@0.6.2) (2024-06-10)
 
 **Note:** Version bump only for package @spinnaker/kubernetes
