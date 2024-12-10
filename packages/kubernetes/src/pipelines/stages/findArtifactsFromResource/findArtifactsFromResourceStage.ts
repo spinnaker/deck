@@ -1,5 +1,6 @@
 import { module } from 'angular';
 
+import type { IStage } from '@spinnaker/core';
 import { ExecutionArtifactTab, ExecutionDetailsTasks, Registry } from '@spinnaker/core';
 
 import { KubernetesV2FindArtifactsFromResourceConfigCtrl } from './findArtifactsFromResourceConfig.controller';
@@ -23,6 +24,8 @@ module(KUBERNETES_FIND_ARTIFACTS_FROM_RESOURCE_STAGE, [KUBERNETES_MANIFEST_SELEC
       executionDetailsSections: [ExecutionDetailsTasks, ExecutionArtifactTab],
       producesArtifacts: true,
       validators: manifestSelectorValidators(STAGE_NAME),
+      accountExtractor: (stage: IStage): string[] => (stage.context.account ? [stage.context.account] : []),
+      configAccountExtractor: (stage: any): string[] => (stage.account ? [stage.account] : []),
     });
   })
   .controller('KubernetesV2FindArtifactsFromResourceConfigCtrl', KubernetesV2FindArtifactsFromResourceConfigCtrl);
