@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.30.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.29.1...@spinnaker/core@0.30.0) (2024-12-20)
+
+
+### Features
+
+* **deployManifest:** Adding Label Selectors feature support ([#10154](https://github.com/spinnaker/deck/issues/10154)) ([45bf17d](https://github.com/spinnaker/deck/commit/45bf17d8ea467ecc1aae3b0c85caf42e55103902))
+* **google:** add support for partnerMetadata in GCE servergroup ([#10150](https://github.com/spinnaker/deck/issues/10150)) ([6b004d3](https://github.com/spinnaker/deck/commit/6b004d3165bfebf1f48b065317954155e955a542))
+
+
+
+
+
 ## [0.29.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.29.0...@spinnaker/core@0.29.1) (2024-06-10)
 
 
