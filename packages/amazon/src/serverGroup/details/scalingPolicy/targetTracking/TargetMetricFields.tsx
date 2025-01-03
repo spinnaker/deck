@@ -134,21 +134,7 @@ export const TargetMetricFields = ({
               inputClassName="metric-select-input"
             />
           )}
-          {!isCustomMetric &&
-            command.targetTrackingConfiguration.predefinedMetricSpecification?.predefinedMetricType ===
-              'ALBRequestCountPerTarget' && (
-              <ReactSelectInput
-                value={command.targetTrackingConfiguration.predefinedMetricSpecification?.resourceLabel}
-                options={targetGroupOptions()}
-                onChange={(e) =>
-                  setCommandField(
-                    'targetTrackingConfiguration.predefinedMetricSpecification.resourceLabel',
-                    e.target.value,
-                  )
-                }
-                inputClassName="metric-select-input"
-              />
-            )}
+
           {isCustomMetric && (
             <MetricSelector
               alarm={command.targetTrackingConfiguration.customizedMetricSpecification as IScalingPolicyAlarmView}
@@ -163,6 +149,26 @@ export const TargetMetricFields = ({
           )}
         </div>
       </div>
+      {!isCustomMetric &&
+        command.targetTrackingConfiguration.predefinedMetricSpecification?.predefinedMetricType ===
+          'ALBRequestCountPerTarget' && (
+          <div className="row sp-margin-s-yaxis">
+            <div className="col-md-2 sm-label-right">Target Group</div>
+            <div className="col-md-10 content-fields horizontal">
+              <ReactSelectInput
+                value={command.targetTrackingConfiguration.predefinedMetricSpecification?.resourceLabel}
+                options={targetGroupOptions()}
+                onChange={(e) =>
+                  setCommandField(
+                    'targetTrackingConfiguration.predefinedMetricSpecification.resourceLabel',
+                    e.target.value,
+                  )
+                }
+                inputClassName="metric-select-input"
+              />
+            </div>
+          </div>
+        )}
       <div className="row sp-margin-s-yaxis">
         <div className="col-md-2 sm-label-right">Target</div>
         <div className="col-md-10 content-fields horizontal">
