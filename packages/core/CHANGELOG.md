@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.24.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.24.0...@spinnaker/core@0.24.1) (2023-06-02)
+
+
+### Bug Fixes
+
+* **core/pipeline:** Pipeline builder-pipeline action dropdown closing not properly ([#9999](https://github.com/spinnaker/deck/issues/9999)) ([a672a20](https://github.com/spinnaker/deck/commit/a672a208625d2551ec38f5179cf519fec4a40280))
+
+
+
+
+
+# [0.24.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.23.2...@spinnaker/core@0.24.0) (2023-05-11)
+
+
+### Features
+
+* **deck:** make StageFailureMessage component overridable ([#9994](https://github.com/spinnaker/deck/issues/9994)) ([39f70cc](https://github.com/spinnaker/deck/commit/39f70ccae0ce2027a63da60a7e6f2f08fe8f7240))
+
+
+
+
+
+## [0.23.2](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.23.1...@spinnaker/core@0.23.2) (2023-05-03)
+
+
+### Bug Fixes
+
+* **angular:** fix missed AngularJS bindings ([#9989](https://github.com/spinnaker/deck/issues/9989)) ([f947bf9](https://github.com/spinnaker/deck/commit/f947bf997a03dee2f600fc72415bf141320978e4))
+
+
+
+
+
+## [0.23.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.23.0...@spinnaker/core@0.23.1) (2023-04-03)
+
+
+### Bug Fixes
+
+* **6755:** Resolved issue regarding warning reporting when cloning a server group in AWS ([#9948](https://github.com/spinnaker/deck/issues/9948)) ([6b36cb6](https://github.com/spinnaker/deck/commit/6b36cb68112361587bfb8e3fb5c31024d10d7072))
+* UI crashes when running pipeline(s) with many stages. ([#9960](https://github.com/spinnaker/deck/issues/9960)) ([8d84d27](https://github.com/spinnaker/deck/commit/8d84d2737729d364a74c34468c874f4613d68801))
+
+
+
+
+
 # [0.23.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.22.2...@spinnaker/core@0.23.0) (2023-02-01)
 
 

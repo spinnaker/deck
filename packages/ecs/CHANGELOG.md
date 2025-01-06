@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.360](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.359...@spinnaker/ecs@0.0.360) (2023-06-02)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.359](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.358...@spinnaker/ecs@0.0.359) (2023-05-11)
+
+
+### Bug Fixes
+
+* **ecs:** VPC Subnet dropdown fix in ecs server group creation. ([10abc99](https://github.com/spinnaker/deck/commit/10abc99641a35803cc3c729d3ccc037ea19a9ed2))
+
+
+
+
+
+## [0.0.358](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.357...@spinnaker/ecs@0.0.358) (2023-05-03)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
+## [0.0.357](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.356...@spinnaker/ecs@0.0.357) (2023-04-03)
+
+**Note:** Version bump only for package @spinnaker/ecs
+
+
+
+
+
 ## [0.0.356](https://github.com/spinnaker/deck/compare/@spinnaker/ecs@0.0.355...@spinnaker/ecs@0.0.356) (2023-02-07)
 
 

@@ -10,7 +10,7 @@ on:
         type: string
 
 env:
-  NODE_VERSION: 16.20.2
+  NODE_VERSION: 14.21.3
 
 jobs:
   branch-build:
@@ -27,7 +27,7 @@ jobs:
 
       - name: Get yarn cache
         id: yarn-cache
-        run: | 
+        run: |
           #echo "::set-output name=dir::$(yarn cache dir)"
           echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
@@ -43,7 +43,7 @@ jobs:
         uses: borales/actions-yarn@v5
         with:
           cmd: install # will run `yarn install` command
-      
+
       - name: Run modules
         uses: borales/actions-yarn@v5
         with:

@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.5.5](https://github.com/spinnaker/deck/compare/deck-app@2.5.4...deck-app@2.5.5) (2023-06-02)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+## [2.5.4](https://github.com/spinnaker/deck/compare/deck-app@2.5.3...deck-app@2.5.4) (2023-05-11)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+## [2.5.3](https://github.com/spinnaker/deck/compare/deck-app@2.5.2...deck-app@2.5.3) (2023-05-03)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+## [2.5.2](https://github.com/spinnaker/deck/compare/deck-app@2.5.1...deck-app@2.5.2) (2023-05-01)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
+## [2.5.1](https://github.com/spinnaker/deck/compare/deck-app@2.5.0...deck-app@2.5.1) (2023-04-03)
+
+**Note:** Version bump only for package deck-app
+
+
+
+
+
 # [2.5.0](https://github.com/spinnaker/deck/compare/deck-app@2.4.3...deck-app@2.5.0) (2023-03-15)
 
 
