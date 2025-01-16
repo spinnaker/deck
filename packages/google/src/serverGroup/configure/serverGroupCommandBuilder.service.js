@@ -521,6 +521,8 @@ angular
             populateTags(serverGroup.launchConfig.instanceTemplate.properties.tags, command);
             populateLabels(serverGroup.instanceTemplateLabels, command);
             populateAuthScopes(serverGroup.launchConfig.instanceTemplate.properties.serviceAccounts, command);
+            populateResourceManagerTags(serverGroup.resourceManagerTags, command);
+            populatePartnerMetadata(serverGroup.partnerMetadata, command);
 
             return populateDisksFromExisting(serverGroup.launchConfig.instanceTemplate.properties.disks, command).then(
               function () {
