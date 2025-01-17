@@ -471,11 +471,6 @@ angular
               return serverGroup;
             },
             serverGroupCommand: () => {
-              /* eslint-disable no-console */
-              console.log('showing server group to clone');
-              console.log(serverGroup);
-              console.log(app);
-              /* eslint-enable no-console */
               return gceServerGroupCommandBuilder.buildServerGroupCommandFromExisting(app, serverGroup);
             },
           },
