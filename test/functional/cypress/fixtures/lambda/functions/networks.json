@@ -1,0 +1,10 @@
+[
+  {
+    "account": "aws-cy-test",
+    "cloudProvider": "aws",
+    "deprecated": false,
+    "id": "vpc-a1234567",
+    "name": "default",
+    "region": "us-west-2"
+  }
+]
