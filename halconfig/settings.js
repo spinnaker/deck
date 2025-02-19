@@ -16,6 +16,7 @@ var fiatEnabled = '{%features.fiat%}' === 'true';
 var manualJudgmentParentPipelineEnabled = '{%features.manualJudgmentParentPipeline%}' === 'true';
 var mineCanaryEnabled = '{%features.mineCanary%}' === 'true';
 var pipelineTemplatesEnabled = '{%features.pipelineTemplates%}' === 'true';
+var pipelineRefEnabled = '{%features.pipelineRefEnabled%}' === 'true';
 var reduxLoggerEnabled = '{%canary.reduxLogger%}' === 'true';
 var showAllConfigsEnabled = '{%canary.showAllCanaryConfigs%}' === 'true';
 var dynamicRollbackTimeoutEnabled = '{%feature.dynamicRollbackTimeout%}' === 'true';
@@ -123,6 +124,7 @@ window.spinnakerSettings = {
     pipelineTemplates: pipelineTemplatesEnabled,
     roscoMode: true,
     dynamicRollbackTimeout: dynamicRollbackTimeoutEnabled,
+      pipelineRefEnabled: pipelineRefEnabled,
   },
   gateUrl: gateHost,
   notifications: {
