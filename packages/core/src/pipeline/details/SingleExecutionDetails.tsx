@@ -32,10 +32,7 @@ export interface ISingleExecutionRouterStateChange extends IStateChange {
 }
 
 export async function getAndTransformExecution(id: string, app: Application) {
-  // Fetch the execution data
   const execution = await ReactInjector.executionService.getExecution(id, app.pipelineConfigs?.data);
-
-  // Transform the execution
   ExecutionsTransformer.transformExecution(app, execution);
 
   // Check if the execution has a trigger with a parentExecutionId
@@ -44,8 +41,6 @@ export async function getAndTransformExecution(id: string, app: Application) {
     const parentExecution = await getAndTransformExecution(execution.trigger.parentExecutionId, app);
     execution.trigger.parentExecution = parentExecution;
   }
-
-  // Return the transformed execution
   return execution;
 }
 
