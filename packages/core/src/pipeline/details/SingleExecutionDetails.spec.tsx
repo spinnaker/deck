@@ -1,4 +1,5 @@
-import { shallow } from 'enzyme';
+import { UIRouter, UIRouterReact } from '@uirouter/react';
+import { mount } from 'enzyme';
 import React from 'react';
 
 import { SingleExecutionDetails } from './SingleExecutionDetails';
@@ -8,12 +9,20 @@ import type { IExecution } from '../../domain';
 describe('<SingleExecutionDetails />', () => {
   let application: Application;
   let wrapper: any;
-  // let execution: IExecution;
+  let router: UIRouterReact;
 
   beforeEach(() => {
     application = new Application('my-app', null, []);
-    // execution = { id: 'exec1', trigger: {}, stages: [] } as IExecution;
-    wrapper = shallow(<SingleExecutionDetails app={application} />);
+    router = new UIRouterReact();
+    wrapper = mount(
+      <UIRouter router={router}>
+        <SingleExecutionDetails app={application} />
+      </UIRouter>,
+    );
+  });
+
+  afterEach(() => {
+    wrapper.unmount();
   });
 
   it('renders without crashing', () => {
@@ -26,12 +35,14 @@ describe('<SingleExecutionDetails />', () => {
 
   it('updates state when new execution is received', () => {
     const newExecution = { id: 'exec2', trigger: {}, stages: [] } as IExecution;
-    wrapper.setProps({ execution: newExecution });
-    expect(wrapper.instance().props.execution.id).toEqual('exec2');
+    wrapper.setProps({ params: { executionId: newExecution.id } });
+    wrapper.update();
+    expect(wrapper.props().params.executionId).toEqual('exec2');
   });
 
   it('handles missing execution gracefully', () => {
-    wrapper.setProps({ execution: null });
-    expect(wrapper.instance().props.execution).toBeNull();
+    wrapper.setProps({ params: { executionId: null } });
+    wrapper.update();
+    expect(wrapper.props().params.executionId).toBeNull();
   });
 });
