@@ -6,6 +6,14 @@ import { SingleExecutionDetails } from './SingleExecutionDetails';
 import { Application } from '../../application/application.model';
 import type { IExecution } from '../../domain';
 
+jest.mock('@uirouter/react', () => ({
+  UIRouter: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  UIRouterReact: class {
+    start = jest.fn();
+    locationService = { onChange: jest.fn() };
+  },
+}));
+
 describe('<SingleExecutionDetails />', () => {
   let application: Application;
   let wrapper: any;
