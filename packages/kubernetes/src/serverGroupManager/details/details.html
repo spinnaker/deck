@@ -61,11 +61,17 @@
             server-group-manager="ctrl.serverGroupManager"
           ></kubernetes-rolling-restart>
           <li role="presentation" class="divider"></li>
-          <li class="disabled">
-            <a> Edit </a>
+          <li
+            uib-tooltip="Editing a server group through Spinnaker is disabled due to THD policy."
+            class="disabled"
+          >
+            <a href>Edit</a>
           </li>
-          <li>
-            <a href ng-click="ctrl.deleteServerGroupManager()"> Delete </a>
+          <li
+            uib-tooltip="Deleting a server group through Spinnaker is disabled due to THD policy."
+            class="disabled"
+          >
+            <a href>Delete</a>
           </li>
           <render-if-feature feature="entityTags">
             <add-entity-tag-links

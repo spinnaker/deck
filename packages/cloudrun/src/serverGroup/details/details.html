@@ -27,20 +27,7 @@
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
           <li
-            ng-if="ctrl.serverGroup.tags.isLatest"
-            uib-tooltip="You cannot destroy the latest server group (revision) . 
-                       You may be able to delete this server group's load balancer."
-            class="disabled"
-          >
-            <a href>Destroy</a>
-          </li>
-          <li ng-if="ctrl.canDestroyServerGroup() && !ctrl.serverGroup.tags.isLatest">
-            <a href ng-click="ctrl.destroyServerGroup()">Destroy</a>
-          </li>
-          <li
-            ng-if="(!ctrl.canDestroyServerGroup() && !ctrl.serverGroup.tags.isLatest)"
-            uib-tooltip="You cannot destroy this server group while it is receiving traffic. 
-                         You may be able to delete this server group's load balancer."
+            uib-tooltip="Destroying a server group through Spinnaker is disabled due to THD policy."
             class="disabled"
           >
             <a href>Destroy</a>

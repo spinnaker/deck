@@ -27,13 +27,14 @@
             Load Balancer Actions <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" uib-dropdown-menu role="menu">
-            <li class="disabled"><a>Edit Load Balancer</a></li>
-            <li ng-if="ctrl.canDeleteLoadBalancer()">
-              <a href ng-click="ctrl.deleteLoadBalancer()">Delete Load Balancer</a>
+            <li
+              uib-tooltip="Editing a load balancer through Spinnaker is disabled due to THD policy."
+              class="disabled"
+            >
+              <a href>Edit Load Balancer</a>
             </li>
             <li
-              ng-if="!ctrl.canDeleteLoadBalancer()"
-              uib-tooltip="You cannot delete a default service."
+              uib-tooltip="Deleting a load balancer through Spinnaker is disabled due to THD policy."
               class="disabled"
             >
               <a href>Delete Load Balancer</a>
