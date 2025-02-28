@@ -234,56 +234,70 @@ angular
         const c = command;
         const result = { dirty: {} };
 
-        const locations = c.regional ? [c.region] : [c.zone];
-        const { credentialsKeyedByAccount } = c.backingData;
-        const { locationToInstanceTypesMap } = credentialsKeyedByAccount[c.credentials];
+        const zonesResult = configureZones(command);
+        const filteredData = command.backingData.filtered;
 
-        if (locations.every((l) => !l)) {
+        if (!filteredData.zones || filteredData.zones.length === 0) {
           return result;
         }
+
+        const locations = c.regional ? filteredData.zones : [c.zone];
+
+        const { credentialsKeyedByAccount } = c.backingData;
+        const { locationToInstanceTypesMap } = credentialsKeyedByAccount[c.credentials];
 
         let filtered = gceInstanceTypeService.getAvailableTypesForLocations(locationToInstanceTypesMap, locations);
 
         filtered = sortInstanceTypes(filtered);
+
         const instanceType = c.instanceType;
         if (_.every([instanceType, !_.includes(instanceType, 'custom-'), !_.includes(filtered, instanceType)])) {
           result.dirty.instanceType = c.instanceType;
           c.instanceType = null;
         }
+
+        // Set the filtered instance types in the command's backing data
         c.backingData.filtered.instanceTypes = filtered;
+
         return result;
       }
 
       function configureCustomInstanceTypes(command) {
         const c = command;
         const result = { dirty: {} };
+
         let vCpuCount = _.get(c, 'viewState.customInstance.vCpuCount');
         const instanceFamily = _.get(c, 'viewState.customInstance.instanceFamily');
         const memory = _.get(c, 'viewState.customInstance.memory');
         const extendedMemory = _.get(c, 'viewState.customInstance.extendedMemory');
         const { zone, regional, region } = c;
-        const { locationToInstanceTypesMap } = c.backingData.credentialsKeyedByAccount[c.credentials];
-        const location = regional ? region : zone;
 
-        if (!location) {
+        const { locationToInstanceTypesMap } = c.backingData.credentialsKeyedByAccount[c.credentials];
+
+        const locations = c.regional ? c.backingData.filtered.zones : [zone];
+
+        if (!locations || locations.length === 0) {
           return result;
         }
+
+        let filtered = gceInstanceTypeService.getAvailableTypesForLocations(locationToInstanceTypesMap, locations);
+
+        filtered = sortInstanceTypes(filtered);
 
         if (zone || regional) {
           _.set(
             c,
             'backingData.customInstanceTypes.vCpuList',
-            gceCustomInstanceBuilderService.generateValidVCpuListForLocation(location, locationToInstanceTypesMap),
+            gceCustomInstanceBuilderService.generateValidVCpuListForLocation(locations[0], locationToInstanceTypesMap),
           );
         }
 
-        // initializes vCpuCount so that memory selector will be populated.
         if (
           !vCpuCount ||
           !gceCustomInstanceBuilderService.vCpuCountForLocationIsValid(
             instanceFamily,
             vCpuCount,
-            location,
+            locations[0],
             locationToInstanceTypesMap,
           )
         ) {
@@ -314,6 +328,8 @@ angular
           'backingData.customInstanceTypes.instanceFamilyList',
           gceCustomInstanceBuilderService.generateValidInstanceFamilyList(),
         );
+
+        c.backingData.filtered.instanceTypes = filtered;
 
         return result;
       }
