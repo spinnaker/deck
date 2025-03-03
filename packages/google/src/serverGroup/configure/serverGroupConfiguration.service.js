@@ -247,7 +247,6 @@ angular
         const { locationToInstanceTypesMap } = credentialsKeyedByAccount[c.credentials];
 
         let filtered = gceInstanceTypeService.getAvailableTypesForLocations(locationToInstanceTypesMap, locations);
-
         filtered = sortInstanceTypes(filtered);
 
         const instanceType = c.instanceType;
