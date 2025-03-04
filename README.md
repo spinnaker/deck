@@ -124,3 +124,5 @@ In spin-operator-np-te-cd-tools repository:
 2. In deploy/spinnaker/np-te-cd-tools/overlays/us-dev1/service-settings.yml
 3. Update artifactId with new `THD_DECK_VERSION`
    1. `artifactId: us.gcr.io/np-te-cd-tools/cd/thd-deck:${THD_DECK_VERSION}`
+
+<!--- thd-deck:1.31.3.1 --->
