@@ -8,6 +8,7 @@ export interface IExecutionTrigger extends ITrigger {
   isPipeline?: boolean;
   parameters?: { [key: string]: string };
   parentExecution?: IExecution;
+  parentExecutionId?: string;
   parentPipelineApplication?: string;
   parentPipelineId?: string;
   parentPipelineStageId?: string;
