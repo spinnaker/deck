@@ -8,10 +8,11 @@ import { ApplicationWriter } from '../service/ApplicationWriter';
 
 export interface IDeleteApplicationSection {
   application: Application;
+  serverGroupsExist: number;
 }
 
 export function DeleteApplicationSection(props: IDeleteApplicationSection) {
-  const { application } = props;
+  const { application, serverGroupsExist } = props;
   const deleteApplication = (): void => {
     const taskMonitor = {
       application,
@@ -44,7 +45,7 @@ export function DeleteApplicationSection(props: IDeleteApplicationSection) {
       </>
     );
   } else {
-    return Boolean(application.serverGroups.data.length) ? (
+    return Boolean(serverGroupsExist) ? (
       <>
         <p>You cannot delete this application because it has server groups.</p>
       </>
