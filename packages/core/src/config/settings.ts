@@ -54,6 +54,7 @@ export interface IFeatures {
   kubernetesRawResources?: boolean;
   renderPipelineStageThreshold?: number;
   deployManifestStageAdvancedConfiguration?: boolean;
+  pipelineRefEnabled?: boolean;
 }
 
 export interface IDockerInsightSettings {
