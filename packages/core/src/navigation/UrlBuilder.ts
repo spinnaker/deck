@@ -244,7 +244,12 @@ class ServerGroupsUrlBuilder implements IUrlBuilder {
       { inherit: false },
     );
 
-    if (input.provider === 'ecs' || (input.provider && input.provider.includes('ecs'))) {
+    if (
+      input.provider === 'ecs' ||
+      (input.provider && input.provider.includes('ecs')) ||
+      input.provider === 'aws' ||
+      (input.provider && input.provider.includes('aws'))
+    ) {
       const serverGroupParts = input.serverGroup.split('-');
       let clusterName = input.serverGroup;
       if (serverGroupParts.length > 1 && serverGroupParts[serverGroupParts.length - 1].match(/^v\d+$/)) {
