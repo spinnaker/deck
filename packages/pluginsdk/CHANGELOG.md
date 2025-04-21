@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/spinnaker/deck/compare/@spinnaker/pluginsdk@0.3.2...@spinnaker/pluginsdk@0.4.0) (2025-04-21)
+
+
+### Features
+
+* **pluginsdk:** Allow overriding proxy ports in deck dev-proxy ([#10115](https://github.com/spinnaker/deck/issues/10115)) ([3fe8402](https://github.com/spinnaker/deck/commit/3fe840255acd53f8c8f386d20b13053e7844afc3))
+
+
+
+
+
 ## [0.3.2](https://github.com/spinnaker/deck/compare/@spinnaker/pluginsdk@0.3.1...@spinnaker/pluginsdk@0.3.2) (2023-12-07)
 
 **Note:** Version bump only for package @spinnaker/pluginsdk

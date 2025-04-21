@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.14...@spinnaker/google@0.3.0) (2025-04-21)
+
+
+### Bug Fixes
+
+* **gcp:** fixing existing test + adding one test and updating credentials.json ([#10166](https://github.com/spinnaker/deck/issues/10166)) ([2740ed5](https://github.com/spinnaker/deck/commit/2740ed53231a1556ec0bbc97b31ec2f41679599e))
+* **google:** Add partner metadata on clone ([#10161](https://github.com/spinnaker/deck/issues/10161)) ([3005516](https://github.com/spinnaker/deck/commit/3005516a29c0277df8ffb248138ab790ea9d2fae))
+
+
+### Features
+
+* **gce:** add support for hyperdisk in GCE ([#10149](https://github.com/spinnaker/deck/issues/10149)) ([14977d1](https://github.com/spinnaker/deck/commit/14977d16c8b3c31d7c54ae9691cb340fcb2c0631))
+* **gce:** support resourceManagerTags in instance template ([#10146](https://github.com/spinnaker/deck/issues/10146)) ([554d57f](https://github.com/spinnaker/deck/commit/554d57f9c5938ad5c9d37ecf2dc1bb7612ff4299))
+* **google:** add support for partnerMetadata in GCE servergroup ([#10150](https://github.com/spinnaker/deck/issues/10150)) ([6b004d3](https://github.com/spinnaker/deck/commit/6b004d3165bfebf1f48b065317954155e955a542))
+
+
+
+# 3.18.0 (2024-08-08)
+
+
+
+
+
 ## [0.2.14](https://github.com/spinnaker/deck/compare/@spinnaker/google@0.2.13...@spinnaker/google@0.2.14) (2024-06-10)
 
 **Note:** Version bump only for package @spinnaker/google

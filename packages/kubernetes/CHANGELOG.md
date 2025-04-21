@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.6.2...@spinnaker/kubernetes@0.7.0) (2025-04-21)
+
+
+
+# 3.20.0 (2025-01-28)
+
+
+### Bug Fixes
+
+* **stages:** accountExtractor in k8s stages should extract data from a context ([#10158](https://github.com/spinnaker/deck/issues/10158)) ([7486d2e](https://github.com/spinnaker/deck/commit/7486d2e3d7efe93fc76054d8cfdd5876a42a5ac0)), closes [/github.com/spinnaker/deck/blob/c96faa581482d251c07132bdcc023e04fc8e869b/packages/cloudfoundry/src/pipeline/stages/runJob/cloudFoundryRunJob.module.ts#L8](https://github.com//github.com/spinnaker/deck/blob/c96faa581482d251c07132bdcc023e04fc8e869b/packages/cloudfoundry/src/pipeline/stages/runJob/cloudFoundryRunJob.module.ts/issues/L8) [/github.com/spinnaker/deck/blob/c49d9b545642f511bfd2e14588b78fdf76385c5a/packages/amazon/src/pipeline/stages/cloneServerGroup/awsCloneServerGroupStage.js#L18](https://github.com//github.com/spinnaker/deck/blob/c49d9b545642f511bfd2e14588b78fdf76385c5a/packages/amazon/src/pipeline/stages/cloneServerGroup/awsCloneServerGroupStage.js/issues/L18)
+
+
+### Features
+
+* **deployManifest:** Adding Label Selectors feature support ([#10154](https://github.com/spinnaker/deck/issues/10154)) ([45bf17d](https://github.com/spinnaker/deck/commit/45bf17d8ea467ecc1aae3b0c85caf42e55103902))
+
+
+
+# 3.19.0 (2024-11-12)
+
+
+### Features
+
+* **deployManifest:** Adding skipSpecTemplateLabels option ([#10152](https://github.com/spinnaker/deck/issues/10152)) ([ee3a32b](https://github.com/spinnaker/deck/commit/ee3a32be598e216cd9c4b49d9f0427230dfa15ba))
+
+
+
+
+
 ## [0.6.2](https://github.com/spinnaker/deck/compare/@spinnaker/kubernetes@0.6.1...@spinnaker/kubernetes@0.6.2) (2024-06-10)
 
 **Note:** Version bump only for package @spinnaker/kubernetes

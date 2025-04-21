@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.30.0](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.29.1...@spinnaker/core@0.30.0) (2025-04-21)
+
+
+### Bug Fixes
+
+* **core:** Always use clusters parameter for ECS server group URLs ([#10171](https://github.com/spinnaker/deck/issues/10171)) ([3f2418e](https://github.com/spinnaker/deck/commit/3f2418ea6d1ecf61b7e9d38e8c90d74ff7619ef6))
+
+
+
+# 3.21.0 (2025-03-17)
+
+
+### Bug Fixes
+
+* **pipelineStage:** Rendering with a warning with the pipelineParameters are defined as a SpeL expression ([#10168](https://github.com/spinnaker/deck/issues/10168)) ([294e0ed](https://github.com/spinnaker/deck/commit/294e0ed16da529d8cc543f9af60ad9413f50aa8e))
+
+
+### Features
+
+* **amazon:** support ALBRequestCountPerTarget scaling policies ([#10160](https://github.com/spinnaker/deck/issues/10160)) ([c6b3c0c](https://github.com/spinnaker/deck/commit/c6b3c0c5e7459ab4cbcfed78c89447378a10eefb))
+* **deployManifest:** Adding Label Selectors feature support ([#10154](https://github.com/spinnaker/deck/issues/10154)) ([45bf17d](https://github.com/spinnaker/deck/commit/45bf17d8ea467ecc1aae3b0c85caf42e55103902))
+* **google:** add support for partnerMetadata in GCE servergroup ([#10150](https://github.com/spinnaker/deck/issues/10150)) ([6b004d3](https://github.com/spinnaker/deck/commit/6b004d3165bfebf1f48b065317954155e955a542))
+
+
+
+
+
 ## [0.29.1](https://github.com/spinnaker/deck/compare/@spinnaker/core@0.29.0...@spinnaker/core@0.29.1) (2024-06-10)
 
 

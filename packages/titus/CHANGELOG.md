@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.44...@spinnaker/titus@0.6.0) (2025-04-21)
+
+
+### Features
+
+* **amazon:** support ALBRequestCountPerTarget scaling policies ([#10160](https://github.com/spinnaker/deck/issues/10160)) ([c6b3c0c](https://github.com/spinnaker/deck/commit/c6b3c0c5e7459ab4cbcfed78c89447378a10eefb))
+
+
+
+
+
 ## [0.5.44](https://github.com/spinnaker/deck/compare/@spinnaker/titus@0.5.43...@spinnaker/titus@0.5.44) (2024-06-10)
 
 **Note:** Version bump only for package @spinnaker/titus
