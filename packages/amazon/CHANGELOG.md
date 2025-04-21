@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.15.0](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.14.5...@spinnaker/amazon@0.15.0) (2025-04-21)
+
+
+### Bug Fixes
+
+* **aws:** Fix IPv6 addresses being incorrectly associated when cloning server groups that have launch templates enabled ([#6979](https://github.com/spinnaker/deck/issues/6979)) ([#10142](https://github.com/spinnaker/deck/issues/10142)) ([22818c6](https://github.com/spinnaker/deck/commit/22818c637072ff6b8f17ff8407513c114f0bec8f))
+* **aws:** Fix userData getting lost when cloning an AWS server group that uses launch templates ([#6771](https://github.com/spinnaker/deck/issues/6771)) ([#10132](https://github.com/spinnaker/deck/issues/10132)) ([d5a8ea3](https://github.com/spinnaker/deck/commit/d5a8ea320dbb7cf4827a26a2af7197f07070a604))
+
+
+### Features
+
+* **amazon:** support ALBRequestCountPerTarget scaling policies ([#10160](https://github.com/spinnaker/deck/issues/10160)) ([c6b3c0c](https://github.com/spinnaker/deck/commit/c6b3c0c5e7459ab4cbcfed78c89447378a10eefb))
+
+
+
+
+
 ## [0.14.5](https://github.com/spinnaker/deck/compare/@spinnaker/amazon@0.14.4...@spinnaker/amazon@0.14.5) (2024-06-10)
 
 
