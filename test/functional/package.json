@@ -6,14 +6,22 @@
   "scripts:comment": "These scripts expect that Deck is built ('yarn build' from the root package)",
   "scripts": {
     "build": "cd ../../ && npm run build",
-    "start": "cypress-runner open --nospa --path ../../build/webpack",
-    "test": "cypress-runner run --nospa --path ../../build/webpack",
-    "open": "npm run start"
+    "preview": "vite preview",
+    "cypress:run": "cypress run",
+    "cypress:open": "cypress open",
+    "open": "concurrently yarn:preview yarn:cypress:open",
+    "test": "start-server-and-test preview http://localhost:5173 cypress:run"
   },
   "keywords": [],
   "author": "",
   "license": "Apache 2.0",
   "devDependencies": {
-    "@uirouter/cypress-runner": "^1.1.0"
+    "@cypress/code-coverage": "^3.14.0",
+    "@types/express": "^5.0.1",
+    "concurrently": "^9.1.2",
+    "cypress": "^14.3.2",
+    "start-server-and-test": "^2.0.11",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.2"
   }
 }
