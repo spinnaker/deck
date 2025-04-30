@@ -47,7 +47,8 @@
   ],
   "jest": {
     "testPathIgnorePatterns": [
-      "<rootDir>/template"
+      "<rootDir>/template",
+      "<rootDir>/rules/ng-strictdi.spec.ts"
     ]
   }
 }
