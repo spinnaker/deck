@@ -78,6 +78,7 @@
     "cheerio": "=1.0.0-rc.3",
     "nth-check": "2.0.1",
     "react": "^16.14.0",
+    "@types/react": "16.14.10",
     "react-dom": "^16.14.0",
     "rxjs": "6.6.7",
     "typescript": "5.0.4"
