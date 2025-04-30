@@ -45,7 +45,7 @@ describe('google: Create Server Group Modal GPU Accelerators', () => {
     });
 
     cy.get('v2-wizard-page[key=zones]').within(() => {
-      cy.get('div.form-group:contains("Zone") select').select('us-east1-c', { force: true });
+      cy.get('div.form-group:contains("Zone") select').select('us-east1-c');
     });
 
     cy.contains('ul.steps-indicator li a', 'Advanced Settings').click();
