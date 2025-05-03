@@ -18,7 +18,7 @@
   "dependencies": {
     "@spinnaker/core": "^0.29.1",
     "@uirouter/angularjs": "1.0.26",
-    "angular": "1.6.10",
+    "angular": "1.8.3",
     "angular-ui-bootstrap": "2.5.0",
     "lodash": "4.17.21",
     "react": "16.14.0",
@@ -28,7 +28,7 @@
   "devDependencies": {
     "@spinnaker/eslint-plugin": "^3.0.2",
     "@spinnaker/scripts": "^0.4.0",
-    "@types/angular": "1.6.26",
+    "@types/angular": "1.8.9",
     "@types/angular-ui-bootstrap": "0.13.41",
     "@types/lodash": "4.14.64",
     "@types/node": "7.0.5",
