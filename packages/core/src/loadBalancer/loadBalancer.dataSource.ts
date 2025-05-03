@@ -16,7 +16,7 @@ module(LOAD_BALANCER_DATA_SOURCE, [LOAD_BALANCER_READ_SERVICE]).run([
   'loadBalancerReader',
   ($q: IQService, loadBalancerReader: LoadBalancerReader) => {
     const loadLoadBalancers = (application: Application) => {
-      return loadBalancerReader.loadLoadBalancers(application.name);
+      return loadBalancerReader.loadLoadBalancers(application.name,application.activeState);
     };
 
     const addLoadBalancers = (_application: Application, loadBalancers: ILoadBalancer[]) => {
