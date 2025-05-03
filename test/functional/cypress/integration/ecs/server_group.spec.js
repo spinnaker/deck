@@ -24,6 +24,7 @@ describe('amazon ecs: ECSApp Server Group', () => {
       '/applications/ecsapp/serverGroups/**/aws-prod-ecsdemo-v000?includeDetails=false',
       'fixture:ecs/clusters/serverGroup.ecsdemo-v000.json',
     );
+    cy.route('/applications/ecsapp/functions', []);
   });
 
   it('configure a new server group with artifacts', () => {

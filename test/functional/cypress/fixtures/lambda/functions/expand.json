@@ -1,0 +1,14 @@
+{
+  "name": "lambdait",
+  "attributes": {
+    "name": "lambdait",
+    "email": "cypress@test.com",
+    "updateTs": "1631113788000",
+    "lastModifiedBy": "anonymous",
+    "cloudProviders": "aws",
+    "trafficGuards": [],
+    "instancePort": 80,
+    "user": "[anonymous]"
+  },
+  "clusters": {}
+}
