@@ -3,6 +3,7 @@ import { set } from 'lodash';
 import React, { useEffect, useState } from 'react';
 
 import type { Application } from '../../application/application.model';
+import { SETTINGS } from '../../config';
 import type { IExecution, IPipeline } from '../../domain';
 import { Execution } from '../executions/execution/Execution';
 import { ManualExecutionModal } from '../manualExecution';
@@ -30,11 +31,17 @@ export interface ISingleExecutionRouterStateChange extends IStateChange {
   toParams: ISingleExecutionStateParams;
 }
 
-export function getAndTransformExecution(id: string, app: Application) {
-  return ReactInjector.executionService.getExecution(id, app.pipelineConfigs?.data).then((execution) => {
-    ExecutionsTransformer.transformExecution(app, execution);
-    return execution;
-  });
+export async function getAndTransformExecution(id: string, app: Application) {
+  const execution = await ReactInjector.executionService.getExecution(id, app.pipelineConfigs?.data);
+  ExecutionsTransformer.transformExecution(app, execution);
+
+  // Check if the execution has a trigger with a parentExecutionId
+  if (SETTINGS.feature.pipelineRefEnabled && execution?.trigger?.parentExecutionId) {
+    // Recursively get the parent execution and append it
+    const parentExecution = await getAndTransformExecution(execution.trigger.parentExecutionId, app);
+    execution.trigger.parentExecution = parentExecution;
+  }
+  return execution;
 }
 
 // 3 generations is probably the most reasonable window to render?
