@@ -197,6 +197,14 @@ class KubernetesServerGroupDetailsController implements IController {
   private configureEntityTagTargets(): IOwnerOption[] {
     return ClusterTargetBuilder.buildClusterTargets(this.serverGroup);
   }
+
+  public canEditServerGroup(): boolean {
+    return !this.serverGroup.name.endsWith('-pr');
+  }
+  
+  public canDeleteServerGroup(): boolean {
+    return !this.serverGroup.name.endsWith('-pr');
+  }
 }
 
 export const KUBERNETES_SERVER_GROUP_DETAILS_CTRL = 'spinnaker.kubernetes.serverGroup.details.controller';

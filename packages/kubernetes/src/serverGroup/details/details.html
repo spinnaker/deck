@@ -43,9 +43,13 @@
           {{ctrl.serverGroup.kind | robotToHuman}} Actions <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+          <li ng-if="ctrl.canEditServerGroup()">
+            <a href ng-click="ctrl.editServerGroup()"> Edit </a>
+          </li>
           <li
-            uib-tooltip="Editing a server group through Spinnaker is disabled due to THD policy."
+            ng-if="!ctrl.canEditServerGroup()"
             class="disabled"
+            uib-tooltip="Editing a server group is restricted."
           >
             <a href> Edit </a>
           </li>
@@ -58,9 +62,13 @@
           <li ng-if="ctrl.canDisable()">
             <a href ng-click="ctrl.disableServerGroup()"> Disable </a>
           </li>
+          <li ng-if="ctrl.canDeleteServerGroup()">
+            <a href ng-click="ctrl.deleteServerGroup()"> Delete </a>
+          </li>
           <li
-            uib-tooltip="Deleting a server group through Spinnaker is disabled due to THD policy."
+            ng-if="!ctrl.canDeleteServerGroup()"
             class="disabled"
+            uib-tooltip="Deleting a server group is restricted."
           >
             <a href> Delete </a>
           </li>

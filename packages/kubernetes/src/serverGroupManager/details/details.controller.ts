@@ -181,6 +181,14 @@ class KubernetesServerGroupManagerDetailsController implements IController {
       this.$state.go('^', null, { location: 'replace' });
     }
   }
+
+  public canEditServerGroupManager(): boolean {
+    return !this.serverGroupManager.name.endsWith('-pr');
+  }
+  
+  public canDeleteServerGroupManager(): boolean {
+    return !this.serverGroupManager.name.endsWith('-pr');
+  }
 }
 
 export const KUBERNETES_SERVER_GROUP_MANAGER_DETAILS_CTRL =
